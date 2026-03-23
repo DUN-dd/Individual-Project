@@ -14,6 +14,8 @@ const SettingsMenuDeveloperSectionScript = preload("res://1.Codebase/src/scripts
 const SettingsMenuAIAnalyticsScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_analytics.gd")
 const SettingsMenuAILogControllerScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_controller.gd")
 const SettingsMenuSaveLoadScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_save_load.gd")
+const SettingsMenuDeveloperHandlersScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_developer_handlers.gd")
+const SettingsMenuTutorialHandlersScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_handlers.gd")
 const SettingsMenuAgentServerSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_agent_server_section.gd")
 const SettingsMenuTutorialSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_section.gd")
 const SettingsMenuStylesScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_styles.gd")
@@ -183,6 +185,8 @@ var _game_state: Node = null
 var _agent_server_section: SettingsMenuAgentServerSection = null
 var _tutorial_section: SettingsMenuTutorialSection = null
 var _ai_log_ctrl: SettingsMenuAILogController = null
+var _dev_ctrl: SettingsMenuDeveloperHandlers = null
+var _tutorial_ctrl: SettingsMenuTutorialHandlers = null
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -515,6 +519,13 @@ func _add_separator(parent: Control):
 	sep.modulate = Color(1, 1, 1, 0.3)
 	parent.add_child(sep)
 func _initialize_new_controls():
+	_dev_ctrl = SettingsMenuDeveloperHandlersScript.new()
+	_dev_ctrl.setup(
+		Callable(self, "_get_game_state"),
+		Callable(self, "_show_notification"),
+		Callable(self, "_play_sfx"),
+		Callable(self, "_report_info"),
+	)
 	var game_state := _get_game_state()
 	var dev_result := SettingsMenuDeveloperSectionScript.build_section(
 		tab_developer,
@@ -530,28 +541,28 @@ func _initialize_new_controls():
 		},
 		game_state,
 		{
-			"on_text_speed_selected": _on_text_speed_selected,
-			"on_screen_shake_toggled": _on_screen_shake_toggled,
-			"on_max_rounds_changed": _on_max_rounds_changed,
-			"on_force_mission_complete_toggled": _on_force_mission_complete_toggled,
-			"on_force_gloria_pressed": _on_force_gloria_pressed,
-			"on_force_trolley_pressed": _on_force_trolley_pressed,
-			"on_force_honeymoon_toggled": _on_force_honeymoon_toggled,
-			"on_reality_score_changed": _on_reality_score_changed,
-			"on_positive_energy_changed": _on_positive_energy_changed,
-			"on_entropy_level_changed": _on_entropy_level_changed,
-			"on_honeymoon_charges_changed": _on_honeymoon_charges_changed,
-			"on_mission_turn_changed": _on_mission_turn_changed,
-			"on_max_stats_pressed": _on_max_stats_pressed,
-			"on_reset_stats_pressed": _on_reset_stats_pressed,
-			"on_clear_debuffs_pressed": _on_clear_debuffs_pressed,
-			"on_add_honeymoon_pressed": _on_add_honeymoon_pressed,
-			"on_autosave_toggled": _on_autosave_toggled,
-			"on_infinite_resources_toggled": _on_infinite_resources_toggled,
-			"on_skip_dialogue_toggled": _on_skip_dialogue_toggled,
-			"on_god_mode_toggled": _on_god_mode_toggled,
-			"on_fsm_jump_to_day_pressed": _on_fsm_jump_to_day_pressed,
-			"on_fsm_reset_pressed": _on_fsm_reset_pressed,
+			"on_text_speed_selected":          _on_text_speed_selected,
+			"on_screen_shake_toggled":         _on_screen_shake_toggled,
+			"on_max_rounds_changed":           _on_max_rounds_changed,
+			"on_force_mission_complete_toggled": Callable(_dev_ctrl, "_on_force_mission_complete_toggled"),
+			"on_force_gloria_pressed":         _on_force_gloria_pressed,
+			"on_force_trolley_pressed":        _on_force_trolley_pressed,
+			"on_force_honeymoon_toggled":      _on_force_honeymoon_toggled,
+			"on_reality_score_changed":        Callable(_dev_ctrl, "_on_reality_score_changed"),
+			"on_positive_energy_changed":      Callable(_dev_ctrl, "_on_positive_energy_changed"),
+			"on_entropy_level_changed":        Callable(_dev_ctrl, "_on_entropy_level_changed"),
+			"on_honeymoon_charges_changed":    Callable(_dev_ctrl, "_on_honeymoon_charges_changed"),
+			"on_mission_turn_changed":         Callable(_dev_ctrl, "_on_mission_turn_changed"),
+			"on_max_stats_pressed":            Callable(_dev_ctrl, "_on_max_stats_pressed"),
+			"on_reset_stats_pressed":          Callable(_dev_ctrl, "_on_reset_stats_pressed"),
+			"on_clear_debuffs_pressed":        Callable(_dev_ctrl, "_on_clear_debuffs_pressed"),
+			"on_add_honeymoon_pressed":        Callable(_dev_ctrl, "_on_add_honeymoon_pressed"),
+			"on_autosave_toggled":             Callable(_dev_ctrl, "_on_autosave_toggled"),
+			"on_infinite_resources_toggled":   Callable(_dev_ctrl, "_on_infinite_resources_toggled"),
+			"on_skip_dialogue_toggled":        Callable(_dev_ctrl, "_on_skip_dialogue_toggled"),
+			"on_god_mode_toggled":             Callable(_dev_ctrl, "_on_god_mode_toggled"),
+			"on_fsm_jump_to_day_pressed":      Callable(_dev_ctrl, "_on_fsm_jump_to_day_pressed"),
+			"on_fsm_reset_pressed":            Callable(_dev_ctrl, "_on_fsm_reset_pressed"),
 		},
 		{
 			"fsm_guide": FSM_IMG_GUIDE,
@@ -583,6 +594,7 @@ func _initialize_new_controls():
 	infinite_resources_toggle = dev_result.get("infinite_resources_toggle")
 	skip_dialogue_toggle = dev_result.get("skip_dialogue_toggle")
 	god_mode_toggle = dev_result.get("god_mode_toggle")
+	_dev_ctrl.set_node_refs(dev_result)
 	_initialize_agent_server_controls()
 	_initialize_tutorial_controls()
 func _initialize_agent_server_controls():
@@ -609,21 +621,24 @@ func _initialize_agent_server_controls():
 	agent_server_help_button = controls.get("help_button", null) as Button
 	_update_agent_server_status()
 func _initialize_tutorial_controls():
+	_tutorial_ctrl = SettingsMenuTutorialHandlersScript.new()
+	_tutorial_ctrl.setup(Callable(self, "_play_sfx"), Callable(self, "_show_notification"))
 	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
 	if _tutorial_section == null:
 		_tutorial_section = SettingsMenuTutorialSectionScript.new()
 	var controls: Dictionary = _tutorial_section.build_section(
 		tab_tutorial,
 		tutorial_system,
-		Callable(self, "_on_tutorial_enabled_toggled"),
-		Callable(self, "_on_reset_tutorials_pressed"),
-		Callable(self, "_on_trigger_tutorial"),
+		Callable(_tutorial_ctrl, "_on_tutorial_enabled_toggled"),
+		Callable(_tutorial_ctrl, "_on_reset_tutorials_pressed"),
+		Callable(_tutorial_ctrl, "_on_trigger_tutorial"),
 	)
 	tutorial_enabled_toggle = controls.get("tutorial_enabled_toggle", null) as CheckBox
 	tutorial_progress_label = controls.get("tutorial_progress_label", null) as Label
-	reset_tutorials_button = controls.get("reset_tutorials_button", null) as Button
+	reset_tutorials_button  = controls.get("reset_tutorials_button",  null) as Button
 	tutorial_list_container = controls.get("tutorial_list_container", null) as VBoxContainer
-	_update_tutorial_progress_display()
+	_tutorial_ctrl.set_node_refs(tutorial_progress_label, tutorial_list_container)
+	_tutorial_ctrl.update_progress_display()
 func _on_text_speed_selected(index: int):
 	match index:
 		0: text_speed = 0.0
@@ -638,10 +653,6 @@ func _on_max_rounds_changed(value: float):
 	var game_state := _get_game_state()
 	if game_state:
 		game_state.settings["max_rounds_per_mission"] = max_rounds_per_mission
-func _on_force_mission_complete_toggled(toggled: bool):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.debug_force_mission_complete = toggled
 func _on_force_gloria_pressed():
 	_play_sfx("menu_click")
 	var flow = _get_story_flow_controller()
@@ -683,96 +694,6 @@ func _close_menu():
 		queue_free()
 	else:
 		_on_back_button_pressed()
-func _on_reality_score_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = int(value)
-func _on_positive_energy_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.positive_energy = int(value)
-func _on_entropy_level_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.entropy_level = int(value)
-func _on_honeymoon_charges_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.honeymoon_charges = int(value)
-func _on_mission_turn_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.mission_turn_count = int(value)
-func _on_max_stats_pressed():
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_max_stats(_get_game_state(), {
-		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
-		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
-	}, Callable(self, "_show_notification"))
-func _on_reset_stats_pressed():
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_reset_stats(_get_game_state(), {
-		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
-		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
-		"mission_turn": mission_turn_spinbox,
-	}, Callable(self, "_show_notification"))
-func _on_clear_debuffs_pressed():
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		if game_state.has_method("clear_all_debuffs") and game_state.clear_all_debuffs():
-			_show_notification("All debuffs cleared!", true)
-		else:
-			_show_notification("Debuff system not available", false)
-	else:
-		_show_notification("GameState not available", false)
-func _on_add_honeymoon_pressed():
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.honeymoon_charges = min(10, game_state.honeymoon_charges + 5)
-		honeymoon_charges_spinbox.value = game_state.honeymoon_charges
-		_show_notification("Added 5 honeymoon charges!", true)
-func _on_autosave_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.autosave_enabled = toggled
-		var msg = "Autosave enabled" if toggled else "Autosave disabled"
-		_show_notification(msg, true)
-func _on_infinite_resources_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.set_metadata("debug_infinite_resources", toggled)
-		var msg = "Infinite resources enabled" if toggled else "Infinite resources disabled"
-		_show_notification(msg, true)
-func _on_skip_dialogue_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.settings["auto_advance_enabled"] = toggled
-		var msg = "Auto-advance dialogue enabled" if toggled else "Auto-advance dialogue disabled"
-		_show_notification(msg, true)
-func _on_god_mode_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.set_metadata("debug_god_mode", toggled)
-		var msg = "God mode enabled" if toggled else "God mode disabled"
-		_show_notification(msg, true)
-func _update_fsm_status_label(label: Label):
-	SettingsMenuDeveloperSectionScript.update_fsm_status_label(label, _get_game_state())
-func _on_fsm_jump_to_day_pressed(target_day_id: int, status_label: Label):
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_fsm_jump_to_day(
-		target_day_id, status_label, _get_game_state(),
-		Callable(self, "_show_notification"), Callable(self, "_report_info"))
-func _on_fsm_reset_pressed(status_label: Label):
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_fsm_reset(
-		status_label, _get_game_state(),
-		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _show_notification(message: String, success: bool = true):
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
 	if notifier:
@@ -782,53 +703,6 @@ func _show_notification(message: String, success: bool = true):
 			notifier.show_warning(message)
 	else:
 		_debug_log("[Settings] " + message)
-func _on_tutorial_enabled_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.set_tutorial_enabled(toggled)
-		var msg = "Tutorials enabled" if toggled else "Tutorials disabled"
-		_show_notification(msg, true)
-func _on_reset_tutorials_pressed():
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.reset_tutorials()
-		_show_notification("All tutorials have been reset!", true)
-		_update_tutorial_progress_display()
-		_update_tutorial_status_labels()
-func _on_trigger_tutorial(step_id: String):
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.trigger_tutorial(step_id)
-		_show_notification("Triggered: " + step_id.replace("_", " ").capitalize(), true)
-func _update_tutorial_progress_display():
-	if not tutorial_progress_label:
-		return
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		var progress = tutorial_system.get_tutorial_progress()
-		var completed_count = tutorial_system.get_completed_tutorials().size()
-		var total_count = tutorial_system.get_all_tutorial_steps().size()
-		tutorial_progress_label.text = "Progress: %d/%d (%.1f%%)" % [completed_count, total_count, progress]
-func _update_tutorial_status_labels():
-	if not tutorial_list_container:
-		return
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if not tutorial_system:
-		return
-	for child in tutorial_list_container.get_children():
-		if child is PanelContainer:
-			var status_label = child.find_child("Status_*", true, false)
-			if status_label and status_label is Label:
-				var step_id = status_label.name.replace("Status_", "")
-				if tutorial_system.is_tutorial_completed(step_id):
-					status_label.text = "✓ Completed"
-					status_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-				else:
-					status_label.text = "Not Seen"
-					status_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 func _enforce_fullscreen_layout() -> void:
 	if menu_container:
 		menu_container.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -905,7 +779,8 @@ func update_ui_text():
 		"delete_logs_dialog": delete_logs_dialog,
 		"fullscreen_option": fullscreen_option,
 	}, Callable(self, "_tr"), voice_capture_active)
-	_update_tutorial_progress_display()
+	if _tutorial_ctrl:
+		_tutorial_ctrl.update_progress_display()
 	_refresh_display_mode_availability()
 	_update_voice_availability_label()
 func _set_button_pressed_safely(button: BaseButton, pressed: bool) -> void:
