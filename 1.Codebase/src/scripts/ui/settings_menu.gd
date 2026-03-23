@@ -16,6 +16,9 @@ const SettingsMenuAgentServerSectionScript = preload("res://1.Codebase/src/scrip
 const SettingsMenuTutorialSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_section.gd")
 const SettingsMenuStylesScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_styles.gd")
 const SettingsMenuAILogSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_section.gd")
+const SettingsMenuAILogRendererScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_renderer.gd")
+const SettingsMenuAILogExportScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_export.gd")
+const SettingsMenuUITextScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ui_text.gd")
 const ICON_CHECK = preload("res://1.Codebase/src/assets/ui/icon_check.svg")
 const ICON_BACK = preload("res://1.Codebase/src/assets/ui/icon_back.svg")
 const ICON_DELETE = preload("res://1.Codebase/src/assets/ui/icon_delete.svg")
@@ -560,93 +563,22 @@ func _on_ai_log_refresh_pressed() -> void:
 	else:
 		_refresh_ai_log_table()
 func _on_ai_export_pressed() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
 	var metrics: Dictionary = {}
 	if ai_manager and ai_manager.has_method("get_ai_metrics"):
 		metrics = ai_manager.get_ai_metrics()
-	var ts := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var path := "user://ai_call_log_%s.json" % ts
-	var export_data := {
-		"exported_at": Time.get_datetime_string_from_system(),
-		"summary": metrics,
-		"call_log": log_entries,
-	}
-	var file := FileAccess.open(path, FileAccess.WRITE)
-	if file:
-		file.store_string(JSON.stringify(export_data, "\t"))
-		file.close()
-		var abs_path := ProjectSettings.globalize_path(path)
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			var msg = _tr_ai("SETTINGS_AI_LOG_EXPORT_JSON_SUCCESS", "Exported %d records to:\n%s") % [log_entries.size(), abs_path]
-			notifier.show_success(msg)
-	else:
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			var msg = _tr_ai("SETTINGS_AI_LOG_EXPORT_JSON_FAILED", "Export failed: could not write file.")
-			notifier.show_warning(msg)
+	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
+	SettingsMenuAILogExportScript.export_json(log_entries, metrics, Callable(self, "_tr_ai"), notifier)
 func _on_ai_export_csv_pressed() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	var analytics := _compute_ai_analytics(log_entries)
-	var ts := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var path := "user://ai_usage_charts_%s.csv" % ts
-	var lines: PackedStringArray = []
-	lines.append("section,timestamp,provider,model,status,input_tokens,output_tokens,response_time_sec,mode,purpose,error")
-	for entry in log_entries:
-		var status_text := "ERR"
-		if bool(entry.get("success", false)):
-			status_text = str(int(entry.get("status_code", 200)))
-		elif str(entry.get("mode", "")) in ["mock", "mock_fallback"]:
-			status_text = "MOCK"
-		lines.append(_csv_row([
-			"call_log",
-			str(entry.get("timestamp", "")),
-			str(entry.get("provider", "")),
-			str(entry.get("model", "")),
-			status_text,
-			str(int(entry.get("input_tokens", 0))),
-			str(int(entry.get("output_tokens", 0))),
-			"%.3f" % float(entry.get("response_time_sec", 0.0)),
-			str(entry.get("mode", "")),
-			str(entry.get("purpose", "")),
-			str(entry.get("error", "")),
-		]))
-	lines.append("")
-	lines.append("section,metric,label,value")
-	_append_metric_series(lines, "provider_success_rate", analytics.get("provider_labels", []), analytics.get("provider_success_rates", []))
-	_append_metric_series(lines, "provider_total_tokens", analytics.get("provider_labels", []), analytics.get("provider_tokens", []))
-	_append_metric_series(lines, "provider_avg_response_seconds", analytics.get("provider_labels", []), analytics.get("provider_response_times", []))
-	_append_metric_series(lines, "provider_input_tokens", analytics.get("provider_labels", []), analytics.get("provider_input_tokens", []))
-	_append_metric_series(lines, "provider_output_tokens", analytics.get("provider_labels", []), analytics.get("provider_output_tokens", []))
-	_append_metric_series(lines, "provider_tps", analytics.get("provider_labels", []), analytics.get("provider_tps", []))
-	_append_metric_series(lines, "mode_distribution", analytics.get("mode_labels", []), analytics.get("mode_counts", []))
-	_append_metric_series(lines, "model_calls", analytics.get("model_labels", []), analytics.get("model_counts", []))
-	_append_metric_series(lines, "hourly_calls", analytics.get("hourly_labels", []), analytics.get("hourly_calls", []))
-	_append_metric_series(lines, "hourly_tokens", analytics.get("hourly_labels", []), analytics.get("hourly_tokens", []))
-	_append_metric_series(lines, "hourly_successes", analytics.get("hourly_labels", []), analytics.get("hourly_successes", []))
-	_append_metric_series(lines, "cumulative_tokens", analytics.get("cumulative_labels", []), analytics.get("cumulative_tokens", []))
-	lines.append(_csv_row(["summary", "total_calls", "", str(int(analytics.get("total", 0)))]))
-	lines.append(_csv_row(["summary", "success_rate_percent", "", "%.2f" % float(analytics.get("success_rate", 0.0))]))
-	lines.append(_csv_row(["summary", "total_tokens", "", str(int(analytics.get("total_tokens", 0)))]))
-	lines.append(_csv_row(["summary", "avg_response_seconds", "", "%.3f" % float(analytics.get("avg_response_time", 0.0))]))
-	var file := FileAccess.open(path, FileAccess.WRITE)
-	if file:
-		file.store_string("\n".join(lines))
-		file.close()
-		var abs_path := ProjectSettings.globalize_path(path)
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			notifier.show_success(_tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_SUCCESS", "CSV exported:\n%s") % abs_path)
-	else:
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			notifier.show_warning(_tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_FAILED", "CSV export failed: could not write file."))
+	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
+	SettingsMenuAILogExportScript.export_csv(log_entries, Callable(self, "_tr_ai"), notifier)
 func _append_metric_series(lines: PackedStringArray, metric: String, labels: Array, values: Array) -> void:
 	SettingsMenuAIAnalyticsScript.append_metric_series(lines, metric, labels, values)
 func _csv_row(cells: Array) -> String:
@@ -683,201 +615,33 @@ func _on_ai_log_clear_pressed() -> void:
 	else:
 		_refresh_ai_log_table()
 func _refresh_analytics_view() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	var a := _compute_ai_analytics(log_entries)
-	var kpi_vals := [
-		str(a.get("total", 0)),
-		"%.1f%%" % float(a.get("success_rate", 0.0)),
-		_format_token_count(int(a.get("total_tokens", 0))),
-		"%.2fs" % float(a.get("avg_response_time", 0.0)),
-	]
-	for i in range(min(_ai_kpi_labels.size(), kpi_vals.size())):
-		if is_instance_valid(_ai_kpi_labels[i]):
-			(_ai_kpi_labels[i] as Label).text = kpi_vals[i]
-	if is_instance_valid(_chart_success_by_provider):
-		(_chart_success_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR,
-			"Success Rate by Provider (%)",
-			a.get("provider_labels", []),
-			a.get("provider_success_rates", []),
-			[Color(0.3, 0.9, 0.4), Color(0.35, 0.7, 1.0), Color(1.0, 0.7, 0.3),
-			 Color(0.9, 0.5, 1.0), Color(0.4, 0.9, 0.9)],
-		)
-	if is_instance_valid(_chart_mode_pie):
-		var mode_colors: Array[Color] = [
-			Color(0.3, 0.85, 0.4), Color(0.8, 0.9, 0.3),
-			Color(1.0, 0.5, 0.3), Color(0.65, 0.4, 1.0),
-		]
-		(_chart_mode_pie as AIChartCanvas).setup(
-			AIChartCanvas.Type.PIE, "Call Mode Distribution",
-			a.get("mode_labels", []), a.get("mode_counts", []), mode_colors,
-		)
-	if is_instance_valid(_chart_hourly_requests):
-		(_chart_hourly_requests as AIChartCanvas).setup(
-			AIChartCanvas.Type.VERTICAL_BAR, "Requests / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_calls", []),
-			[Color(0.35, 0.7, 1.0)],
-		)
-	if is_instance_valid(_chart_success_per_hour):
-		(_chart_success_per_hour as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Success Count / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_successes", []),
-			[Color(0.3, 0.9, 0.4)],
-		)
-	if is_instance_valid(_chart_calls_by_model):
-		(_chart_calls_by_model as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Calls by Model",
-			a.get("model_labels", []), a.get("model_counts", []),
-			[Color(0.6, 0.82, 1.0)],
-		)
-	if is_instance_valid(_chart_tokens_by_provider):
-		(_chart_tokens_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Total Tokens by Provider",
-			a.get("provider_labels", []), a.get("provider_tokens", []),
-			[Color(0.55, 0.82, 1.0)],
-		)
-	if is_instance_valid(_chart_response_by_provider):
-		(_chart_response_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Avg Response Time / Provider (s)",
-			a.get("provider_labels", []), a.get("provider_response_times", []),
-			[Color(1.0, 0.72, 0.28)],
-		)
-	if is_instance_valid(_chart_input_output_tokens):
-		var stacked_labels: Array = a.get("provider_labels", []).duplicate()
-		var stacked_vals: Array = []
-		var in_vals: Array = a.get("provider_input_tokens", [])
-		var out_vals: Array = a.get("provider_output_tokens", [])
-		for idx in range(stacked_labels.size()):
-			stacked_labels.insert(idx * 2 + 1, stacked_labels[idx * 2] + " out")
-			stacked_labels[idx * 2] = stacked_labels[idx * 2] + " in"
-		for idx in range(in_vals.size()):
-			stacked_vals.append(float(in_vals[idx]))
-			stacked_vals.append(float(out_vals[idx]))
-		(_chart_input_output_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.VERTICAL_BAR, "Input vs Output Tokens by Provider",
-			stacked_labels, stacked_vals,
-			[Color(0.35, 0.70, 1.0), Color(0.35, 0.95, 0.60)],
-		)
-	if is_instance_valid(_chart_tps_by_provider):
-		(_chart_tps_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Avg TPS by Provider",
-			a.get("provider_labels", []), a.get("provider_tps", []),
-			[Color(0.78, 0.48, 1.0)],
-		)
-	if is_instance_valid(_chart_hourly_tokens):
-		(_chart_hourly_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Token Usage / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_tokens", []), [],
-		)
-	if is_instance_valid(_chart_cumulative_tokens):
-		(_chart_cumulative_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Cumulative Total Tokens (session, newest last)",
-			a.get("cumulative_labels", []), a.get("cumulative_tokens", []),
-			[Color(1.0, 0.82, 0.35)],
-		)
+	SettingsMenuAILogRendererScript.refresh_analytics({
+		"success_by_provider": _chart_success_by_provider,
+		"mode_pie": _chart_mode_pie,
+		"hourly_requests": _chart_hourly_requests,
+		"success_per_hour": _chart_success_per_hour,
+		"calls_by_model": _chart_calls_by_model,
+		"tokens_by_provider": _chart_tokens_by_provider,
+		"response_by_provider": _chart_response_by_provider,
+		"input_output_tokens": _chart_input_output_tokens,
+		"tps_by_provider": _chart_tps_by_provider,
+		"hourly_tokens": _chart_hourly_tokens,
+		"cumulative_tokens": _chart_cumulative_tokens,
+	}, _ai_kpi_labels, log_entries)
 func _compute_ai_analytics(log_entries: Array) -> Dictionary:
 	return SettingsMenuAIAnalyticsScript.compute_analytics(log_entries)
 func _format_token_count(n: int) -> String:
 	return SettingsMenuAIAnalyticsScript.format_token_count(n)
 func _refresh_ai_log_table() -> void:
-	if not _ai_log_rows_container:
-		return
-	for child in _ai_log_rows_container.get_children():
-		child.queue_free()
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	if log_entries.is_empty():
-		var empty_lbl = Label.new()
-		empty_lbl.name = "AILogEmptyLabel"
-		empty_lbl.text = _tr_ai("SETTINGS_AI_LOG_EMPTY", "No AI calls recorded yet.")
-		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-		empty_lbl.add_theme_font_size_override("font_size", 14)
-		_ai_log_rows_container.add_child(empty_lbl)
-		return
-	var col_widths := [170, 90, 160, 70, 80, 80, 75, 90, 100]
-	var reversed_entries: Array = log_entries.duplicate()
-	reversed_entries.reverse()
-	for row_idx in range(reversed_entries.size()):
-		var entry: Dictionary = reversed_entries[row_idx]
-		var row_panel = PanelContainer.new()
-		row_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var row_style = StyleBoxFlat.new()
-		var success: bool = bool(entry.get("success", false))
-		var mode: String = str(entry.get("mode", ""))
-		if not success:
-			row_style.bg_color = Color(0.35, 0.12, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.3, 0.1, 0.1, 0.85)
-		elif mode == "mock" or mode == "mock_fallback":
-			row_style.bg_color = Color(0.18, 0.22, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.15, 0.19, 0.10, 0.85)
-		else:
-			row_style.bg_color = Color(0.12, 0.18, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.10, 0.15, 0.10, 0.85)
-		row_panel.add_theme_stylebox_override("panel", row_style)
-		var row_margin = MarginContainer.new()
-		row_margin.add_theme_constant_override("margin_top", 4)
-		row_margin.add_theme_constant_override("margin_left", 14)
-		row_margin.add_theme_constant_override("margin_right", 14)
-		row_margin.add_theme_constant_override("margin_bottom", 4)
-		row_panel.add_child(row_margin)
-		var row_hbox = HBoxContainer.new()
-		row_hbox.add_theme_constant_override("separation", 4)
-		row_margin.add_child(row_hbox)
-		var status_code: int = int(entry.get("status_code", 0))
-		var status_text: String = ""
-		var status_color := Color(0.9, 0.9, 0.9)
-		if mode == "mock" or mode == "mock_fallback":
-			status_text = "MOCK"
-			status_color = Color(0.8, 0.9, 0.4)
-		elif not success:
-			status_text = str(status_code) if status_code > 0 else "ERR"
-			status_color = Color(1.0, 0.4, 0.4)
-		else:
-			status_text = str(status_code) if status_code > 0 else "200"
-			status_color = Color(0.4, 1.0, 0.4)
-		var timestamp_str: String = str(entry.get("timestamp", ""))
-		if timestamp_str.length() > 19:
-			timestamp_str = timestamp_str.substr(0, 19)
-		timestamp_str = timestamp_str.replace("T", " ")
-		var cell_values: Array = [
-			timestamp_str,
-			str(entry.get("provider", "")),
-			str(entry.get("model", "")),
-			status_text,
-			str(int(entry.get("input_tokens", 0))),
-			str(int(entry.get("output_tokens", 0))),
-			"%.2f" % float(entry.get("response_time_sec", 0.0)),
-			str(entry.get("mode", "")),
-			str(entry.get("purpose", "")),
-		]
-		var cell_colors: Array = [
-			Color(0.85, 0.85, 0.85),
-			Color(0.7, 0.85, 1.0),
-			Color(0.85, 0.85, 1.0),
-			status_color,
-			Color(0.8, 1.0, 0.8),
-			Color(0.8, 1.0, 0.8),
-			Color(1.0, 0.9, 0.6),
-			Color(0.9, 0.8, 1.0),
-			Color(0.85, 0.85, 0.85),
-		]
-		for i in range(cell_values.size()):
-			var cell_lbl = Label.new()
-			cell_lbl.text = str(cell_values[i])
-			cell_lbl.add_theme_font_size_override("font_size", 11)
-			cell_lbl.add_theme_color_override("font_color", cell_colors[i])
-			cell_lbl.custom_minimum_size = Vector2(col_widths[i], 0)
-			cell_lbl.clip_text = true
-			cell_lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
-			row_hbox.add_child(cell_lbl)
-		if not success:
-			var err_str: String = str(entry.get("error", ""))
-			if not err_str.is_empty():
-				row_panel.tooltip_text = "Error: " + err_str
-		_ai_log_rows_container.add_child(row_panel)
+	SettingsMenuAILogRendererScript.refresh_table(_ai_log_rows_container, log_entries, Callable(self, "_tr_ai"))
 func _move_control(node: Control, new_parent: Control):
 	if node and node.get_parent():
 		node.get_parent().remove_child(node)
@@ -1307,107 +1071,63 @@ func update_ui_text():
 		var ai_tab := tab_container.get_tab_count() - 1
 		if ai_tab >= 0:
 			_normalize_ai_log_language_texts(tab_container.get_child(ai_tab))
-	if tab_container:
-		tab_container.set_tab_title(0, _tr("SETTINGS_GAMEPLAY"))
-		tab_container.set_tab_title(1, _tr("SETTINGS_DISPLAY"))
-		tab_container.set_tab_title(2, _tr("SETTINGS_AUDIO_2"))
-		tab_container.set_tab_title(3, _tr("SETTINGS_VOICE"))
-		tab_container.set_tab_title(4, _tr("SETTINGS_TUTORIAL"))
-		tab_container.set_tab_title(5, _tr("SETTINGS_DEVELOPER"))
-		tab_container.set_tab_title(6, _tr("SETTINGS_AI_LOG"))
-	title_label.text = _tr("SETTINGS_TITLE")
-	text_speed_label.text = _tr("SETTINGS_TEXT_SPEED_LABEL")
-	text_speed_option.set_item_text(0, _tr("SETTINGS_TEXT_SPEED_INSTANT"))
-	text_speed_option.set_item_text(1, _tr("SETTINGS_TEXT_SPEED_FAST"))
-	text_speed_option.set_item_text(2, _tr("SETTINGS_TEXT_SPEED_NORMAL"))
-	text_speed_option.set_item_text(3, _tr("SETTINGS_TEXT_SPEED_SLOW"))
-	screen_shake_check.text = _tr("SETTINGS_SCREEN_SHAKE")
-	if max_rounds_label:
-		max_rounds_label.text = _tr("SETTINGS_MAX_ROUNDS_LABEL")
-	if max_rounds_spinbox:
-		max_rounds_spinbox.tooltip_text = _tr("SETTINGS_MAX_ROUNDS_HINT")
-	touch_controls_checkbox.text = _tr("SETTINGS_TOUCH_CONTROLS")
-	if force_mission_complete_check:
-		force_mission_complete_check.text = _tr("SETTINGS_FORCE_MISSION_END")
-		force_mission_complete_check.tooltip_text = tr("SETTINGS_DEV_FORCE_COMPLETE_HINT")
-	reality_score_label.text = _tr("SETTINGS_REALITY_SCORE")
-	positive_energy_label.text = _tr("SETTINGS_POSITIVE_ENERGY")
-	entropy_level_label.text = _tr("SETTINGS_ENTROPY_LEVEL")
-	honeymoon_charges_label.text = _tr("SETTINGS_HONEYMOON_CHARGES")
-	mission_turn_label.text = _tr("SETTINGS_MISSION_TURN_COUNT")
-	if tab_developer.has_node("QuickActionsLabel"):
-		tab_developer.get_node("QuickActionsLabel").text = _tr("SETTINGS_QUICK_ACTIONS")
-	if tab_developer.has_node("TogglesLabel"):
-		tab_developer.get_node("TogglesLabel").text = _tr("SETTINGS_GAME_STATE_TOGGLES")
-	max_stats_button.text = _tr("SETTINGS_MAX_ALL_STATS")
-	reset_stats_button.text = _tr("SETTINGS_RESET_ALL_STATS")
-	clear_debuffs_button.text = _tr("SETTINGS_CLEAR_ALL_DEBUFFS")
-	add_honeymoon_button.text = _tr("SETTINGS_ADD_HONEYMOON")
-	autosave_toggle.text = _tr("SETTINGS_ENABLE_AUTOSAVE")
-	infinite_resources_toggle.text = _tr("SETTINGS_INFINITE_RESOURCES")
-	skip_dialogue_toggle.text = _tr("SETTINGS_AUTO_ADVANCE_DIALOGUE")
-	god_mode_toggle.text = _tr("SETTINGS_GOD_MODE")
-	if master_volume_hbox.has_node("MasterVolumeLabel"):
-		master_volume_hbox.get_node("MasterVolumeLabel").text = _tr("SETTINGS_MASTER_VOLUME")
-	if music_volume_hbox.has_node("MusicVolumeLabel"):
-		music_volume_hbox.get_node("MusicVolumeLabel").text = _tr("SETTINGS_MUSIC_VOLUME")
-	if sfx_volume_hbox.has_node("SFXVolumeLabel"):
-		sfx_volume_hbox.get_node("SFXVolumeLabel").text = _tr("SETTINGS_SFX_VOLUME")
-	if gloria_voice_check:
-		gloria_voice_check.text = _tr("SETTINGS_GLORIA_VOICE")
-	mute_check_box.text = _tr("SETTINGS_MUTE_ALL")
-	voice_description.text = _tr("SETTINGS_VOICE_DESCRIPTION")
-	voice_enabled_check.text = _tr("SETTINGS_VOICE_ENABLED")
-	voice_output_check.text = _tr("SETTINGS_VOICE_OUTPUT")
-	voice_input_check.text = _tr("SETTINGS_VOICE_INPUT")
-	voice_choice_label.text = _tr("SETTINGS_VOICE_PRESET")
-	voice_volume_label.text = _tr("SETTINGS_VOICE_VOLUME")
-	voice_input_mode_label.text = _tr("SETTINGS_MIC_MODE")
-	voice_proactive_check.text = _tr("SETTINGS_PROACTIVE_LISTENING")
-	if not voice_capture_active:
-		voice_capture_button.text = _tr("SETTINGS_CAPTURE_MIC_TEST")
-	voice_preview_button.text = _tr("SETTINGS_PLAY_SAMPLE")
-	if not voice_status_label.text:
-		voice_status_label.text = _tr("SETTINGS_VOICE_IDLE")
-	resolution_label.text = _tr("SETTINGS_RESOLUTION")
-	fullscreen_label.text = _tr("SETTINGS_DISPLAY_MODE")
-	language_label.text = _tr("SETTINGS_LANGUAGE")
-	font_size_label.text = _tr("SETTINGS_FONT_SIZE")
-	english_font_label.text = _tr("SETTINGS_FONT_ENGLISH")
-	chinese_font_label.text = _tr("SETTINGS_FONT_CHINESE")
-	if tab_tutorial:
-		if tab_tutorial.has_node("TutorialInfoPanel"):
-			var info_panel = tab_tutorial.get_node("TutorialInfoPanel")
-			if info_panel.has_node("TutorialInfoTitle"):
-				info_panel.find_child("TutorialInfoTitle", true, false).text = _tr("SETTINGS_ABOUT_TUTORIALS")
-			if info_panel.has_node("TutorialInfoDesc"):
-				info_panel.find_child("TutorialInfoDesc", true, false).text = _tr("SETTINGS_TUTORIAL_DESC")
-		if tab_tutorial.has_node("ControlsHeader"):
-			tab_tutorial.get_node("ControlsHeader").text = _tr("SETTINGS_TUTORIAL_HEADER")
-		if tab_tutorial.has_node("ProgressPanel"):
-			var progress_panel = tab_tutorial.get_node("ProgressPanel")
-			if progress_panel.has_node("ProgressTitle"):
-				progress_panel.find_child("ProgressTitle", true, false).text = _tr("SETTINGS_YOUR_PROGRESS")
-		if tab_tutorial.has_node("TutorialListLabel"):
-			tab_tutorial.get_node("TutorialListLabel").text = _tr("SETTINGS_ALL_TUTORIALS")
-	if tutorial_enabled_toggle:
-		tutorial_enabled_toggle.text = _tr("SETTINGS_ENABLE_TUTORIALS")
-	if reset_tutorials_button:
-		reset_tutorials_button.text = _tr("SETTINGS_RESET_ALL_TUTORIALS")
+	SettingsMenuUITextScript.apply_labels({
+		"tab_container": tab_container,
+		"title_label": title_label,
+		"text_speed_label": text_speed_label,
+		"text_speed_option": text_speed_option,
+		"screen_shake_check": screen_shake_check,
+		"max_rounds_label": max_rounds_label,
+		"max_rounds_spinbox": max_rounds_spinbox,
+		"touch_controls_checkbox": touch_controls_checkbox,
+		"force_mission_complete_check": force_mission_complete_check,
+		"reality_score_label": reality_score_label,
+		"positive_energy_label": positive_energy_label,
+		"entropy_level_label": entropy_level_label,
+		"honeymoon_charges_label": honeymoon_charges_label,
+		"mission_turn_label": mission_turn_label,
+		"tab_developer": tab_developer,
+		"max_stats_button": max_stats_button,
+		"reset_stats_button": reset_stats_button,
+		"clear_debuffs_button": clear_debuffs_button,
+		"add_honeymoon_button": add_honeymoon_button,
+		"autosave_toggle": autosave_toggle,
+		"infinite_resources_toggle": infinite_resources_toggle,
+		"skip_dialogue_toggle": skip_dialogue_toggle,
+		"god_mode_toggle": god_mode_toggle,
+		"master_volume_hbox": master_volume_hbox,
+		"music_volume_hbox": music_volume_hbox,
+		"sfx_volume_hbox": sfx_volume_hbox,
+		"gloria_voice_check": gloria_voice_check,
+		"mute_check_box": mute_check_box,
+		"voice_description": voice_description,
+		"voice_enabled_check": voice_enabled_check,
+		"voice_output_check": voice_output_check,
+		"voice_input_check": voice_input_check,
+		"voice_choice_label": voice_choice_label,
+		"voice_volume_label": voice_volume_label,
+		"voice_input_mode_label": voice_input_mode_label,
+		"voice_proactive_check": voice_proactive_check,
+		"voice_capture_button": voice_capture_button,
+		"voice_preview_button": voice_preview_button,
+		"voice_status_label": voice_status_label,
+		"resolution_label": resolution_label,
+		"fullscreen_label": fullscreen_label,
+		"language_label": language_label,
+		"font_size_label": font_size_label,
+		"english_font_label": english_font_label,
+		"chinese_font_label": chinese_font_label,
+		"tab_tutorial": tab_tutorial,
+		"tutorial_enabled_toggle": tutorial_enabled_toggle,
+		"reset_tutorials_button": reset_tutorials_button,
+		"ai_settings_button": ai_settings_button,
+		"apply_button": apply_button,
+		"delete_logs_button": delete_logs_button,
+		"back_button": back_button,
+		"delete_logs_dialog": delete_logs_dialog,
+		"fullscreen_option": fullscreen_option,
+	}, Callable(self, "_tr"), voice_capture_active)
 	_update_tutorial_progress_display()
-	ai_settings_button.text = _tr("SETTINGS_AI_PROVIDER")
-	apply_button.text = _tr("SETTINGS_APPLY")
-	if delete_logs_button:
-		delete_logs_button.text = _tr("SETTINGS_DELETE_LOGS")
-	back_button.text = _tr("SETTINGS_BACK")
-	if delete_logs_dialog:
-		delete_logs_dialog.title = _tr("SETTINGS_DELETE_LOGS_TITLE")
-		delete_logs_dialog.dialog_text = _tr("SETTINGS_DELETE_LOGS_CONFIRM")
-		delete_logs_dialog.ok_button_text = _tr("SETTINGS_DELETE")
-		delete_logs_dialog.cancel_button_text = _tr("SETTINGS_CANCEL")
-	fullscreen_option.set_item_text(0, _tr("SETTINGS_WINDOWED"))
-	fullscreen_option.set_item_text(1, _tr("SETTINGS_FULLSCREEN"))
-	fullscreen_option.set_item_text(2, _tr("SETTINGS_BORDERLESS"))
 	_refresh_display_mode_availability()
 	_update_voice_availability_label()
 func _set_button_pressed_safely(button: BaseButton, pressed: bool) -> void:
