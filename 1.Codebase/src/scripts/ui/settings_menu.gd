@@ -19,6 +19,7 @@ const SettingsMenuAILogSectionScript = preload("res://1.Codebase/src/scripts/ui/
 const SettingsMenuAILogRendererScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_renderer.gd")
 const SettingsMenuAILogExportScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_export.gd")
 const SettingsMenuUITextScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ui_text.gd")
+const SettingsMenuLogActionsScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_log_actions.gd")
 const ICON_CHECK = preload("res://1.Codebase/src/assets/ui/icon_check.svg")
 const ICON_BACK = preload("res://1.Codebase/src/assets/ui/icon_back.svg")
 const ICON_DELETE = preload("res://1.Codebase/src/assets/ui/icon_delete.svg")
@@ -804,17 +805,7 @@ func _on_force_trolley_pressed():
 	else:
 		_update_debug_button_status(force_trolley_button, force_trolley_status_label, false, "✗ Not in story scene")
 func _update_debug_button_status(button: Button, label: Label, success: bool, message: String) -> void:
-	if not is_instance_valid(label):
-		return
-	label.text = message
-	if success:
-		label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-		if is_instance_valid(button):
-			button.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-	else:
-		label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
-		if is_instance_valid(button):
-			button.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+	SettingsMenuDeveloperSectionScript.update_debug_button_status(button, label, success, message)
 func _on_force_honeymoon_toggled(toggled: bool):
 	_play_sfx("menu_click")
 	var flow = _get_story_flow_controller()
@@ -852,32 +843,17 @@ func _on_mission_turn_changed(value: float):
 		game_state.mission_turn_count = int(value)
 func _on_max_stats_pressed():
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = 100
-		game_state.positive_energy = 100
-		game_state.entropy_level = 0
-		game_state.honeymoon_charges = 10
-		reality_score_spinbox.value = 100
-		positive_energy_spinbox.value = 100
-		entropy_level_spinbox.value = 0
-		honeymoon_charges_spinbox.value = 10
-		_show_notification("All stats maximized!", true)
+	SettingsMenuDeveloperSectionScript.on_max_stats(_get_game_state(), {
+		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
+		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
+	}, Callable(self, "_show_notification"))
 func _on_reset_stats_pressed():
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = 50
-		game_state.positive_energy = 50
-		game_state.entropy_level = 0
-		game_state.honeymoon_charges = 3
-		game_state.mission_turn_count = 0
-		reality_score_spinbox.value = 50
-		positive_energy_spinbox.value = 50
-		entropy_level_spinbox.value = 0
-		honeymoon_charges_spinbox.value = 3
-		mission_turn_spinbox.value = 0
-		_show_notification("All stats reset to defaults!", true)
+	SettingsMenuDeveloperSectionScript.on_reset_stats(_get_game_state(), {
+		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
+		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
+		"mission_turn": mission_turn_spinbox,
+	}, Callable(self, "_show_notification"))
 func _on_clear_debuffs_pressed():
 	_play_sfx("menu_click")
 	var game_state := _get_game_state()
@@ -927,74 +903,14 @@ func _update_fsm_status_label(label: Label):
 	SettingsMenuDeveloperSectionScript.update_fsm_status_label(label, _get_game_state())
 func _on_fsm_jump_to_day_pressed(target_day_id: int, status_label: Label):
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if not game_state:
-		_show_notification("GameState not available", false)
-		return
-	var fsm_module = game_state.get_fsm_challenge_module()
-	if not fsm_module:
-		_show_notification("FSM Module not available", false)
-		return
-	fsm_module.reset()
-	if target_day_id == 0:
-		game_state.save_game()
-		game_state.autosave()
-		_update_fsm_status_label(status_label)
-		var msg := "FSM Challenge: jumped to Not Started"
-		_show_notification(msg, true)
-		_report_info("%s (slot + autosave updated)" % msg)
-		return
-	var today_dt := Time.get_datetime_dict_from_system()
-	var today_str := "%04d-%02d-%02d" % [today_dt.year, today_dt.month, today_dt.day]
-	fsm_module.is_challenge_active = true
-	fsm_module.challenge_start_date = today_str
-	fsm_module.last_login_date = today_str
-	fsm_module.challenge_completed = false
-	fsm_module.challenge_crashed = false
-	if target_day_id == 78:
-		for d in range(1, 8):
-			fsm_module.days_completed.append(d)
-		fsm_module.current_day = 8
-		fsm_module.challenge_crashed = false
-		fsm_module.challenge_completed = false
-		game_state.save_game()
-		game_state.autosave()
-		_update_fsm_status_label(status_label)
-		var msg78 := "FSM Challenge: Day 8 In Progress (not yet complete)"
-		_show_notification(msg78, true)
-		_report_info("%s (slot + autosave updated)" % msg78)
-		return
-	for d in range(1, target_day_id + 1):
-		fsm_module.days_completed.append(d)
-	fsm_module.current_day = target_day_id
-	if target_day_id >= GameConstants.FSMChallenge.DAYS_BEFORE_CRASH:
-		fsm_module.challenge_crashed = true
-		fsm_module.is_challenge_active = false
-	game_state.save_game()
-	game_state.autosave()
-	_update_fsm_status_label(status_label)
-	var msg := "FSM Challenge: jumped to Day %d completed" % target_day_id
-	if fsm_module.challenge_crashed:
-		msg += " (Crashed)"
-	_show_notification(msg, true)
-	_report_info("%s (slot + autosave updated)" % msg)
+	SettingsMenuDeveloperSectionScript.on_fsm_jump_to_day(
+		target_day_id, status_label, _get_game_state(),
+		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _on_fsm_reset_pressed(status_label: Label):
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if not game_state:
-		_show_notification("GameState not available", false)
-		return
-	var fsm_module = game_state.get_fsm_challenge_module()
-	if not fsm_module:
-		_show_notification("FSM Module not available", false)
-		return
-	fsm_module.reset()
-	game_state.save_game()
-	game_state.autosave()
-	_update_fsm_status_label(status_label)
-	var msg := "FSM Challenge has been reset"
-	_show_notification(msg, true)
-	_report_info("%s (slot + autosave updated)" % msg)
+	SettingsMenuDeveloperSectionScript.on_fsm_reset(
+		status_label, _get_game_state(),
+		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _show_notification(message: String, success: bool = true):
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
 	if notifier:
@@ -1695,34 +1611,10 @@ func _on_delete_logs_button_pressed():
 		if ok_button:
 			ok_button.call_deferred("grab_focus")
 func _on_delete_logs_confirmed():
-	var success := false
-	var files_removed := 0
-	var metadata_removed := 0
 	if AudioManager:
 		AudioManager.play_sfx("happy_click")
-	var game_state := _get_game_state()
-	if game_state and game_state.has_method("delete_local_logs"):
-		var result: Dictionary = game_state.delete_local_logs()
-		success = true
-		files_removed = int(result.get("files_deleted", 0))
-		var removed_array_variant: Variant = result.get("metadata_keys_removed", [])
-		if removed_array_variant is Array:
-			var removed_array: Array = removed_array_variant
-			metadata_removed = removed_array.size()
-		game_state.set_metadata("prayer_notice_acknowledged", false)
-	else:
-		success = false
-	var message := ""
-	if success:
-		message = _tr("SETTINGS_LOGS_CLEARED") % [files_removed, metadata_removed]
-	else:
-		message = _tr("SETTINGS_LOGS_UNAVAILABLE")
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-	if notifier:
-		if success:
-			notifier.show_success(message)
-		else:
-			notifier.show_warning(message)
+	SettingsMenuLogActionsScript.delete_logs(_get_game_state(), notifier, Callable(self, "_tr"))
 func _on_ai_settings_button_pressed():
 	if _exit_mode == EXIT_MODE_OVERLAY:
 		var ai_settings_scene = load("res://1.Codebase/src/scenes/ui/ai_settings_menu.tscn")

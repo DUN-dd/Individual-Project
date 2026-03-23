@@ -404,3 +404,128 @@ static func _get_handler(handlers: Dictionary, key: String) -> Callable:
 		if val is Callable:
 			return val as Callable
 	return Callable()
+
+## Updates a debug button and its status label color based on success/failure.
+static func update_debug_button_status(button: Button, label: Label, success: bool, message: String) -> void:
+	if not is_instance_valid(label):
+		return
+	label.text = message
+	if success:
+		label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
+		if is_instance_valid(button):
+			button.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
+	else:
+		label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+		if is_instance_valid(button):
+			button.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+
+## Jumps FSM challenge to a target day. notify_fn(msg, success), report_fn(msg).
+static func on_fsm_jump_to_day(target_day_id: int, status_label: Label, game_state: Node, notify_fn: Callable, report_fn: Callable) -> void:
+	if not game_state:
+		notify_fn.call("GameState not available", false)
+		return
+	var fsm_module = game_state.get_fsm_challenge_module()
+	if not fsm_module:
+		notify_fn.call("FSM Module not available", false)
+		return
+	fsm_module.reset()
+	if target_day_id == 0:
+		game_state.save_game()
+		game_state.autosave()
+		update_fsm_status_label(status_label, game_state)
+		var msg := "FSM Challenge: jumped to Not Started"
+		notify_fn.call(msg, true)
+		report_fn.call("%s (slot + autosave updated)" % msg)
+		return
+	var today_dt := Time.get_datetime_dict_from_system()
+	var today_str := "%04d-%02d-%02d" % [today_dt.year, today_dt.month, today_dt.day]
+	fsm_module.is_challenge_active = true
+	fsm_module.challenge_start_date = today_str
+	fsm_module.last_login_date = today_str
+	fsm_module.challenge_completed = false
+	fsm_module.challenge_crashed = false
+	if target_day_id == 78:
+		for d in range(1, 8):
+			fsm_module.days_completed.append(d)
+		fsm_module.current_day = 8
+		fsm_module.challenge_crashed = false
+		fsm_module.challenge_completed = false
+		game_state.save_game()
+		game_state.autosave()
+		update_fsm_status_label(status_label, game_state)
+		var msg78 := "FSM Challenge: Day 8 In Progress (not yet complete)"
+		notify_fn.call(msg78, true)
+		report_fn.call("%s (slot + autosave updated)" % msg78)
+		return
+	for d in range(1, target_day_id + 1):
+		fsm_module.days_completed.append(d)
+	fsm_module.current_day = target_day_id
+	if target_day_id >= GameConstants.FSMChallenge.DAYS_BEFORE_CRASH:
+		fsm_module.challenge_crashed = true
+		fsm_module.is_challenge_active = false
+	game_state.save_game()
+	game_state.autosave()
+	update_fsm_status_label(status_label, game_state)
+	var msg := "FSM Challenge: jumped to Day %d completed" % target_day_id
+	if fsm_module.challenge_crashed:
+		msg += " (Crashed)"
+	notify_fn.call(msg, true)
+	report_fn.call("%s (slot + autosave updated)" % msg)
+
+## Resets FSM challenge. notify_fn(msg, success), report_fn(msg).
+static func on_fsm_reset(status_label: Label, game_state: Node, notify_fn: Callable, report_fn: Callable) -> void:
+	if not game_state:
+		notify_fn.call("GameState not available", false)
+		return
+	var fsm_module = game_state.get_fsm_challenge_module()
+	if not fsm_module:
+		notify_fn.call("FSM Module not available", false)
+		return
+	fsm_module.reset()
+	game_state.save_game()
+	game_state.autosave()
+	update_fsm_status_label(status_label, game_state)
+	var msg := "FSM Challenge has been reset"
+	notify_fn.call(msg, true)
+	report_fn.call("%s (slot + autosave updated)" % msg)
+
+## Sets all game stats to max values and updates spinboxes.
+## spinboxes keys: reality, positive_energy, entropy, honeymoon
+static func on_max_stats(game_state: Node, spinboxes: Dictionary, notify_fn: Callable) -> void:
+	if not game_state:
+		return
+	game_state.reality_score = 100
+	game_state.positive_energy = 100
+	game_state.entropy_level = 0
+	game_state.honeymoon_charges = 10
+	var sb_reality: SpinBox = spinboxes.get("reality") as SpinBox
+	var sb_positive: SpinBox = spinboxes.get("positive_energy") as SpinBox
+	var sb_entropy: SpinBox = spinboxes.get("entropy") as SpinBox
+	var sb_honeymoon: SpinBox = spinboxes.get("honeymoon") as SpinBox
+	if sb_reality: sb_reality.value = 100
+	if sb_positive: sb_positive.value = 100
+	if sb_entropy: sb_entropy.value = 0
+	if sb_honeymoon: sb_honeymoon.value = 10
+	notify_fn.call("All stats maximized!", true)
+
+## Resets all game stats to default values and updates spinboxes.
+## spinboxes keys: reality, positive_energy, entropy, honeymoon, mission_turn
+static func on_reset_stats(game_state: Node, spinboxes: Dictionary, notify_fn: Callable) -> void:
+	if not game_state:
+		return
+	game_state.reality_score = 50
+	game_state.positive_energy = 50
+	game_state.entropy_level = 0
+	game_state.honeymoon_charges = 3
+	game_state.mission_turn_count = 0
+	var sb_reality: SpinBox = spinboxes.get("reality") as SpinBox
+	var sb_positive: SpinBox = spinboxes.get("positive_energy") as SpinBox
+	var sb_entropy: SpinBox = spinboxes.get("entropy") as SpinBox
+	var sb_honeymoon: SpinBox = spinboxes.get("honeymoon") as SpinBox
+	var sb_mission: SpinBox = spinboxes.get("mission_turn") as SpinBox
+	if sb_reality: sb_reality.value = 50
+	if sb_positive: sb_positive.value = 50
+	if sb_entropy: sb_entropy.value = 0
+	if sb_honeymoon: sb_honeymoon.value = 3
+	if sb_mission: sb_mission.value = 0
+	notify_fn.call("All stats reset to defaults!", true)
