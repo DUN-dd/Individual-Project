@@ -6,8 +6,20 @@ const ErrorReporterBridge = preload("res://1.Codebase/src/scripts/core/error_rep
 const ERROR_CONTEXT := "SettingsMenu"
 @warning_ignore("shadowed_global_identifier")
 const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const GameSave = preload("res://1.Codebase/src/scripts/core/game_save.gd")
+const SettingsMenuAudioSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_audio_section.gd")
+const SettingsMenuDisplaySectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_display_section.gd")
+const SettingsMenuVoiceSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_voice_section.gd")
+const SettingsMenuDeveloperSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_developer_section.gd")
+const SettingsMenuAIAnalyticsScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_analytics.gd")
 const SettingsMenuAgentServerSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_agent_server_section.gd")
 const SettingsMenuTutorialSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_section.gd")
+const SettingsMenuStylesScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_styles.gd")
+const SettingsMenuAILogSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_section.gd")
+const SettingsMenuAILogRendererScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_renderer.gd")
+const SettingsMenuAILogExportScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_export.gd")
+const SettingsMenuUITextScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ui_text.gd")
+const SettingsMenuLogActionsScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_log_actions.gd")
 const ICON_CHECK = preload("res://1.Codebase/src/assets/ui/icon_check.svg")
 const ICON_BACK = preload("res://1.Codebase/src/assets/ui/icon_back.svg")
 const ICON_DELETE = preload("res://1.Codebase/src/assets/ui/icon_delete.svg")
@@ -482,377 +494,53 @@ func _create_tab_page(tab_name: String) -> VBoxContainer:
 	tab_container.add_child(scroll)
 	return vbox
 func _create_ai_log_tab_page() -> VBoxContainer:
-	var outer_vbox = VBoxContainer.new()
-	outer_vbox.name = "AILogOuterVBox"
-	outer_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	outer_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	outer_vbox.add_theme_constant_override("separation", 4)
-	tab_container.add_child(outer_vbox)
-	var header_margin = MarginContainer.new()
-	header_margin.add_theme_constant_override("margin_top", 8)
-	header_margin.add_theme_constant_override("margin_left", 14)
-	header_margin.add_theme_constant_override("margin_right", 14)
-	header_margin.add_theme_constant_override("margin_bottom", 4)
-	header_margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	outer_vbox.add_child(header_margin)
-	var header_hbox = HBoxContainer.new()
-	header_hbox.add_theme_constant_override("separation", 6)
-	header_margin.add_child(header_hbox)
-	var title_lbl = Label.new()
-	title_lbl.name = "AILogTitle"
-	title_lbl.text = _tr_ai("SETTINGS_AI_LOG_TITLE", "AI Call Log")
-	title_lbl.add_theme_font_size_override("font_size", 16)
-	title_lbl.add_theme_color_override("font_color", Color(0.4, 0.85, 1.0))
-	title_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header_hbox.add_child(title_lbl)
-	var log_toggle = Button.new()
-	log_toggle.name = "AILogToggleLog"
-	log_toggle.text = _tr_ai("SETTINGS_AI_LOG_TOGGLE_LOG", "Log")
-	log_toggle.icon = ICON_HISTORY
-	log_toggle.expand_icon = true
-	log_toggle.toggle_mode = true
-	log_toggle.button_pressed = true
-	log_toggle.custom_minimum_size = Vector2(82, 32)
-	log_toggle.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	log_toggle.pressed.connect(_on_ai_log_toggle_log_pressed)
-	header_hbox.add_child(log_toggle)
-	var charts_toggle = Button.new()
-	charts_toggle.name = "AILogToggleCharts"
-	charts_toggle.text = _tr_ai("SETTINGS_AI_LOG_TOGGLE_CHARTS", "Charts")
-	charts_toggle.icon = ICON_OPTIONS
-	charts_toggle.expand_icon = true
-	charts_toggle.toggle_mode = true
-	charts_toggle.button_pressed = false
-	charts_toggle.custom_minimum_size = Vector2(92, 32)
-	charts_toggle.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	charts_toggle.pressed.connect(_on_ai_log_toggle_charts_pressed)
-	header_hbox.add_child(charts_toggle)
-	var sep = VSeparator.new()
-	sep.modulate = Color(1, 1, 1, 0.25)
-	sep.custom_minimum_size = Vector2(2, 28)
-	header_hbox.add_child(sep)
-	var refresh_btn = Button.new()
-	refresh_btn.name = "AILogRefreshButton"
-	refresh_btn.icon = ICON_REFRESH
-	refresh_btn.expand_icon = true
-	refresh_btn.tooltip_text = _tr_ai("SETTINGS_AI_LOG_REFRESH_TOOLTIP", "Refresh")
-	refresh_btn.custom_minimum_size = Vector2(36, 32)
-	refresh_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	refresh_btn.pressed.connect(_on_ai_log_refresh_pressed)
-	header_hbox.add_child(refresh_btn)
-	var export_btn = Button.new()
-	export_btn.name = "AILogExportButton"
-	export_btn.icon = ICON_SAVE
-	export_btn.expand_icon = true
-	export_btn.tooltip_text = _tr_ai("SETTINGS_AI_LOG_EXPORT_JSON_TOOLTIP", "Export log to JSON")
-	export_btn.custom_minimum_size = Vector2(36, 32)
-	export_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	export_btn.pressed.connect(_on_ai_export_pressed)
-	header_hbox.add_child(export_btn)
-	var export_csv_btn = Button.new()
-	export_csv_btn.name = "AILogExportCsvButton"
-	export_csv_btn.text = _tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_SHORT", "CSV")
-	export_csv_btn.icon = ICON_SAVE
-	export_csv_btn.expand_icon = true
-	export_csv_btn.tooltip_text = _tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_TOOLTIP", "Export log and chart data to CSV")
-	export_csv_btn.custom_minimum_size = Vector2(72, 32)
-	export_csv_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	export_csv_btn.pressed.connect(_on_ai_export_csv_pressed)
-	header_hbox.add_child(export_csv_btn)
-	var clear_btn = Button.new()
-	clear_btn.name = "AILogClearButton"
-	clear_btn.icon = ICON_DELETE
-	clear_btn.expand_icon = true
-	clear_btn.tooltip_text = _tr_ai("SETTINGS_AI_LOG_CLEAR_TOOLTIP", "Clear log")
-	clear_btn.custom_minimum_size = Vector2(36, 32)
-	clear_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	clear_btn.pressed.connect(_on_ai_log_clear_pressed)
-	header_hbox.add_child(clear_btn)
-	var log_view = VBoxContainer.new()
-	log_view.name = "AILogTableView"
-	log_view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	log_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_view.add_theme_constant_override("separation", 2)
-	_ai_log_view_panel = log_view
-	outer_vbox.add_child(log_view)
-	var col_widths := [170, 90, 160, 70, 80, 80, 75, 90, 100]
-	var col_names_en := ["Time", "Provider", "Model", "Status", "In Tok", "Out Tok", "Time(s)", "Mode", "Purpose"]
-	var header_panel = PanelContainer.new()
-	header_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var header_style = StyleBoxFlat.new()
-	header_style.bg_color = Color(0.12, 0.22, 0.32, 1.0)
-	header_style.set_corner_radius_all(4)
-	header_style.border_width_bottom = 2
-	header_style.border_color = Color(0.3, 0.6, 0.9, 0.6)
-	header_panel.add_theme_stylebox_override("panel", header_style)
-	var header_margin2 = MarginContainer.new()
-	header_margin2.add_theme_constant_override("margin_top", 5)
-	header_margin2.add_theme_constant_override("margin_left", 14)
-	header_margin2.add_theme_constant_override("margin_right", 14)
-	header_margin2.add_theme_constant_override("margin_bottom", 5)
-	header_panel.add_child(header_margin2)
-	var header_row = HBoxContainer.new()
-	header_row.add_theme_constant_override("separation", 4)
-	header_margin2.add_child(header_row)
-	for i in range(col_names_en.size()):
-		var lbl = Label.new()
-		lbl.text = col_names_en[i]
-		lbl.add_theme_font_size_override("font_size", 12)
-		lbl.add_theme_color_override("font_color", Color(0.75, 0.88, 1.0))
-		lbl.custom_minimum_size = Vector2(col_widths[i], 0)
-		lbl.clip_text = true
-		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
-		header_row.add_child(lbl)
-	log_view.add_child(header_panel)
-	var scroll = ScrollContainer.new()
-	scroll.name = "AILogScroll"
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	log_view.add_child(scroll)
-	_ai_log_rows_container = VBoxContainer.new()
-	_ai_log_rows_container.name = "AILogRows"
-	_ai_log_rows_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_ai_log_rows_container.add_theme_constant_override("separation", 2)
-	scroll.add_child(_ai_log_rows_container)
-	var empty_lbl = Label.new()
-	empty_lbl.name = "AILogEmptyLabel"
-	empty_lbl.text = _tr_ai("SETTINGS_AI_LOG_EMPTY", "No AI calls recorded yet.")
-	empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	empty_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-	empty_lbl.add_theme_font_size_override("font_size", 14)
-	_ai_log_rows_container.add_child(empty_lbl)
-	var analytics_scroll = ScrollContainer.new()
-	analytics_scroll.name = "AIAnalyticsScroll"
-	analytics_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	analytics_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	analytics_scroll.visible = false
-	_ai_analytics_view = analytics_scroll
-	outer_vbox.add_child(analytics_scroll)
-	_build_analytics_content(analytics_scroll)
-	tab_container.tab_changed.connect(_on_ai_log_tab_changed)
-	_normalize_ai_log_language_texts(outer_vbox)
-	return outer_vbox
-func _build_analytics_content(parent_scroll: ScrollContainer) -> void:
-	var av = VBoxContainer.new()
-	av.name = "AIAnalyticsVBox"
-	av.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	av.add_theme_constant_override("separation", 12)
-	parent_scroll.add_child(av)
-	var am = MarginContainer.new()
-	am.add_theme_constant_override("margin_top", 10)
-	am.add_theme_constant_override("margin_left", 14)
-	am.add_theme_constant_override("margin_right", 14)
-	am.add_theme_constant_override("margin_bottom", 14)
-	am.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	av.add_child(am)
-	var inner = VBoxContainer.new()
-	inner.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inner.add_theme_constant_override("separation", 12)
-	am.add_child(inner)
-	_ai_chart_rows.clear()
-	_ai_chart_canvases.clear()
-	var controls_row = HBoxContainer.new()
-	controls_row.add_theme_constant_override("separation", 8)
-	controls_row.custom_minimum_size = Vector2(0, 34)
-	inner.add_child(controls_row)
-	var controls_title = Label.new()
-	controls_title.text = _tr_ai("SETTINGS_AI_LOG_CHART_CONTROLS", "Chart Controls")
-	controls_title.add_theme_font_size_override("font_size", 12)
-	controls_title.add_theme_color_override("font_color", Color(0.7, 0.88, 1.0))
-	controls_row.add_child(controls_title)
-	var width_label = Label.new()
-	width_label.text = "W"
-	width_label.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
-	controls_row.add_child(width_label)
-	_ai_chart_width_spin = SpinBox.new()
-	_ai_chart_width_spin.min_value = 260
-	_ai_chart_width_spin.max_value = 1400
-	_ai_chart_width_spin.step = 10
-	_ai_chart_width_spin.value = _ai_chart_width
-	_ai_chart_width_spin.custom_minimum_size = Vector2(96, 0)
-	_ai_chart_width_spin.value_changed.connect(_on_ai_chart_size_changed)
-	controls_row.add_child(_ai_chart_width_spin)
-	var height_label = Label.new()
-	height_label.text = "H"
-	height_label.add_theme_color_override("font_color", Color(0.8, 0.85, 0.95))
-	controls_row.add_child(height_label)
-	_ai_chart_height_spin = SpinBox.new()
-	_ai_chart_height_spin.min_value = 140
-	_ai_chart_height_spin.max_value = 760
-	_ai_chart_height_spin.step = 10
-	_ai_chart_height_spin.value = _ai_chart_height
-	_ai_chart_height_spin.custom_minimum_size = Vector2(96, 0)
-	_ai_chart_height_spin.value_changed.connect(_on_ai_chart_size_changed)
-	controls_row.add_child(_ai_chart_height_spin)
-	_ai_chart_toggle_button = Button.new()
-	_ai_chart_toggle_button.text = _tr_ai("SETTINGS_AI_LOG_HIDE_GRAPHS", "Hide Graphs")
-	_ai_chart_toggle_button.toggle_mode = true
-	_ai_chart_toggle_button.button_pressed = true
-	_ai_chart_toggle_button.custom_minimum_size = Vector2(118, 30)
-	_ai_chart_toggle_button.pressed.connect(_on_ai_chart_visibility_toggled)
-	controls_row.add_child(_ai_chart_toggle_button)
-	var controls_sep = VSeparator.new()
-	controls_sep.custom_minimum_size = Vector2(2, 22)
-	controls_sep.modulate = Color(1, 1, 1, 0.2)
-	controls_row.add_child(controls_sep)
-	var export_csv_btn = Button.new()
-	export_csv_btn.text = _tr_ai("SETTINGS_AI_LOG_EXPORT_CSV", "Export CSV")
-	export_csv_btn.icon = ICON_SAVE
-	export_csv_btn.expand_icon = true
-	export_csv_btn.custom_minimum_size = Vector2(120, 30)
-	export_csv_btn.pressed.connect(_on_ai_export_csv_pressed)
-	controls_row.add_child(export_csv_btn)
-	var controls_spacer = Control.new()
-	controls_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	controls_row.add_child(controls_spacer)
-	var kpi_hbox = HBoxContainer.new()
-	kpi_hbox.add_theme_constant_override("separation", 8)
-	kpi_hbox.custom_minimum_size = Vector2(0, 78)
-	inner.add_child(kpi_hbox)
-	var kpi_icons := [ICON_INFO, ICON_CHECK, ICON_SYNC, ICON_REFRESH]
-	var kpi_titles := [_tr_ai("SETTINGS_AI_LOG_KPI_TOTAL_CALLS", "Total Calls"), _tr_ai("SETTINGS_AI_LOG_KPI_SUCCESS_RATE", "Success Rate"), _tr_ai("SETTINGS_AI_LOG_KPI_TOTAL_TOKENS", "Total Tokens"), _tr_ai("SETTINGS_AI_LOG_KPI_AVG_RESPONSE", "Avg Response")]
-	var kpi_defaults := ["0", "0%", "0", "0s"]
-	var kpi_accent_colors := [
-		Color(0.4, 0.75, 1.0), Color(0.35, 0.92, 0.55),
-		Color(1.0, 0.80, 0.30), Color(0.85, 0.60, 1.0)]
-	_ai_kpi_labels.clear()
-	for i in range(kpi_titles.size()):
-		var kpi_panel = PanelContainer.new()
-		kpi_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var kpi_style = StyleBoxFlat.new()
-		kpi_style.bg_color = Color(0.09, 0.14, 0.22, 1.0)
-		kpi_style.set_corner_radius_all(8)
-		kpi_style.border_width_bottom = 3
-		kpi_style.border_color = kpi_accent_colors[i]
-		kpi_panel.add_theme_stylebox_override("panel", kpi_style)
-		var kpi_inner = VBoxContainer.new()
-		kpi_inner.alignment = BoxContainer.ALIGNMENT_CENTER
-		kpi_inner.add_theme_constant_override("separation", 3)
-		kpi_panel.add_child(kpi_inner)
-		var icon_row = HBoxContainer.new()
-		icon_row.alignment = BoxContainer.ALIGNMENT_CENTER
-		icon_row.add_theme_constant_override("separation", 4)
-		kpi_inner.add_child(icon_row)
-		var icon_rect = TextureRect.new()
-		icon_rect.texture = kpi_icons[i]
-		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon_rect.custom_minimum_size = Vector2(16, 16)
-		icon_rect.modulate = kpi_accent_colors[i]
-		icon_row.add_child(icon_rect)
-		var kpi_title = Label.new()
-		kpi_title.text = kpi_titles[i]
-		kpi_title.add_theme_font_size_override("font_size", 10)
-		kpi_title.add_theme_color_override("font_color", kpi_accent_colors[i])
-		kpi_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		kpi_title.autowrap_mode = TextServer.AUTOWRAP_WORD
-		icon_row.add_child(kpi_title)
-		var kpi_val = Label.new()
-		kpi_val.text = kpi_defaults[i]
-		kpi_val.add_theme_font_size_override("font_size", 20)
-		kpi_val.add_theme_color_override("font_color", Color(0.95, 0.95, 1.0))
-		kpi_val.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		kpi_inner.add_child(kpi_val)
-		kpi_hbox.add_child(kpi_panel)
-		_ai_kpi_labels.append(kpi_val)
-	_add_section_header(inner, ICON_CHECK, _tr_ai("SETTINGS_AI_LOG_HDR_PROVIDER_SUCCESS", "Provider Success Rate"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row1 = HBoxContainer.new()
-	row1.add_theme_constant_override("separation", 10)
-	row1.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row1)
-	_ai_chart_rows.append(row1)
-	_chart_success_by_provider = _make_chart_canvas(row1, AIChartCanvas.Type.HORIZONTAL_BAR,
-		"Success Rate by Provider (%)")
-	_chart_mode_pie = _make_chart_canvas(row1, AIChartCanvas.Type.PIE,
-		"Call Mode Distribution")
-	_add_section_header(inner, ICON_HISTORY, _tr_ai("SETTINGS_AI_LOG_HDR_REQUESTS_TIMELINE", "Requests Timeline (last 24 h)"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row2 = HBoxContainer.new()
-	row2.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row2)
-	_ai_chart_rows.append(row2)
-	_chart_hourly_requests = _make_chart_canvas(row2, AIChartCanvas.Type.VERTICAL_BAR,
-		"Requests / Hour (last 24 h)")
-	_add_section_header(inner, ICON_INFO, _tr_ai("SETTINGS_AI_LOG_HDR_SUCCESS_ERROR", "Success / Error per Hour"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row3 = HBoxContainer.new()
-	row3.add_theme_constant_override("separation", 10)
-	row3.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row3)
-	_ai_chart_rows.append(row3)
-	_chart_success_per_hour = _make_chart_canvas(row3, AIChartCanvas.Type.LINE,
-		"Success Count / Hour (last 24 h)")
-	_chart_calls_by_model = _make_chart_canvas(row3, AIChartCanvas.Type.HORIZONTAL_BAR,
-		"Calls by Model")
-	_add_section_header(inner, ICON_SYNC, _tr_ai("SETTINGS_AI_LOG_HDR_TOKEN_LATENCY", "Token and Latency by Provider"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row4 = HBoxContainer.new()
-	row4.add_theme_constant_override("separation", 10)
-	row4.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row4)
-	_ai_chart_rows.append(row4)
-	_chart_tokens_by_provider = _make_chart_canvas(row4, AIChartCanvas.Type.HORIZONTAL_BAR,
-		"Total Tokens by Provider")
-	_chart_response_by_provider = _make_chart_canvas(row4, AIChartCanvas.Type.HORIZONTAL_BAR,
-		"Avg Response Time / Provider (s)")
-	_add_section_header(inner, ICON_OPTIONS, _tr_ai("SETTINGS_AI_LOG_HDR_TOKEN_BREAKDOWN", "Token Breakdown and Speed"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row5 = HBoxContainer.new()
-	row5.add_theme_constant_override("separation", 10)
-	row5.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row5)
-	_ai_chart_rows.append(row5)
-	_chart_input_output_tokens = _make_chart_canvas(row5, AIChartCanvas.Type.VERTICAL_BAR,
-		"Input vs Output Tokens by Provider")
-	_chart_tps_by_provider = _make_chart_canvas(row5, AIChartCanvas.Type.HORIZONTAL_BAR,
-		"Avg Tokens / Second by Provider (TPS)")
-	_add_section_header(inner, ICON_REFRESH, _tr_ai("SETTINGS_AI_LOG_HDR_TOKEN_TRENDS", "Token Trends (last 24 h)"))
-	_ai_chart_rows.append(inner.get_child(inner.get_child_count() - 1) as Control)
-	var row6 = HBoxContainer.new()
-	row6.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row6)
-	_ai_chart_rows.append(row6)
-	_chart_hourly_tokens = _make_chart_canvas(row6, AIChartCanvas.Type.LINE,
-		"Token Usage / Hour (last 24 h)")
-	var row7 = HBoxContainer.new()
-	row7.custom_minimum_size = Vector2(0, _ai_chart_height)
-	inner.add_child(row7)
-	_ai_chart_rows.append(row7)
-	_chart_cumulative_tokens = _make_chart_canvas(row7, AIChartCanvas.Type.LINE,
-		"Cumulative Total Tokens (session)")
+	var result: Dictionary = SettingsMenuAILogSectionScript.build_log_page(
+		tab_container,
+		{
+			"history": ICON_HISTORY, "options": ICON_OPTIONS, "refresh": ICON_REFRESH,
+			"save": ICON_SAVE, "delete": ICON_DELETE, "info": ICON_INFO,
+			"check": ICON_CHECK, "sync": ICON_SYNC,
+		},
+		Callable(self, "_tr_ai"),
+		_ai_chart_width,
+		_ai_chart_height,
+		{
+			"toggle_log": Callable(self, "_on_ai_log_toggle_log_pressed"),
+			"toggle_charts": Callable(self, "_on_ai_log_toggle_charts_pressed"),
+			"refresh": Callable(self, "_on_ai_log_refresh_pressed"),
+			"export_json": Callable(self, "_on_ai_export_pressed"),
+			"export_csv": Callable(self, "_on_ai_export_csv_pressed"),
+			"clear": Callable(self, "_on_ai_log_clear_pressed"),
+			"chart_size_changed": Callable(self, "_on_ai_chart_size_changed"),
+			"chart_visibility_toggled": Callable(self, "_on_ai_chart_visibility_toggled"),
+			"tab_changed": Callable(self, "_on_ai_log_tab_changed"),
+		},
+	)
+	_ai_log_view_panel = result["log_view_panel"] as Control
+	_ai_log_rows_container = result["log_rows_container"] as VBoxContainer
+	_ai_analytics_view = result["analytics_view"] as Control
+	_ai_chart_toggle_button = result["chart_toggle_button"] as Button
+	_ai_chart_width_spin = result["chart_width_spin"] as SpinBox
+	_ai_chart_height_spin = result["chart_height_spin"] as SpinBox
+	var kpi_result: Variant = result["kpi_labels"]
+	if kpi_result is Array:
+		_ai_kpi_labels = kpi_result
+	_ai_chart_rows.assign(result["chart_rows"])
+	_ai_chart_canvases.assign(result["chart_canvases"])
+	_chart_success_by_provider = result["chart_success_by_provider"] as Control
+	_chart_mode_pie = result["chart_mode_pie"] as Control
+	_chart_hourly_requests = result["chart_hourly_requests"] as Control
+	_chart_success_per_hour = result["chart_success_per_hour"] as Control
+	_chart_calls_by_model = result["chart_calls_by_model"] as Control
+	_chart_tokens_by_provider = result["chart_tokens_by_provider"] as Control
+	_chart_response_by_provider = result["chart_response_by_provider"] as Control
+	_chart_input_output_tokens = result["chart_input_output_tokens"] as Control
+	_chart_tps_by_provider = result["chart_tps_by_provider"] as Control
+	_chart_hourly_tokens = result["chart_hourly_tokens"] as Control
+	_chart_cumulative_tokens = result["chart_cumulative_tokens"] as Control
+	_normalize_ai_log_language_texts(result["outer_vbox"] as VBoxContainer)
 	_apply_ai_chart_layout()
-func _add_section_header(parent: Control, icon_tex: Texture2D, text: String) -> void:
-	var hbox = HBoxContainer.new()
-	hbox.add_theme_constant_override("separation", 8)
-	hbox.custom_minimum_size = Vector2(0, 24)
-	parent.add_child(hbox)
-	var icon_rect = TextureRect.new()
-	icon_rect.texture = icon_tex
-	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon_rect.custom_minimum_size = Vector2(18, 18)
-	icon_rect.modulate = Color(0.55, 0.82, 1.0)
-	hbox.add_child(icon_rect)
-	var lbl = Label.new()
-	lbl.text = text
-	lbl.add_theme_font_size_override("font_size", 13)
-	lbl.add_theme_color_override("font_color", Color(0.7, 0.88, 1.0))
-	hbox.add_child(lbl)
-	var sep = HSeparator.new()
-	sep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sep.modulate = Color(1, 1, 1, 0.15)
-	hbox.add_child(sep)
-func _make_chart_canvas(parent: Control, chart_type: int, title: String) -> Control:
-	var canvas = AIChartCanvas.new()
-	canvas.chart_type = chart_type
-	canvas.chart_title = title
-	canvas.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	canvas.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	canvas.custom_minimum_size = Vector2(_ai_chart_width, _ai_chart_height)
-	parent.add_child(canvas)
-	_ai_chart_canvases.append(canvas)
-	return canvas
+	return result["outer_vbox"] as VBoxContainer
 func _on_ai_log_tab_changed(tab_idx: int) -> void:
 	if tab_container and tab_idx == tab_container.get_tab_count() - 1:
 		_refresh_ai_log_table()
@@ -878,107 +566,28 @@ func _on_ai_log_refresh_pressed() -> void:
 	else:
 		_refresh_ai_log_table()
 func _on_ai_export_pressed() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
 	var metrics: Dictionary = {}
 	if ai_manager and ai_manager.has_method("get_ai_metrics"):
 		metrics = ai_manager.get_ai_metrics()
-	var ts := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var path := "user://ai_call_log_%s.json" % ts
-	var export_data := {
-		"exported_at": Time.get_datetime_string_from_system(),
-		"summary": metrics,
-		"call_log": log_entries,
-	}
-	var file := FileAccess.open(path, FileAccess.WRITE)
-	if file:
-		file.store_string(JSON.stringify(export_data, "\t"))
-		file.close()
-		var abs_path := ProjectSettings.globalize_path(path)
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			var msg = _tr_ai("SETTINGS_AI_LOG_EXPORT_JSON_SUCCESS", "Exported %d records to:\n%s") % [log_entries.size(), abs_path]
-			notifier.show_success(msg)
-	else:
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			var msg = _tr_ai("SETTINGS_AI_LOG_EXPORT_JSON_FAILED", "Export failed: could not write file.")
-			notifier.show_warning(msg)
+	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
+	SettingsMenuAILogExportScript.export_json(log_entries, metrics, Callable(self, "_tr_ai"), notifier)
 func _on_ai_export_csv_pressed() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	var analytics := _compute_ai_analytics(log_entries)
-	var ts := Time.get_datetime_string_from_system().replace(":", "-").replace("T", "_")
-	var path := "user://ai_usage_charts_%s.csv" % ts
-	var lines: PackedStringArray = []
-	lines.append("section,timestamp,provider,model,status,input_tokens,output_tokens,response_time_sec,mode,purpose,error")
-	for entry in log_entries:
-		var status_text := "ERR"
-		if bool(entry.get("success", false)):
-			status_text = str(int(entry.get("status_code", 200)))
-		elif str(entry.get("mode", "")) in ["mock", "mock_fallback"]:
-			status_text = "MOCK"
-		lines.append(_csv_row([
-			"call_log",
-			str(entry.get("timestamp", "")),
-			str(entry.get("provider", "")),
-			str(entry.get("model", "")),
-			status_text,
-			str(int(entry.get("input_tokens", 0))),
-			str(int(entry.get("output_tokens", 0))),
-			"%.3f" % float(entry.get("response_time_sec", 0.0)),
-			str(entry.get("mode", "")),
-			str(entry.get("purpose", "")),
-			str(entry.get("error", "")),
-		]))
-	lines.append("")
-	lines.append("section,metric,label,value")
-	_append_metric_series(lines, "provider_success_rate", analytics.get("provider_labels", []), analytics.get("provider_success_rates", []))
-	_append_metric_series(lines, "provider_total_tokens", analytics.get("provider_labels", []), analytics.get("provider_tokens", []))
-	_append_metric_series(lines, "provider_avg_response_seconds", analytics.get("provider_labels", []), analytics.get("provider_response_times", []))
-	_append_metric_series(lines, "provider_input_tokens", analytics.get("provider_labels", []), analytics.get("provider_input_tokens", []))
-	_append_metric_series(lines, "provider_output_tokens", analytics.get("provider_labels", []), analytics.get("provider_output_tokens", []))
-	_append_metric_series(lines, "provider_tps", analytics.get("provider_labels", []), analytics.get("provider_tps", []))
-	_append_metric_series(lines, "mode_distribution", analytics.get("mode_labels", []), analytics.get("mode_counts", []))
-	_append_metric_series(lines, "model_calls", analytics.get("model_labels", []), analytics.get("model_counts", []))
-	_append_metric_series(lines, "hourly_calls", analytics.get("hourly_labels", []), analytics.get("hourly_calls", []))
-	_append_metric_series(lines, "hourly_tokens", analytics.get("hourly_labels", []), analytics.get("hourly_tokens", []))
-	_append_metric_series(lines, "hourly_successes", analytics.get("hourly_labels", []), analytics.get("hourly_successes", []))
-	_append_metric_series(lines, "cumulative_tokens", analytics.get("cumulative_labels", []), analytics.get("cumulative_tokens", []))
-	lines.append(_csv_row(["summary", "total_calls", "", str(int(analytics.get("total", 0)))]))
-	lines.append(_csv_row(["summary", "success_rate_percent", "", "%.2f" % float(analytics.get("success_rate", 0.0))]))
-	lines.append(_csv_row(["summary", "total_tokens", "", str(int(analytics.get("total_tokens", 0)))]))
-	lines.append(_csv_row(["summary", "avg_response_seconds", "", "%.3f" % float(analytics.get("avg_response_time", 0.0))]))
-	var file := FileAccess.open(path, FileAccess.WRITE)
-	if file:
-		file.store_string("\n".join(lines))
-		file.close()
-		var abs_path := ProjectSettings.globalize_path(path)
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			notifier.show_success(_tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_SUCCESS", "CSV exported:\n%s") % abs_path)
-	else:
-		var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-		if notifier:
-			notifier.show_warning(_tr_ai("SETTINGS_AI_LOG_EXPORT_CSV_FAILED", "CSV export failed: could not write file."))
+	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
+	SettingsMenuAILogExportScript.export_csv(log_entries, Callable(self, "_tr_ai"), notifier)
 func _append_metric_series(lines: PackedStringArray, metric: String, labels: Array, values: Array) -> void:
-	var count := mini(labels.size(), values.size())
-	for idx in range(count):
-		lines.append(_csv_row(["chart_metric", metric, str(labels[idx]), str(values[idx])]))
+	SettingsMenuAIAnalyticsScript.append_metric_series(lines, metric, labels, values)
 func _csv_row(cells: Array) -> String:
-	var escaped: PackedStringArray = []
-	for cell in cells:
-		escaped.append(_csv_escape(str(cell)))
-	return ",".join(escaped)
+	return SettingsMenuAIAnalyticsScript.csv_row(cells)
 func _csv_escape(value: String) -> String:
-	var v := value.replace("\"", "\"\"")
-	if v.contains(",") or v.contains("\n") or v.contains("\r") or v.contains("\""):
-		return "\"" + v + "\""
-	return v
+	return SettingsMenuAIAnalyticsScript.csv_escape(value)
 func _on_ai_chart_size_changed(_value: float) -> void:
 	if is_instance_valid(_ai_chart_width_spin):
 		_ai_chart_width = maxf(260.0, float(_ai_chart_width_spin.value))
@@ -1009,327 +618,33 @@ func _on_ai_log_clear_pressed() -> void:
 	else:
 		_refresh_ai_log_table()
 func _refresh_analytics_view() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	var a := _compute_ai_analytics(log_entries)
-	var kpi_vals := [
-		str(a.get("total", 0)),
-		"%.1f%%" % float(a.get("success_rate", 0.0)),
-		_format_token_count(int(a.get("total_tokens", 0))),
-		"%.2fs" % float(a.get("avg_response_time", 0.0)),
-	]
-	for i in range(min(_ai_kpi_labels.size(), kpi_vals.size())):
-		if is_instance_valid(_ai_kpi_labels[i]):
-			(_ai_kpi_labels[i] as Label).text = kpi_vals[i]
-	if is_instance_valid(_chart_success_by_provider):
-		(_chart_success_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR,
-			"Success Rate by Provider (%)",
-			a.get("provider_labels", []),
-			a.get("provider_success_rates", []),
-			[Color(0.3, 0.9, 0.4), Color(0.35, 0.7, 1.0), Color(1.0, 0.7, 0.3),
-			 Color(0.9, 0.5, 1.0), Color(0.4, 0.9, 0.9)],
-		)
-	if is_instance_valid(_chart_mode_pie):
-		var mode_colors: Array[Color] = [
-			Color(0.3, 0.85, 0.4), Color(0.8, 0.9, 0.3),
-			Color(1.0, 0.5, 0.3), Color(0.65, 0.4, 1.0),
-		]
-		(_chart_mode_pie as AIChartCanvas).setup(
-			AIChartCanvas.Type.PIE, "Call Mode Distribution",
-			a.get("mode_labels", []), a.get("mode_counts", []), mode_colors,
-		)
-	if is_instance_valid(_chart_hourly_requests):
-		(_chart_hourly_requests as AIChartCanvas).setup(
-			AIChartCanvas.Type.VERTICAL_BAR, "Requests / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_calls", []),
-			[Color(0.35, 0.7, 1.0)],
-		)
-	if is_instance_valid(_chart_success_per_hour):
-		(_chart_success_per_hour as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Success Count / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_successes", []),
-			[Color(0.3, 0.9, 0.4)],
-		)
-	if is_instance_valid(_chart_calls_by_model):
-		(_chart_calls_by_model as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Calls by Model",
-			a.get("model_labels", []), a.get("model_counts", []),
-			[Color(0.6, 0.82, 1.0)],
-		)
-	if is_instance_valid(_chart_tokens_by_provider):
-		(_chart_tokens_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Total Tokens by Provider",
-			a.get("provider_labels", []), a.get("provider_tokens", []),
-			[Color(0.55, 0.82, 1.0)],
-		)
-	if is_instance_valid(_chart_response_by_provider):
-		(_chart_response_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Avg Response Time / Provider (s)",
-			a.get("provider_labels", []), a.get("provider_response_times", []),
-			[Color(1.0, 0.72, 0.28)],
-		)
-	if is_instance_valid(_chart_input_output_tokens):
-		var stacked_labels: Array = a.get("provider_labels", []).duplicate()
-		var stacked_vals: Array = []
-		var in_vals: Array = a.get("provider_input_tokens", [])
-		var out_vals: Array = a.get("provider_output_tokens", [])
-		for idx in range(stacked_labels.size()):
-			stacked_labels.insert(idx * 2 + 1, stacked_labels[idx * 2] + " out")
-			stacked_labels[idx * 2] = stacked_labels[idx * 2] + " in"
-		for idx in range(in_vals.size()):
-			stacked_vals.append(float(in_vals[idx]))
-			stacked_vals.append(float(out_vals[idx]))
-		(_chart_input_output_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.VERTICAL_BAR, "Input vs Output Tokens by Provider",
-			stacked_labels, stacked_vals,
-			[Color(0.35, 0.70, 1.0), Color(0.35, 0.95, 0.60)],
-		)
-	if is_instance_valid(_chart_tps_by_provider):
-		(_chart_tps_by_provider as AIChartCanvas).setup(
-			AIChartCanvas.Type.HORIZONTAL_BAR, "Avg TPS by Provider",
-			a.get("provider_labels", []), a.get("provider_tps", []),
-			[Color(0.78, 0.48, 1.0)],
-		)
-	if is_instance_valid(_chart_hourly_tokens):
-		(_chart_hourly_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Token Usage / Hour (last 24 h)",
-			a.get("hourly_labels", []), a.get("hourly_tokens", []), [],
-		)
-	if is_instance_valid(_chart_cumulative_tokens):
-		(_chart_cumulative_tokens as AIChartCanvas).setup(
-			AIChartCanvas.Type.LINE, "Cumulative Total Tokens (session, newest last)",
-			a.get("cumulative_labels", []), a.get("cumulative_tokens", []),
-			[Color(1.0, 0.82, 0.35)],
-		)
+	SettingsMenuAILogRendererScript.refresh_analytics({
+		"success_by_provider": _chart_success_by_provider,
+		"mode_pie": _chart_mode_pie,
+		"hourly_requests": _chart_hourly_requests,
+		"success_per_hour": _chart_success_per_hour,
+		"calls_by_model": _chart_calls_by_model,
+		"tokens_by_provider": _chart_tokens_by_provider,
+		"response_by_provider": _chart_response_by_provider,
+		"input_output_tokens": _chart_input_output_tokens,
+		"tps_by_provider": _chart_tps_by_provider,
+		"hourly_tokens": _chart_hourly_tokens,
+		"cumulative_tokens": _chart_cumulative_tokens,
+	}, _ai_kpi_labels, log_entries)
 func _compute_ai_analytics(log_entries: Array) -> Dictionary:
-	var total := log_entries.size()
-	var total_success := 0
-	var total_tokens := 0
-	var total_time := 0.0
-	var by_provider: Dictionary = {}
-	var by_mode: Dictionary = {}
-	var by_model: Dictionary = {}
-	var hourly: Dictionary = {}
-	var now_unix := Time.get_unix_time_from_system()
-	var cumulative_running := 0
-	var cumulative_labels: Array = []
-	var cumulative_tokens: Array = []
-	for idx in range(log_entries.size()):
-		var entry: Dictionary = log_entries[idx]
-		var success := bool(entry.get("success", false))
-		var in_tok := int(entry.get("input_tokens", 0))
-		var out_tok := int(entry.get("output_tokens", 0))
-		var tokens := in_tok + out_tok
-		var rtime := float(entry.get("response_time_sec", 0.0))
-		var provider := str(entry.get("provider", "UNKNOWN"))
-		var model := str(entry.get("model", "UNKNOWN"))
-		var mode := str(entry.get("mode", "unknown"))
-		var ts_str := str(entry.get("timestamp", "")).replace("T", " ")
-		if success:
-			total_success += 1
-		total_tokens += tokens
-		total_time += rtime
-		if not by_provider.has(provider):
-			by_provider[provider] = {
-				"calls": 0, "success": 0, "tokens": 0,
-				"input_tokens": 0, "output_tokens": 0,
-				"response_time": 0.0, "output_tokens_for_tps": 0, "tps_time": 0.0,
-			}
-		by_provider[provider]["calls"] = int(by_provider[provider]["calls"]) + 1
-		if success:
-			by_provider[provider]["success"] = int(by_provider[provider]["success"]) + 1
-		by_provider[provider]["tokens"] = int(by_provider[provider]["tokens"]) + tokens
-		by_provider[provider]["input_tokens"] = int(by_provider[provider]["input_tokens"]) + in_tok
-		by_provider[provider]["output_tokens"] = int(by_provider[provider]["output_tokens"]) + out_tok
-		by_provider[provider]["response_time"] = float(by_provider[provider]["response_time"]) + rtime
-		if rtime > 0.0 and out_tok > 0:
-			by_provider[provider]["output_tokens_for_tps"] = int(by_provider[provider]["output_tokens_for_tps"]) + out_tok
-			by_provider[provider]["tps_time"] = float(by_provider[provider]["tps_time"]) + rtime
-		by_mode[mode] = int(by_mode.get(mode, 0)) + 1
-		by_model[model] = int(by_model.get(model, 0)) + 1
-		if ts_str.length() >= 10:
-			var entry_unix := Time.get_unix_time_from_datetime_string(ts_str)
-			if entry_unix > 0:
-				var hours_ago := (now_unix - entry_unix) / 3600.0
-				if hours_ago >= 0.0 and hours_ago < 24.0:
-					var bucket := int(hours_ago)
-					if not hourly.has(bucket):
-						hourly[bucket] = {"calls": 0, "tokens": 0, "successes": 0}
-					hourly[bucket]["calls"] = int(hourly[bucket]["calls"]) + 1
-					hourly[bucket]["tokens"] = int(hourly[bucket]["tokens"]) + tokens
-					if success:
-						hourly[bucket]["successes"] = int(hourly[bucket]["successes"]) + 1
-		cumulative_running += tokens
-		cumulative_labels.append(str(idx + 1))
-		cumulative_tokens.append(float(cumulative_running))
-	var provider_labels: Array = []
-	var provider_success_rates: Array = []
-	var provider_tokens: Array = []
-	var provider_input_tokens: Array = []
-	var provider_output_tokens: Array = []
-	var provider_response_times: Array = []
-	var provider_tps: Array = []
-	for prov in by_provider.keys():
-		var p: Dictionary = by_provider[prov]
-		var calls := int(p.get("calls", 0))
-		provider_labels.append(prov)
-		provider_success_rates.append(float(p.get("success", 0)) / float(max(1, calls)) * 100.0)
-		provider_tokens.append(float(p.get("tokens", 0)))
-		provider_input_tokens.append(float(p.get("input_tokens", 0)))
-		provider_output_tokens.append(float(p.get("output_tokens", 0)))
-		provider_response_times.append(float(p.get("response_time", 0.0)) / float(max(1, calls)))
-		var tps_out := int(p.get("output_tokens_for_tps", 0))
-		var tps_t := float(p.get("tps_time", 0.0))
-		provider_tps.append(float(tps_out) / max(0.001, tps_t))
-	var hourly_labels: Array = []
-	var hourly_calls: Array = []
-	var hourly_tokens: Array = []
-	var hourly_successes: Array = []
-	for h in range(23, -1, -1):
-		var d: Dictionary = hourly.get(h, {"calls": 0, "tokens": 0, "successes": 0})
-		hourly_labels.insert(0, "%dh" % h if h > 0 else "now")
-		hourly_calls.insert(0, float(d.get("calls", 0)))
-		hourly_tokens.insert(0, float(d.get("tokens", 0)))
-		hourly_successes.insert(0, float(d.get("successes", 0)))
-	var mode_labels: Array = []
-	var mode_counts: Array = []
-	for m in by_mode.keys():
-		mode_labels.append(m)
-		mode_counts.append(float(by_mode[m]))
-	var model_labels: Array = []
-	var model_counts: Array = []
-	for mdl in by_model.keys():
-		model_labels.append(mdl)
-		model_counts.append(float(by_model[mdl]))
-	return {
-		"total": total,
-		"total_success": total_success,
-		"success_rate": float(total_success) / float(max(1, total)) * 100.0,
-		"total_tokens": total_tokens,
-		"avg_response_time": total_time / float(max(1, total)),
-		"provider_labels": provider_labels,
-		"provider_success_rates": provider_success_rates,
-		"provider_tokens": provider_tokens,
-		"provider_input_tokens": provider_input_tokens,
-		"provider_output_tokens": provider_output_tokens,
-		"provider_response_times": provider_response_times,
-		"provider_tps": provider_tps,
-		"hourly_labels": hourly_labels,
-		"hourly_calls": hourly_calls,
-		"hourly_tokens": hourly_tokens,
-		"hourly_successes": hourly_successes,
-		"mode_labels": mode_labels,
-		"mode_counts": mode_counts,
-		"model_labels": model_labels,
-		"model_counts": model_counts,
-		"cumulative_labels": cumulative_labels,
-		"cumulative_tokens": cumulative_tokens,
-	}
+	return SettingsMenuAIAnalyticsScript.compute_analytics(log_entries)
 func _format_token_count(n: int) -> String:
-	if n >= 1_000_000:
-		return "%.1fM" % (float(n) / 1_000_000.0)
-	if n >= 1_000:
-		return "%.1fK" % (float(n) / 1_000.0)
-	return str(n)
+	return SettingsMenuAIAnalyticsScript.format_token_count(n)
 func _refresh_ai_log_table() -> void:
-	if not _ai_log_rows_container:
-		return
-	for child in _ai_log_rows_container.get_children():
-		child.queue_free()
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
+	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	var log_entries: Array = []
 	if ai_manager and ai_manager.has_method("get_call_log"):
 		log_entries = ai_manager.get_call_log()
-	if log_entries.is_empty():
-		var empty_lbl = Label.new()
-		empty_lbl.name = "AILogEmptyLabel"
-		empty_lbl.text = _tr_ai("SETTINGS_AI_LOG_EMPTY", "No AI calls recorded yet.")
-		empty_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		empty_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
-		empty_lbl.add_theme_font_size_override("font_size", 14)
-		_ai_log_rows_container.add_child(empty_lbl)
-		return
-	var col_widths := [170, 90, 160, 70, 80, 80, 75, 90, 100]
-	var reversed_entries: Array = log_entries.duplicate()
-	reversed_entries.reverse()
-	for row_idx in range(reversed_entries.size()):
-		var entry: Dictionary = reversed_entries[row_idx]
-		var row_panel = PanelContainer.new()
-		row_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var row_style = StyleBoxFlat.new()
-		var success: bool = bool(entry.get("success", false))
-		var mode: String = str(entry.get("mode", ""))
-		if not success:
-			row_style.bg_color = Color(0.35, 0.12, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.3, 0.1, 0.1, 0.85)
-		elif mode == "mock" or mode == "mock_fallback":
-			row_style.bg_color = Color(0.18, 0.22, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.15, 0.19, 0.10, 0.85)
-		else:
-			row_style.bg_color = Color(0.12, 0.18, 0.12, 0.85) if row_idx % 2 == 0 else Color(0.10, 0.15, 0.10, 0.85)
-		row_panel.add_theme_stylebox_override("panel", row_style)
-		var row_margin = MarginContainer.new()
-		row_margin.add_theme_constant_override("margin_top", 4)
-		row_margin.add_theme_constant_override("margin_left", 14)
-		row_margin.add_theme_constant_override("margin_right", 14)
-		row_margin.add_theme_constant_override("margin_bottom", 4)
-		row_panel.add_child(row_margin)
-		var row_hbox = HBoxContainer.new()
-		row_hbox.add_theme_constant_override("separation", 4)
-		row_margin.add_child(row_hbox)
-		var status_code: int = int(entry.get("status_code", 0))
-		var status_text: String = ""
-		var status_color := Color(0.9, 0.9, 0.9)
-		if mode == "mock" or mode == "mock_fallback":
-			status_text = "MOCK"
-			status_color = Color(0.8, 0.9, 0.4)
-		elif not success:
-			status_text = str(status_code) if status_code > 0 else "ERR"
-			status_color = Color(1.0, 0.4, 0.4)
-		else:
-			status_text = str(status_code) if status_code > 0 else "200"
-			status_color = Color(0.4, 1.0, 0.4)
-		var timestamp_str: String = str(entry.get("timestamp", ""))
-		if timestamp_str.length() > 19:
-			timestamp_str = timestamp_str.substr(0, 19)
-		timestamp_str = timestamp_str.replace("T", " ")
-		var cell_values: Array = [
-			timestamp_str,
-			str(entry.get("provider", "")),
-			str(entry.get("model", "")),
-			status_text,
-			str(int(entry.get("input_tokens", 0))),
-			str(int(entry.get("output_tokens", 0))),
-			"%.2f" % float(entry.get("response_time_sec", 0.0)),
-			str(entry.get("mode", "")),
-			str(entry.get("purpose", "")),
-		]
-		var cell_colors: Array = [
-			Color(0.85, 0.85, 0.85),
-			Color(0.7, 0.85, 1.0),
-			Color(0.85, 0.85, 1.0),
-			status_color,
-			Color(0.8, 1.0, 0.8),
-			Color(0.8, 1.0, 0.8),
-			Color(1.0, 0.9, 0.6),
-			Color(0.9, 0.8, 1.0),
-			Color(0.85, 0.85, 0.85),
-		]
-		for i in range(cell_values.size()):
-			var cell_lbl = Label.new()
-			cell_lbl.text = str(cell_values[i])
-			cell_lbl.add_theme_font_size_override("font_size", 11)
-			cell_lbl.add_theme_color_override("font_color", cell_colors[i])
-			cell_lbl.custom_minimum_size = Vector2(col_widths[i], 0)
-			cell_lbl.clip_text = true
-			cell_lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
-			row_hbox.add_child(cell_lbl)
-		if not success:
-			var err_str: String = str(entry.get("error", ""))
-			if not err_str.is_empty():
-				row_panel.tooltip_text = "Error: " + err_str
-		_ai_log_rows_container.add_child(row_panel)
+	SettingsMenuAILogRendererScript.refresh_table(_ai_log_rows_container, log_entries, Callable(self, "_tr_ai"))
 func _move_control(node: Control, new_parent: Control):
 	if node and node.get_parent():
 		node.get_parent().remove_child(node)
@@ -1341,277 +656,73 @@ func _add_separator(parent: Control):
 	parent.add_child(sep)
 func _initialize_new_controls():
 	var game_state := _get_game_state()
-	text_speed_option.add_item("Instant", 0)
-	text_speed_option.add_item("Fast", 1)
-	text_speed_option.add_item("Normal", 2)
-	text_speed_option.add_item("Slow", 3)
-	text_speed_option.item_selected.connect(_on_text_speed_selected)
-	if text_speed == 0.0: text_speed_option.select(0)
-	elif text_speed == 2.0: text_speed_option.select(1)
-	elif text_speed == 1.0: text_speed_option.select(2)
-	elif text_speed == 0.5: text_speed_option.select(3)
-	else: text_speed_option.select(2)
-	screen_shake_check.toggled.connect(_on_screen_shake_toggled)
-	screen_shake_check.button_pressed = screen_shake_enabled
-	max_rounds_spinbox.min_value = 0
-	max_rounds_spinbox.max_value = 30
-	max_rounds_spinbox.step = 1
-	if game_state and game_state.settings.has("max_rounds_per_mission"):
-		max_rounds_per_mission = int(game_state.settings["max_rounds_per_mission"])
-	max_rounds_spinbox.value = max_rounds_per_mission
-	max_rounds_spinbox.value_changed.connect(_on_max_rounds_changed)
-	force_mission_complete_check = CheckBox.new()
-	tab_developer.add_child(force_mission_complete_check)
-	force_mission_complete_check.toggled.connect(_on_force_mission_complete_toggled)
-	if game_state:
-		force_mission_complete_check.button_pressed = game_state.debug_force_mission_complete
-	var gloria_hbox = HBoxContainer.new()
-	gloria_hbox.add_theme_constant_override("separation", 10)
-	force_gloria_button = Button.new()
-	force_gloria_button.text = "Queue Gloria (Next Turn)"
-	force_gloria_button.custom_minimum_size = Vector2(250, 40)
-	force_gloria_button.focus_mode = Control.FOCUS_NONE
-	force_gloria_button.pressed.connect(_on_force_gloria_pressed)
-	gloria_hbox.add_child(force_gloria_button)
-	force_gloria_status_label = Label.new()
-	force_gloria_status_label.text = ""
-	force_gloria_status_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-	gloria_hbox.add_child(force_gloria_status_label)
-	tab_developer.add_child(gloria_hbox)
-	var trolley_hbox = HBoxContainer.new()
-	trolley_hbox.add_theme_constant_override("separation", 10)
-	force_trolley_button = Button.new()
-	force_trolley_button.text = "Force Trolley Problem Now"
-	force_trolley_button.custom_minimum_size = Vector2(250, 40)
-	force_trolley_button.focus_mode = Control.FOCUS_NONE
-	force_trolley_button.pressed.connect(_on_force_trolley_pressed)
-	trolley_hbox.add_child(force_trolley_button)
-	force_trolley_status_label = Label.new()
-	force_trolley_status_label.text = ""
-	force_trolley_status_label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-	trolley_hbox.add_child(force_trolley_status_label)
-	tab_developer.add_child(trolley_hbox)
-	force_honeymoon_check = CheckBox.new()
-	force_honeymoon_check.text = "Force Honeymoon Phase"
-	tab_developer.add_child(force_honeymoon_check)
-	force_honeymoon_check.toggled.connect(_on_force_honeymoon_toggled)
-	if game_state:
-		force_honeymoon_check.button_pressed = game_state.is_honeymoon_phase
-	_add_separator(tab_developer)
-	var reality_hbox = HBoxContainer.new()
-	reality_hbox.add_theme_constant_override("separation", 10)
-	reality_score_label = Label.new()
-	reality_score_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	reality_hbox.add_child(reality_score_label)
-	reality_score_spinbox = SpinBox.new()
-	reality_score_spinbox.custom_minimum_size = Vector2(100, 0)
-	reality_score_spinbox.min_value = 0
-	reality_score_spinbox.max_value = 100
-	reality_score_spinbox.step = 1
-	if game_state:
-		reality_score_spinbox.value = game_state.reality_score
-	reality_hbox.add_child(reality_score_spinbox)
-	tab_developer.add_child(reality_hbox)
-	var positive_hbox = HBoxContainer.new()
-	positive_hbox.add_theme_constant_override("separation", 10)
-	positive_energy_label = Label.new()
-	positive_energy_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	positive_hbox.add_child(positive_energy_label)
-	positive_energy_spinbox = SpinBox.new()
-	positive_energy_spinbox.custom_minimum_size = Vector2(100, 0)
-	positive_energy_spinbox.min_value = 0
-	positive_energy_spinbox.max_value = 100
-	positive_energy_spinbox.step = 1
-	if game_state:
-		positive_energy_spinbox.value = game_state.positive_energy
-	positive_hbox.add_child(positive_energy_spinbox)
-	tab_developer.add_child(positive_hbox)
-	var entropy_hbox = HBoxContainer.new()
-	entropy_hbox.add_theme_constant_override("separation", 10)
-	entropy_level_label = Label.new()
-	entropy_level_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	entropy_hbox.add_child(entropy_level_label)
-	entropy_level_spinbox = SpinBox.new()
-	entropy_level_spinbox.custom_minimum_size = Vector2(100, 0)
-	entropy_level_spinbox.min_value = 0
-	entropy_level_spinbox.max_value = 100
-	entropy_level_spinbox.step = 1
-	if game_state:
-		entropy_level_spinbox.value = game_state.entropy_level
-	entropy_hbox.add_child(entropy_level_spinbox)
-	tab_developer.add_child(entropy_hbox)
-	var honeymoon_hbox = HBoxContainer.new()
-	honeymoon_hbox.add_theme_constant_override("separation", 10)
-	honeymoon_charges_label = Label.new()
-	honeymoon_charges_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	honeymoon_hbox.add_child(honeymoon_charges_label)
-	honeymoon_charges_spinbox = SpinBox.new()
-	honeymoon_charges_spinbox.custom_minimum_size = Vector2(100, 0)
-	honeymoon_charges_spinbox.min_value = 0
-	honeymoon_charges_spinbox.max_value = 10
-	honeymoon_charges_spinbox.step = 1
-	if game_state:
-		honeymoon_charges_spinbox.value = game_state.honeymoon_charges
-	honeymoon_hbox.add_child(honeymoon_charges_spinbox)
-	tab_developer.add_child(honeymoon_hbox)
-	var mission_turn_hbox = HBoxContainer.new()
-	mission_turn_hbox.add_theme_constant_override("separation", 10)
-	mission_turn_label = Label.new()
-	mission_turn_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	mission_turn_hbox.add_child(mission_turn_label)
-	mission_turn_spinbox = SpinBox.new()
-	mission_turn_spinbox.custom_minimum_size = Vector2(100, 0)
-	mission_turn_spinbox.min_value = 0
-	mission_turn_spinbox.max_value = 100
-	mission_turn_spinbox.step = 1
-	if game_state:
-		mission_turn_spinbox.value = game_state.mission_turn_count
-	mission_turn_hbox.add_child(mission_turn_spinbox)
-	tab_developer.add_child(mission_turn_hbox)
-	reality_score_spinbox.value_changed.connect(_on_reality_score_changed)
-	positive_energy_spinbox.value_changed.connect(_on_positive_energy_changed)
-	entropy_level_spinbox.value_changed.connect(_on_entropy_level_changed)
-	honeymoon_charges_spinbox.value_changed.connect(_on_honeymoon_charges_changed)
-	mission_turn_spinbox.value_changed.connect(_on_mission_turn_changed)
-	_add_separator(tab_developer)
-	var quick_actions_label = Label.new()
-	quick_actions_label.name = "QuickActionsLabel"
-	quick_actions_label.add_theme_font_size_override("font_size", 20)
-	quick_actions_label.add_theme_color_override("font_color", Color(1, 0.8, 0.4))
-	tab_developer.add_child(quick_actions_label)
-	var quick_actions_grid = GridContainer.new()
-	quick_actions_grid.columns = 2
-	quick_actions_grid.add_theme_constant_override("h_separation", 10)
-	quick_actions_grid.add_theme_constant_override("v_separation", 10)
-	tab_developer.add_child(quick_actions_grid)
-	max_stats_button = Button.new()
-	max_stats_button.custom_minimum_size = Vector2(200, 40)
-	max_stats_button.pressed.connect(_on_max_stats_pressed)
-	quick_actions_grid.add_child(max_stats_button)
-	reset_stats_button = Button.new()
-	reset_stats_button.custom_minimum_size = Vector2(200, 40)
-	reset_stats_button.pressed.connect(_on_reset_stats_pressed)
-	quick_actions_grid.add_child(reset_stats_button)
-	clear_debuffs_button = Button.new()
-	clear_debuffs_button.custom_minimum_size = Vector2(200, 40)
-	clear_debuffs_button.pressed.connect(_on_clear_debuffs_pressed)
-	quick_actions_grid.add_child(clear_debuffs_button)
-	add_honeymoon_button = Button.new()
-	add_honeymoon_button.custom_minimum_size = Vector2(200, 40)
-	add_honeymoon_button.pressed.connect(_on_add_honeymoon_pressed)
-	quick_actions_grid.add_child(add_honeymoon_button)
-	_add_separator(tab_developer)
-	var toggles_label = Label.new()
-	toggles_label.name = "TogglesLabel"
-	toggles_label.add_theme_font_size_override("font_size", 20)
-	toggles_label.add_theme_color_override("font_color", Color(1, 0.8, 0.4))
-	tab_developer.add_child(toggles_label)
-	autosave_toggle = CheckBox.new()
-	if game_state:
-		autosave_toggle.set_pressed_no_signal(game_state.autosave_enabled)
-	autosave_toggle.toggled.connect(_on_autosave_toggled)
-	tab_developer.add_child(autosave_toggle)
-	infinite_resources_toggle = CheckBox.new()
-	if game_state:
-		infinite_resources_toggle.set_pressed_no_signal(game_state.get_metadata("debug_infinite_resources", false))
-	infinite_resources_toggle.toggled.connect(_on_infinite_resources_toggled)
-	tab_developer.add_child(infinite_resources_toggle)
-	skip_dialogue_toggle = CheckBox.new()
-	if game_state:
-		skip_dialogue_toggle.set_pressed_no_signal(game_state.settings.get("auto_advance_enabled", false))
-	skip_dialogue_toggle.toggled.connect(_on_skip_dialogue_toggled)
-	tab_developer.add_child(skip_dialogue_toggle)
-	god_mode_toggle = CheckBox.new()
-	if game_state:
-		god_mode_toggle.set_pressed_no_signal(game_state.get_metadata("debug_god_mode", false))
-	god_mode_toggle.toggled.connect(_on_god_mode_toggled)
-	tab_developer.add_child(god_mode_toggle)
-	_add_separator(tab_developer)
-	var fsm_challenge_label = Label.new()
-	fsm_challenge_label.text = "FSM Challenge Debug"
-	fsm_challenge_label.add_theme_font_size_override("font_size", 18)
-	tab_developer.add_child(fsm_challenge_label)
-	var fsm_status_label = Label.new()
-	fsm_status_label.name = "FSMStatusLabel"
-	_update_fsm_status_label(fsm_status_label)
-	tab_developer.add_child(fsm_status_label)
-	var fsm_img_row = HBoxContainer.new()
-	fsm_img_row.name = "FSMImageRow"
-	fsm_img_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	fsm_img_row.add_theme_constant_override("separation", 18)
-	fsm_img_row.custom_minimum_size = Vector2(0, 140)
-	var _fsm_img_data := [
-		{"tex": FSM_IMG_GUIDE,   "caption": _tr("FSM_IMG_CAPTION_GUIDE"),          "tint": Color(0.85, 0.95, 1.0, 1.0)},
-		{"tex": FSM_IMG_TEACHER, "caption": "Teacher Chan",                         "tint": Color(1.0, 0.95, 0.75, 1.0)},
-		{"tex": FSM_IMG_GLORIA,  "caption": _tr("FSM_IMG_CAPTION_GLORIA_NEUTRAL"), "tint": Color(0.85, 1.0, 0.88, 1.0)},
-	]
-	for img_entry in _fsm_img_data:
-		var col = VBoxContainer.new()
-		col.alignment = BoxContainer.ALIGNMENT_CENTER
-		col.add_theme_constant_override("separation", 4)
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var img_panel = PanelContainer.new()
-		var img_panel_style = StyleBoxFlat.new()
-		img_panel_style.bg_color = Color(0.08, 0.10, 0.18, 0.85)
-		img_panel_style.set_corner_radius_all(10)
-		img_panel_style.border_width_bottom = 2
-		img_panel_style.border_color = Color(0.35, 0.55, 0.90, 0.55)
-		img_panel_style.content_margin_left = 6
-		img_panel_style.content_margin_right = 6
-		img_panel_style.content_margin_top = 6
-		img_panel_style.content_margin_bottom = 6
-		img_panel.add_theme_stylebox_override("panel", img_panel_style)
-		var tex_rect = TextureRect.new()
-		tex_rect.texture = img_entry["tex"]
-		tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tex_rect.custom_minimum_size = Vector2(100, 100)
-		tex_rect.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tex_rect.modulate = img_entry["tint"]
-		img_panel.add_child(tex_rect)
-		col.add_child(img_panel)
-		var cap_lbl = Label.new()
-		cap_lbl.text = img_entry["caption"]
-		cap_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cap_lbl.add_theme_font_size_override("font_size", 11)
-		cap_lbl.add_theme_color_override("font_color", Color(0.65, 0.75, 0.95, 0.85))
-		col.add_child(cap_lbl)
-		fsm_img_row.add_child(col)
-	tab_developer.add_child(fsm_img_row)
-	var fsm_jump_hbox = HBoxContainer.new()
-	fsm_jump_hbox.add_theme_constant_override("separation", 8)
-	var fsm_jump_label = Label.new()
-	fsm_jump_label.text = "Jump to Day:"
-	fsm_jump_label.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	var fsm_jump_option = OptionButton.new()
-	fsm_jump_option.name = "FSMJumpOption"
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_0"), 0)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_1"), 1)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_2"), 2)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_3"), 3)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_4"), 4)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_5"), 5)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_6"), 6)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_7"), 7)
-	fsm_jump_option.add_item("⚠️ " + _tr_bilingual("FSM_JUMP_DAY_8_INPROGRESS"), 78)
-	fsm_jump_option.add_item(_tr_bilingual("FSM_JUMP_DAY_8_CRASHED"), 8)
-	fsm_jump_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var fsm_jump_button = Button.new()
-	fsm_jump_button.text = "Apply"
-	fsm_jump_button.pressed.connect(func():
-		_on_fsm_jump_to_day_pressed(fsm_jump_option.get_selected_id(), fsm_status_label)
+	var dev_result := SettingsMenuDeveloperSectionScript.build_section(
+		tab_developer,
+		{
+			"text_speed_option": text_speed_option,
+			"screen_shake_check": screen_shake_check,
+			"max_rounds_spinbox": max_rounds_spinbox,
+		},
+		{
+			"text_speed": text_speed,
+			"screen_shake_enabled": screen_shake_enabled,
+			"max_rounds_per_mission": max_rounds_per_mission,
+		},
+		game_state,
+		{
+			"on_text_speed_selected": _on_text_speed_selected,
+			"on_screen_shake_toggled": _on_screen_shake_toggled,
+			"on_max_rounds_changed": _on_max_rounds_changed,
+			"on_force_mission_complete_toggled": _on_force_mission_complete_toggled,
+			"on_force_gloria_pressed": _on_force_gloria_pressed,
+			"on_force_trolley_pressed": _on_force_trolley_pressed,
+			"on_force_honeymoon_toggled": _on_force_honeymoon_toggled,
+			"on_reality_score_changed": _on_reality_score_changed,
+			"on_positive_energy_changed": _on_positive_energy_changed,
+			"on_entropy_level_changed": _on_entropy_level_changed,
+			"on_honeymoon_charges_changed": _on_honeymoon_charges_changed,
+			"on_mission_turn_changed": _on_mission_turn_changed,
+			"on_max_stats_pressed": _on_max_stats_pressed,
+			"on_reset_stats_pressed": _on_reset_stats_pressed,
+			"on_clear_debuffs_pressed": _on_clear_debuffs_pressed,
+			"on_add_honeymoon_pressed": _on_add_honeymoon_pressed,
+			"on_autosave_toggled": _on_autosave_toggled,
+			"on_infinite_resources_toggled": _on_infinite_resources_toggled,
+			"on_skip_dialogue_toggled": _on_skip_dialogue_toggled,
+			"on_god_mode_toggled": _on_god_mode_toggled,
+			"on_fsm_jump_to_day_pressed": _on_fsm_jump_to_day_pressed,
+			"on_fsm_reset_pressed": _on_fsm_reset_pressed,
+		},
+		{
+			"fsm_guide": FSM_IMG_GUIDE,
+			"fsm_teacher": FSM_IMG_TEACHER,
+			"fsm_gloria": FSM_IMG_GLORIA,
+		},
 	)
-	fsm_jump_hbox.add_child(fsm_jump_label)
-	fsm_jump_hbox.add_child(fsm_jump_option)
-	fsm_jump_hbox.add_child(fsm_jump_button)
-	tab_developer.add_child(fsm_jump_hbox)
-	var fsm_reset_button = Button.new()
-	fsm_reset_button.text = "Reset FSM Challenge"
-	fsm_reset_button.pressed.connect(func():
-		_on_fsm_reset_pressed(fsm_status_label)
-	)
-	tab_developer.add_child(fsm_reset_button)
-	_add_separator(tab_developer)
+	force_mission_complete_check = dev_result.get("force_mission_complete_check")
+	force_gloria_button = dev_result.get("force_gloria_button")
+	force_gloria_status_label = dev_result.get("force_gloria_status_label")
+	force_trolley_button = dev_result.get("force_trolley_button")
+	force_trolley_status_label = dev_result.get("force_trolley_status_label")
+	force_honeymoon_check = dev_result.get("force_honeymoon_check")
+	reality_score_label = dev_result.get("reality_score_label")
+	reality_score_spinbox = dev_result.get("reality_score_spinbox")
+	positive_energy_label = dev_result.get("positive_energy_label")
+	positive_energy_spinbox = dev_result.get("positive_energy_spinbox")
+	entropy_level_label = dev_result.get("entropy_level_label")
+	entropy_level_spinbox = dev_result.get("entropy_level_spinbox")
+	honeymoon_charges_label = dev_result.get("honeymoon_charges_label")
+	honeymoon_charges_spinbox = dev_result.get("honeymoon_charges_spinbox")
+	mission_turn_label = dev_result.get("mission_turn_label")
+	mission_turn_spinbox = dev_result.get("mission_turn_spinbox")
+	max_stats_button = dev_result.get("max_stats_button")
+	reset_stats_button = dev_result.get("reset_stats_button")
+	clear_debuffs_button = dev_result.get("clear_debuffs_button")
+	add_honeymoon_button = dev_result.get("add_honeymoon_button")
+	autosave_toggle = dev_result.get("autosave_toggle")
+	infinite_resources_toggle = dev_result.get("infinite_resources_toggle")
+	skip_dialogue_toggle = dev_result.get("skip_dialogue_toggle")
+	god_mode_toggle = dev_result.get("god_mode_toggle")
 	_initialize_agent_server_controls()
 	_initialize_tutorial_controls()
 func _initialize_agent_server_controls():
@@ -1696,17 +807,7 @@ func _on_force_trolley_pressed():
 	else:
 		_update_debug_button_status(force_trolley_button, force_trolley_status_label, false, "✗ Not in story scene")
 func _update_debug_button_status(button: Button, label: Label, success: bool, message: String) -> void:
-	if not is_instance_valid(label):
-		return
-	label.text = message
-	if success:
-		label.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-		if is_instance_valid(button):
-			button.add_theme_color_override("font_color", Color(0.4, 1.0, 0.4))
-	else:
-		label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
-		if is_instance_valid(button):
-			button.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+	SettingsMenuDeveloperSectionScript.update_debug_button_status(button, label, success, message)
 func _on_force_honeymoon_toggled(toggled: bool):
 	_play_sfx("menu_click")
 	var flow = _get_story_flow_controller()
@@ -1744,32 +845,17 @@ func _on_mission_turn_changed(value: float):
 		game_state.mission_turn_count = int(value)
 func _on_max_stats_pressed():
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = 100
-		game_state.positive_energy = 100
-		game_state.entropy_level = 0
-		game_state.honeymoon_charges = 10
-		reality_score_spinbox.value = 100
-		positive_energy_spinbox.value = 100
-		entropy_level_spinbox.value = 0
-		honeymoon_charges_spinbox.value = 10
-		_show_notification("All stats maximized!", true)
+	SettingsMenuDeveloperSectionScript.on_max_stats(_get_game_state(), {
+		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
+		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
+	}, Callable(self, "_show_notification"))
 func _on_reset_stats_pressed():
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = 50
-		game_state.positive_energy = 50
-		game_state.entropy_level = 0
-		game_state.honeymoon_charges = 3
-		game_state.mission_turn_count = 0
-		reality_score_spinbox.value = 50
-		positive_energy_spinbox.value = 50
-		entropy_level_spinbox.value = 0
-		honeymoon_charges_spinbox.value = 3
-		mission_turn_spinbox.value = 0
-		_show_notification("All stats reset to defaults!", true)
+	SettingsMenuDeveloperSectionScript.on_reset_stats(_get_game_state(), {
+		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
+		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
+		"mission_turn": mission_turn_spinbox,
+	}, Callable(self, "_show_notification"))
 func _on_clear_debuffs_pressed():
 	_play_sfx("menu_click")
 	var game_state := _get_game_state()
@@ -1816,94 +902,17 @@ func _on_god_mode_toggled(toggled: bool):
 		var msg = "God mode enabled" if toggled else "God mode disabled"
 		_show_notification(msg, true)
 func _update_fsm_status_label(label: Label):
-	var game_state := _get_game_state()
-	if not game_state:
-		label.text = "Status: GameState not available"
-		return
-	var fsm_module = game_state.get_fsm_challenge_module()
-	if not fsm_module:
-		label.text = "Status: FSM Module not available"
-		return
-	if fsm_module.challenge_crashed:
-		label.text = "Status: Challenge Crashed (Day 8 completed)"
-	elif fsm_module.is_challenge_active:
-		label.text = "Status: Active | Day: %d | Start: %s | Days Completed: %s" % [
-			fsm_module.current_day,
-			fsm_module.challenge_start_date,
-			str(fsm_module.days_completed)
-		]
-	else:
-		label.text = "Status: Not started"
+	SettingsMenuDeveloperSectionScript.update_fsm_status_label(label, _get_game_state())
 func _on_fsm_jump_to_day_pressed(target_day_id: int, status_label: Label):
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if not game_state:
-		_show_notification("GameState not available", false)
-		return
-	var fsm_module = game_state.get_fsm_challenge_module()
-	if not fsm_module:
-		_show_notification("FSM Module not available", false)
-		return
-	fsm_module.reset()
-	if target_day_id == 0:
-		game_state.save_game()
-		game_state.autosave()
-		_update_fsm_status_label(status_label)
-		var msg := "FSM Challenge: jumped to Not Started"
-		_show_notification(msg, true)
-		_report_info("%s (slot + autosave updated)" % msg)
-		return
-	var today_dt := Time.get_datetime_dict_from_system()
-	var today_str := "%04d-%02d-%02d" % [today_dt.year, today_dt.month, today_dt.day]
-	fsm_module.is_challenge_active = true
-	fsm_module.challenge_start_date = today_str
-	fsm_module.last_login_date = today_str
-	fsm_module.challenge_completed = false
-	fsm_module.challenge_crashed = false
-	if target_day_id == 78:
-		for d in range(1, 8):
-			fsm_module.days_completed.append(d)
-		fsm_module.current_day = 8
-		fsm_module.challenge_crashed = false
-		fsm_module.challenge_completed = false
-		game_state.save_game()
-		game_state.autosave()
-		_update_fsm_status_label(status_label)
-		var msg78 := "FSM Challenge: Day 8 In Progress (not yet complete)"
-		_show_notification(msg78, true)
-		_report_info("%s (slot + autosave updated)" % msg78)
-		return
-	for d in range(1, target_day_id + 1):
-		fsm_module.days_completed.append(d)
-	fsm_module.current_day = target_day_id
-	if target_day_id >= GameConstants.FSMChallenge.DAYS_BEFORE_CRASH:
-		fsm_module.challenge_crashed = true
-		fsm_module.is_challenge_active = false
-	game_state.save_game()
-	game_state.autosave()
-	_update_fsm_status_label(status_label)
-	var msg := "FSM Challenge: jumped to Day %d completed" % target_day_id
-	if fsm_module.challenge_crashed:
-		msg += " (Crashed)"
-	_show_notification(msg, true)
-	_report_info("%s (slot + autosave updated)" % msg)
+	SettingsMenuDeveloperSectionScript.on_fsm_jump_to_day(
+		target_day_id, status_label, _get_game_state(),
+		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _on_fsm_reset_pressed(status_label: Label):
 	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if not game_state:
-		_show_notification("GameState not available", false)
-		return
-	var fsm_module = game_state.get_fsm_challenge_module()
-	if not fsm_module:
-		_show_notification("FSM Module not available", false)
-		return
-	fsm_module.reset()
-	game_state.save_game()
-	game_state.autosave()
-	_update_fsm_status_label(status_label)
-	var msg := "FSM Challenge has been reset"
-	_show_notification(msg, true)
-	_report_info("%s (slot + autosave updated)" % msg)
+	SettingsMenuDeveloperSectionScript.on_fsm_reset(
+		status_label, _get_game_state(),
+		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _show_notification(message: String, success: bool = true):
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
 	if notifier:
@@ -1980,107 +989,63 @@ func update_ui_text():
 		var ai_tab := tab_container.get_tab_count() - 1
 		if ai_tab >= 0:
 			_normalize_ai_log_language_texts(tab_container.get_child(ai_tab))
-	if tab_container:
-		tab_container.set_tab_title(0, _tr("SETTINGS_GAMEPLAY"))
-		tab_container.set_tab_title(1, _tr("SETTINGS_DISPLAY"))
-		tab_container.set_tab_title(2, _tr("SETTINGS_AUDIO_2"))
-		tab_container.set_tab_title(3, _tr("SETTINGS_VOICE"))
-		tab_container.set_tab_title(4, _tr("SETTINGS_TUTORIAL"))
-		tab_container.set_tab_title(5, _tr("SETTINGS_DEVELOPER"))
-		tab_container.set_tab_title(6, _tr("SETTINGS_AI_LOG"))
-	title_label.text = _tr("SETTINGS_TITLE")
-	text_speed_label.text = _tr("SETTINGS_TEXT_SPEED_LABEL")
-	text_speed_option.set_item_text(0, _tr("SETTINGS_TEXT_SPEED_INSTANT"))
-	text_speed_option.set_item_text(1, _tr("SETTINGS_TEXT_SPEED_FAST"))
-	text_speed_option.set_item_text(2, _tr("SETTINGS_TEXT_SPEED_NORMAL"))
-	text_speed_option.set_item_text(3, _tr("SETTINGS_TEXT_SPEED_SLOW"))
-	screen_shake_check.text = _tr("SETTINGS_SCREEN_SHAKE")
-	if max_rounds_label:
-		max_rounds_label.text = _tr("SETTINGS_MAX_ROUNDS_LABEL")
-	if max_rounds_spinbox:
-		max_rounds_spinbox.tooltip_text = _tr("SETTINGS_MAX_ROUNDS_HINT")
-	touch_controls_checkbox.text = _tr("SETTINGS_TOUCH_CONTROLS")
-	if force_mission_complete_check:
-		force_mission_complete_check.text = _tr("SETTINGS_FORCE_MISSION_END")
-		force_mission_complete_check.tooltip_text = tr("SETTINGS_DEV_FORCE_COMPLETE_HINT")
-	reality_score_label.text = _tr("SETTINGS_REALITY_SCORE")
-	positive_energy_label.text = _tr("SETTINGS_POSITIVE_ENERGY")
-	entropy_level_label.text = _tr("SETTINGS_ENTROPY_LEVEL")
-	honeymoon_charges_label.text = _tr("SETTINGS_HONEYMOON_CHARGES")
-	mission_turn_label.text = _tr("SETTINGS_MISSION_TURN_COUNT")
-	if tab_developer.has_node("QuickActionsLabel"):
-		tab_developer.get_node("QuickActionsLabel").text = _tr("SETTINGS_QUICK_ACTIONS")
-	if tab_developer.has_node("TogglesLabel"):
-		tab_developer.get_node("TogglesLabel").text = _tr("SETTINGS_GAME_STATE_TOGGLES")
-	max_stats_button.text = _tr("SETTINGS_MAX_ALL_STATS")
-	reset_stats_button.text = _tr("SETTINGS_RESET_ALL_STATS")
-	clear_debuffs_button.text = _tr("SETTINGS_CLEAR_ALL_DEBUFFS")
-	add_honeymoon_button.text = _tr("SETTINGS_ADD_HONEYMOON")
-	autosave_toggle.text = _tr("SETTINGS_ENABLE_AUTOSAVE")
-	infinite_resources_toggle.text = _tr("SETTINGS_INFINITE_RESOURCES")
-	skip_dialogue_toggle.text = _tr("SETTINGS_AUTO_ADVANCE_DIALOGUE")
-	god_mode_toggle.text = _tr("SETTINGS_GOD_MODE")
-	if master_volume_hbox.has_node("MasterVolumeLabel"):
-		master_volume_hbox.get_node("MasterVolumeLabel").text = _tr("SETTINGS_MASTER_VOLUME")
-	if music_volume_hbox.has_node("MusicVolumeLabel"):
-		music_volume_hbox.get_node("MusicVolumeLabel").text = _tr("SETTINGS_MUSIC_VOLUME")
-	if sfx_volume_hbox.has_node("SFXVolumeLabel"):
-		sfx_volume_hbox.get_node("SFXVolumeLabel").text = _tr("SETTINGS_SFX_VOLUME")
-	if gloria_voice_check:
-		gloria_voice_check.text = _tr("SETTINGS_GLORIA_VOICE")
-	mute_check_box.text = _tr("SETTINGS_MUTE_ALL")
-	voice_description.text = _tr("SETTINGS_VOICE_DESCRIPTION")
-	voice_enabled_check.text = _tr("SETTINGS_VOICE_ENABLED")
-	voice_output_check.text = _tr("SETTINGS_VOICE_OUTPUT")
-	voice_input_check.text = _tr("SETTINGS_VOICE_INPUT")
-	voice_choice_label.text = _tr("SETTINGS_VOICE_PRESET")
-	voice_volume_label.text = _tr("SETTINGS_VOICE_VOLUME")
-	voice_input_mode_label.text = _tr("SETTINGS_MIC_MODE")
-	voice_proactive_check.text = _tr("SETTINGS_PROACTIVE_LISTENING")
-	if not voice_capture_active:
-		voice_capture_button.text = _tr("SETTINGS_CAPTURE_MIC_TEST")
-	voice_preview_button.text = _tr("SETTINGS_PLAY_SAMPLE")
-	if not voice_status_label.text:
-		voice_status_label.text = _tr("SETTINGS_VOICE_IDLE")
-	resolution_label.text = _tr("SETTINGS_RESOLUTION")
-	fullscreen_label.text = _tr("SETTINGS_DISPLAY_MODE")
-	language_label.text = _tr("SETTINGS_LANGUAGE")
-	font_size_label.text = _tr("SETTINGS_FONT_SIZE")
-	english_font_label.text = _tr("SETTINGS_FONT_ENGLISH")
-	chinese_font_label.text = _tr("SETTINGS_FONT_CHINESE")
-	if tab_tutorial:
-		if tab_tutorial.has_node("TutorialInfoPanel"):
-			var info_panel = tab_tutorial.get_node("TutorialInfoPanel")
-			if info_panel.has_node("TutorialInfoTitle"):
-				info_panel.find_child("TutorialInfoTitle", true, false).text = _tr("SETTINGS_ABOUT_TUTORIALS")
-			if info_panel.has_node("TutorialInfoDesc"):
-				info_panel.find_child("TutorialInfoDesc", true, false).text = _tr("SETTINGS_TUTORIAL_DESC")
-		if tab_tutorial.has_node("ControlsHeader"):
-			tab_tutorial.get_node("ControlsHeader").text = _tr("SETTINGS_TUTORIAL_HEADER")
-		if tab_tutorial.has_node("ProgressPanel"):
-			var progress_panel = tab_tutorial.get_node("ProgressPanel")
-			if progress_panel.has_node("ProgressTitle"):
-				progress_panel.find_child("ProgressTitle", true, false).text = _tr("SETTINGS_YOUR_PROGRESS")
-		if tab_tutorial.has_node("TutorialListLabel"):
-			tab_tutorial.get_node("TutorialListLabel").text = _tr("SETTINGS_ALL_TUTORIALS")
-	if tutorial_enabled_toggle:
-		tutorial_enabled_toggle.text = _tr("SETTINGS_ENABLE_TUTORIALS")
-	if reset_tutorials_button:
-		reset_tutorials_button.text = _tr("SETTINGS_RESET_ALL_TUTORIALS")
+	SettingsMenuUITextScript.apply_labels({
+		"tab_container": tab_container,
+		"title_label": title_label,
+		"text_speed_label": text_speed_label,
+		"text_speed_option": text_speed_option,
+		"screen_shake_check": screen_shake_check,
+		"max_rounds_label": max_rounds_label,
+		"max_rounds_spinbox": max_rounds_spinbox,
+		"touch_controls_checkbox": touch_controls_checkbox,
+		"force_mission_complete_check": force_mission_complete_check,
+		"reality_score_label": reality_score_label,
+		"positive_energy_label": positive_energy_label,
+		"entropy_level_label": entropy_level_label,
+		"honeymoon_charges_label": honeymoon_charges_label,
+		"mission_turn_label": mission_turn_label,
+		"tab_developer": tab_developer,
+		"max_stats_button": max_stats_button,
+		"reset_stats_button": reset_stats_button,
+		"clear_debuffs_button": clear_debuffs_button,
+		"add_honeymoon_button": add_honeymoon_button,
+		"autosave_toggle": autosave_toggle,
+		"infinite_resources_toggle": infinite_resources_toggle,
+		"skip_dialogue_toggle": skip_dialogue_toggle,
+		"god_mode_toggle": god_mode_toggle,
+		"master_volume_hbox": master_volume_hbox,
+		"music_volume_hbox": music_volume_hbox,
+		"sfx_volume_hbox": sfx_volume_hbox,
+		"gloria_voice_check": gloria_voice_check,
+		"mute_check_box": mute_check_box,
+		"voice_description": voice_description,
+		"voice_enabled_check": voice_enabled_check,
+		"voice_output_check": voice_output_check,
+		"voice_input_check": voice_input_check,
+		"voice_choice_label": voice_choice_label,
+		"voice_volume_label": voice_volume_label,
+		"voice_input_mode_label": voice_input_mode_label,
+		"voice_proactive_check": voice_proactive_check,
+		"voice_capture_button": voice_capture_button,
+		"voice_preview_button": voice_preview_button,
+		"voice_status_label": voice_status_label,
+		"resolution_label": resolution_label,
+		"fullscreen_label": fullscreen_label,
+		"language_label": language_label,
+		"font_size_label": font_size_label,
+		"english_font_label": english_font_label,
+		"chinese_font_label": chinese_font_label,
+		"tab_tutorial": tab_tutorial,
+		"tutorial_enabled_toggle": tutorial_enabled_toggle,
+		"reset_tutorials_button": reset_tutorials_button,
+		"ai_settings_button": ai_settings_button,
+		"apply_button": apply_button,
+		"delete_logs_button": delete_logs_button,
+		"back_button": back_button,
+		"delete_logs_dialog": delete_logs_dialog,
+		"fullscreen_option": fullscreen_option,
+	}, Callable(self, "_tr"), voice_capture_active)
 	_update_tutorial_progress_display()
-	ai_settings_button.text = _tr("SETTINGS_AI_PROVIDER")
-	apply_button.text = _tr("SETTINGS_APPLY")
-	if delete_logs_button:
-		delete_logs_button.text = _tr("SETTINGS_DELETE_LOGS")
-	back_button.text = _tr("SETTINGS_BACK")
-	if delete_logs_dialog:
-		delete_logs_dialog.title = _tr("SETTINGS_DELETE_LOGS_TITLE")
-		delete_logs_dialog.dialog_text = _tr("SETTINGS_DELETE_LOGS_CONFIRM")
-		delete_logs_dialog.ok_button_text = _tr("SETTINGS_DELETE")
-		delete_logs_dialog.cancel_button_text = _tr("SETTINGS_CANCEL")
-	fullscreen_option.set_item_text(0, _tr("SETTINGS_WINDOWED"))
-	fullscreen_option.set_item_text(1, _tr("SETTINGS_FULLSCREEN"))
-	fullscreen_option.set_item_text(2, _tr("SETTINGS_BORDERLESS"))
 	_refresh_display_mode_availability()
 	_update_voice_availability_label()
 func _set_button_pressed_safely(button: BaseButton, pressed: bool) -> void:
@@ -2139,90 +1104,27 @@ func _clear_pending_ai_callback(force_clear: bool) -> void:
 	else:
 		AIManager.pending_callback = Callable()
 func _apply_modern_styles():
-	var panel_style = UIStyleManager.create_panel_style(0.98, 0)
-	panel.add_theme_stylebox_override("panel", panel_style)
-	if apply_button:
-		UIStyleManager.apply_button_style(apply_button, "accent", "large")
-		apply_button.icon = ICON_CHECK
-		apply_button.expand_icon = true
-		UIStyleManager.add_hover_scale_effect(apply_button, 1.06)
-		UIStyleManager.add_press_feedback(apply_button)
-		apply_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if ai_settings_button:
-		UIStyleManager.apply_button_style(ai_settings_button, "primary", "large")
-		ai_settings_button.icon = ICON_CREATIVE
-		ai_settings_button.expand_icon = true
-		UIStyleManager.add_hover_scale_effect(ai_settings_button, 1.06)
-		UIStyleManager.add_press_feedback(ai_settings_button)
-		ai_settings_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if back_button:
-		UIStyleManager.apply_button_style(back_button, "primary", "large")
-		back_button.icon = ICON_BACK
-		back_button.expand_icon = true
-		UIStyleManager.add_hover_scale_effect(back_button, 1.06)
-		UIStyleManager.add_press_feedback(back_button)
-		back_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if delete_logs_button:
-		UIStyleManager.apply_button_style(delete_logs_button, "danger", "medium")
-		delete_logs_button.icon = ICON_DELETE
-		delete_logs_button.expand_icon = true
-		UIStyleManager.add_hover_scale_effect(delete_logs_button, 1.05)
-		UIStyleManager.add_press_feedback(delete_logs_button)
-		delete_logs_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if master_volume_hbox.has_node("MasterVolumeSlider"):
-		master_volume_hbox.get_node("MasterVolumeSlider").mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if music_volume_hbox.has_node("MusicVolumeSlider"):
-		music_volume_hbox.get_node("MusicVolumeSlider").mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if sfx_volume_hbox.has_node("SFXVolumeSlider"):
-		sfx_volume_hbox.get_node("SFXVolumeSlider").mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if voice_preview_button:
-		UIStyleManager.apply_button_style(voice_preview_button, "secondary", "medium")
-		UIStyleManager.add_press_feedback(voice_preview_button)
-		voice_preview_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if voice_capture_button:
-		UIStyleManager.apply_button_style(voice_capture_button, "secondary", "medium")
-		voice_capture_button.icon = ICON_MIC
-		voice_capture_button.expand_icon = true
-		UIStyleManager.add_press_feedback(voice_capture_button)
-		voice_capture_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if reset_tutorials_button:
-		UIStyleManager.apply_button_style(reset_tutorials_button, "accent", "medium")
-		UIStyleManager.add_press_feedback(reset_tutorials_button)
-		reset_tutorials_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if tab_tutorial:
-		if tab_tutorial.has_node("TutorialInfoPanel"):
-			var info_panel = tab_tutorial.get_node("TutorialInfoPanel")
-			var info_style = UIStyleManager.create_panel_style(0.92, UIStyleManager.CORNER_RADIUS_MEDIUM)
-			info_style.border_width_left = 3
-			info_style.border_width_top = 0
-			info_style.border_width_right = 0
-			info_style.border_width_bottom = 0
-			info_style.border_color = Color(0.4, 0.7, 1.0, 0.8)
-			info_panel.add_theme_stylebox_override("panel", info_style)
-		if tab_tutorial.has_node("ProgressPanel"):
-			var progress_panel = tab_tutorial.get_node("ProgressPanel")
-			var progress_style = UIStyleManager.create_panel_style(0.94, UIStyleManager.CORNER_RADIUS_MEDIUM)
-			progress_style.border_width_left = 0
-			progress_style.border_width_top = 2
-			progress_style.border_width_right = 0
-			progress_style.border_width_bottom = 2
-			progress_style.border_color = Color(0.7, 0.9, 1.0, 0.5)
-			progress_panel.add_theme_stylebox_override("panel", progress_style)
-	if tutorial_list_container:
-		for child in tutorial_list_container.get_children():
-			if child is PanelContainer:
-				var item_style = UIStyleManager.create_panel_style(0.9, UIStyleManager.CORNER_RADIUS_SMALL)
-				item_style.border_width_left = 2
-				item_style.border_width_top = 0
-				item_style.border_width_right = 0
-				item_style.border_width_bottom = 0
-				item_style.border_color = Color(0.5, 0.5, 0.5, 0.3)
-				child.add_theme_stylebox_override("panel", item_style)
-				var trigger_button = child.find_child("Trigger_*", true, false)
-				if trigger_button and trigger_button is Button:
-					UIStyleManager.apply_button_style(trigger_button, "primary", "small")
-					UIStyleManager.add_press_feedback(trigger_button)
-					trigger_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	SettingsMenuStylesScript.apply_modern_styles({
+		"panel": panel,
+		"apply_button": apply_button,
+		"ai_settings_button": ai_settings_button,
+		"back_button": back_button,
+		"delete_logs_button": delete_logs_button,
+		"master_volume_hbox": master_volume_hbox,
+		"music_volume_hbox": music_volume_hbox,
+		"sfx_volume_hbox": sfx_volume_hbox,
+		"voice_preview_button": voice_preview_button,
+		"voice_capture_button": voice_capture_button,
+		"reset_tutorials_button": reset_tutorials_button,
+		"tab_tutorial": tab_tutorial,
+		"tutorial_list_container": tutorial_list_container,
+	}, {
+		"check": ICON_CHECK,
+		"creative": ICON_CREATIVE,
+		"back": ICON_BACK,
+		"delete": ICON_DELETE,
+		"mic": ICON_MIC,
+	})
 	_connect_button_sounds()
 func _get_audio_manager() -> Node:
 	if is_instance_valid(_audio_manager):
@@ -2364,34 +1266,11 @@ func _sync_voice_ui_state():
 	_update_voice_availability_label()
 func _update_voice_availability_label():
 	if not voice_availability_label: return
-	if not AIManager:
-		voice_availability_label.text = "Native voice unavailable (AI Manager missing)."
-		return
-	if voice_supported:
-		var provider_name := ""
-		var model_name := ""
-		match AIManager.current_provider:
-			AIManager.AIProvider.GEMINI:
-				provider_name = "Gemini"
-				model_name = AIManager.gemini_model
-			AIManager.AIProvider.OPENROUTER:
-				provider_name = "OpenRouter"
-				model_name = AIManager.openrouter_model
-			AIManager.AIProvider.OLLAMA:
-				provider_name = "Ollama (Local)"
-				model_name = AIManager.ollama_model
-			_:
-				provider_name = "Unknown"
-		voice_availability_label.text = "Native audio ready via %s (%s)." % [provider_name, model_name]
-	else:
-		voice_availability_label.text = "Current model does not expose native audio."
+	voice_availability_label.text = SettingsMenuVoiceSectionScript.build_availability_text(
+		AIManager, voice_supported
+	)
 func _try_enable_gemini_native_audio_support() -> bool:
-	if not AIManager:
-		return false
-	if AIManager.current_provider != AIManager.AIProvider.GEMINI:
-		return false
-	AIManager.refresh_voice_capabilities()
-	voice_supported = AIManager.is_native_voice_supported()
+	voice_supported = SettingsMenuVoiceSectionScript.try_enable_gemini_native_audio(AIManager)
 	_update_voice_availability_label()
 	return voice_supported
 func _update_voice_volume_display():
@@ -2404,18 +1283,12 @@ func _update_voice_status(message: String, is_error: bool = false):
 		voice_status_label.add_theme_color_override("font_color", Color(1.0, 0.45, 0.45))
 	else:
 		voice_status_label.add_theme_color_override("font_color", Color(0.75, 0.9, 1.0))
-func _gather_voice_preferences() -> Dictionary:
-	return {
-		"prefer_native_audio": voice_enabled,
-		"voice_output_enabled": voice_output_enabled,
-		"voice_input_enabled": voice_input_enabled,
-		"preferred_voice_name": voice_voice_name,
-		"voice_input_mode": voice_input_mode,
-		"proactive_audio_enabled": voice_proactive_enabled,
-	}
 func _apply_voice_preferences():
 	if not AIManager: return
-	var prefs := _gather_voice_preferences()
+	var prefs := SettingsMenuVoiceSectionScript.gather_preferences(
+		voice_enabled, voice_output_enabled, voice_input_enabled,
+		voice_voice_name, voice_input_mode, voice_proactive_enabled
+	)
 	AIManager.apply_voice_settings(prefs)
 	AIManager.refresh_voice_capabilities()
 	AIManager.save_ai_settings()
@@ -2552,88 +1425,39 @@ func _on_touch_controls_toggled(button_pressed: bool) -> void:
 	var touch_controls = get_tree().get_root().find_child("TouchControls", true, false)
 	if touch_controls:
 		touch_controls.visible = touch_controls_enabled
+func _get_audio_settings_data() -> Dictionary:
+	return {
+		"master_volume": master_volume,
+		"music_volume": music_volume,
+		"sfx_volume": sfx_volume,
+		"voice_volume": voice_volume,
+		"gloria_voice_enabled": gloria_voice_enabled,
+		"muted": is_muted,
+	}
 func _on_master_volume_changed(value: float):
 	master_volume = value
-	if master_volume_hbox.has_node("MasterVolumeValue"):
-		master_volume_hbox.get_node("MasterVolumeValue").text = str(int(value)) + "%"
-	_apply_audio_settings()
+	SettingsMenuAudioSectionScript.update_volume_label(master_volume_hbox, "MasterVolumeValue", value)
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_music_volume_changed(value: float):
 	music_volume = value
-	if music_volume_hbox.has_node("MusicVolumeValue"):
-		music_volume_hbox.get_node("MusicVolumeValue").text = str(int(value)) + "%"
-	_apply_audio_settings()
+	SettingsMenuAudioSectionScript.update_volume_label(music_volume_hbox, "MusicVolumeValue", value)
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_sfx_volume_changed(value: float):
 	sfx_volume = value
-	if sfx_volume_hbox.has_node("SFXVolumeValue"):
-		sfx_volume_hbox.get_node("SFXVolumeValue").text = str(int(value)) + "%"
-	_apply_audio_settings()
+	SettingsMenuAudioSectionScript.update_volume_label(sfx_volume_hbox, "SFXVolumeValue", value)
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_gloria_voice_toggled(button_pressed: bool):
 	gloria_voice_enabled = button_pressed
-	_apply_audio_settings()
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_mute_toggled(button_pressed: bool):
 	is_muted = button_pressed
-	_apply_audio_settings()
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _apply_audio_settings():
-	if AudioManager:
-		AudioManager.apply_volume_settings(
-			{
-				"master_volume": master_volume,
-				"music_volume": music_volume,
-				"sfx_volume": sfx_volume,
-				"voice_volume": voice_volume,
-				"gloria_voice_enabled": gloria_voice_enabled,
-				"muted": is_muted,
-			},
-		)
-	else:
-		var master_bus_idx = AudioServer.get_bus_index("Master")
-		var music_bus_idx = AudioServer.get_bus_index("Music")
-		var sfx_bus_idx = AudioServer.get_bus_index("SFX")
-		var voice_bus_idx = AudioServer.get_bus_index("Voice")
-		if master_bus_idx != -1:
-			AudioServer.set_bus_mute(master_bus_idx, is_muted)
-			if not is_muted:
-				var master_db = linear_to_db(master_volume / 100.0)
-				var music_db = linear_to_db(music_volume / 100.0)
-				var sfx_db = linear_to_db(sfx_volume / 100.0)
-				var voice_db = linear_to_db(voice_volume / 100.0)
-				AudioServer.set_bus_volume_db(master_bus_idx, master_db)
-				if music_bus_idx != -1:
-					AudioServer.set_bus_volume_db(music_bus_idx, music_db)
-				if sfx_bus_idx != -1:
-					AudioServer.set_bus_volume_db(sfx_bus_idx, sfx_db)
-				if voice_bus_idx != -1:
-					AudioServer.set_bus_volume_db(voice_bus_idx, voice_db)
-func _coerce_vector2i(value: Variant, fallback: Vector2i) -> Vector2i:
-	if value is Vector2i:
-		return value
-	if value is Vector2:
-		var vec: Vector2 = value
-		return Vector2i(roundi(vec.x), roundi(vec.y))
-	if value is Array:
-		var arr: Array = value
-		if arr.size() >= 2:
-			return Vector2i(int(arr[0]), int(arr[1]))
-	return fallback
-func _get_closest_resolution_key(size: Vector2i) -> int:
-	var best_key: int = 0
-	var best_score: int = 2147483647
-	for key_variant: Variant in resolutions.keys():
-		var key: int = int(key_variant)
-		var candidate_variant: Variant = resolutions.get(key, resolutions[0])
-		var candidate: Vector2i = _coerce_vector2i(candidate_variant, resolutions[0])
-		var score: int = int(abs(candidate.x - size.x) + abs(candidate.y - size.y))
-		if score < best_score:
-			best_score = score
-			best_key = key
-	return best_key
+	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _normalize_selected_resolution(fallback_size: Vector2i) -> void:
-	var requested: Vector2i = selected_resolution
-	if requested.x <= 0 or requested.y <= 0:
-		requested = fallback_size
-	var nearest_key: int = _get_closest_resolution_key(requested)
-	var normalized_variant: Variant = resolutions.get(nearest_key, resolutions[0])
-	selected_resolution = _coerce_vector2i(normalized_variant, resolutions[0])
+	selected_resolution = SettingsMenuDisplaySectionScript.normalize_resolution(
+		selected_resolution, resolutions, fallback_size
+	)
 func _initialize_font_options() -> void:
 	if english_font_option == null or chinese_font_option == null:
 		return
@@ -2646,58 +1470,20 @@ func _initialize_font_options() -> void:
 		en_fonts.append(_get_default_font("en"))
 	if zh_fonts.is_empty():
 		zh_fonts.append(_get_default_font("zh"))
-	_populate_font_option(english_font_option, en_fonts)
-	_populate_font_option(chinese_font_option, zh_fonts)
+	SettingsMenuDisplaySectionScript.populate_font_option(english_font_option, en_fonts)
+	SettingsMenuDisplaySectionScript.populate_font_option(chinese_font_option, zh_fonts)
 	if selected_english_font.is_empty():
 		selected_english_font = en_fonts[0]
 	if selected_chinese_font.is_empty():
 		selected_chinese_font = zh_fonts[0]
 	_sync_font_option_selection()
-func _populate_font_option(option: OptionButton, items: Array) -> void:
-	if option == null:
-		return
-	option.clear()
-	for item in items:
-		var font_name := String(item)
-		option.add_item(font_name)
-		option.set_item_metadata(option.item_count - 1, font_name)
 func _sync_font_option_selection() -> void:
-	_select_option_by_metadata(english_font_option, selected_english_font, _get_default_font("en"))
-	_select_option_by_metadata(chinese_font_option, selected_chinese_font, _get_default_font("zh"))
-func _select_option_by_metadata(option: OptionButton, target: String, fallback: String) -> void:
-	if option == null:
-		return
-	var resolved := fallback
-	var selected_idx := 0
-	for i in range(option.item_count):
-		var meta: Variant = option.get_item_metadata(i)
-		var meta_str := ""
-		if typeof(meta) == TYPE_STRING:
-			meta_str = meta
-		var text := option.get_item_text(i)
-		if meta_str == target or text == target:
-			selected_idx = i
-			resolved = meta_str if not meta_str.is_empty() else text
-			break
-	option.select(selected_idx)
-	var chosen := _get_option_metadata(option, selected_idx)
-	if chosen.is_empty():
-		chosen = resolved
-	if option == english_font_option:
-		selected_english_font = chosen
-	elif option == chinese_font_option:
-		selected_chinese_font = chosen
-func _get_option_metadata(option: OptionButton, index: int) -> String:
-	if option == null:
-		return ""
-	if index < 0 or index >= option.item_count:
-		return ""
-	var meta: Variant = option.get_item_metadata(index)
-	if typeof(meta) == TYPE_STRING:
-		var meta_str: String = meta
-		if not meta_str.is_empty():
-			return meta_str
-	return option.get_item_text(index)
+	selected_english_font = SettingsMenuDisplaySectionScript.select_option_by_metadata(
+		english_font_option, selected_english_font, _get_default_font("en")
+	)
+	selected_chinese_font = SettingsMenuDisplaySectionScript.select_option_by_metadata(
+		chinese_font_option, selected_chinese_font, _get_default_font("zh")
+	)
 func _apply_selected_fonts_for_current_language() -> void:
 	if not FontManager:
 		return
@@ -2707,7 +1493,9 @@ func _apply_selected_fonts_for_current_language() -> void:
 	if FontManager.has_method("apply_language_font"):
 		FontManager.apply_language_font(selected_language)
 func _sync_display_options_with_state() -> void:
-	var resolution_key: int = _get_closest_resolution_key(selected_resolution)
+	var resolution_key: int = SettingsMenuDisplaySectionScript.get_closest_resolution_key(
+		selected_resolution, resolutions
+	)
 	resolution_option.select(resolution_key)
 	fullscreen_option.select(clampi(selected_mode, 0, 2))
 func _refresh_display_mode_availability() -> void:
@@ -2722,7 +1510,7 @@ func _refresh_display_mode_availability() -> void:
 		fullscreen_option.tooltip_text = ""
 func _on_resolution_changed(index: int):
 	var selected_variant: Variant = resolutions.get(index, resolutions[0])
-	selected_resolution = _coerce_vector2i(selected_variant, resolutions[0])
+	selected_resolution = SettingsMenuDisplaySectionScript.coerce_vector2i(selected_variant, resolutions[0])
 func _on_fullscreen_changed(index: int):
 	selected_mode = index
 func _on_language_changed(index: int):
@@ -2749,11 +1537,11 @@ func _on_font_size_changed(index: int):
 	else:
 		_report_info("Font size changed to index: %s" % selected_font_size)
 func _on_english_font_changed(index: int):
-	selected_english_font = _get_option_metadata(english_font_option, index)
+	selected_english_font = SettingsMenuDisplaySectionScript.get_option_metadata(english_font_option, index)
 	_report_info("English font changed to: %s" % selected_english_font)
 	_apply_selected_fonts_for_current_language()
 func _on_chinese_font_changed(index: int):
-	selected_chinese_font = _get_option_metadata(chinese_font_option, index)
+	selected_chinese_font = SettingsMenuDisplaySectionScript.get_option_metadata(chinese_font_option, index)
 	_report_info("Chinese font changed to: %s" % selected_chinese_font)
 	_apply_selected_fonts_for_current_language()
 func _on_apply_button_pressed():
@@ -2830,34 +1618,10 @@ func _on_delete_logs_button_pressed():
 		if ok_button:
 			ok_button.call_deferred("grab_focus")
 func _on_delete_logs_confirmed():
-	var success := false
-	var files_removed := 0
-	var metadata_removed := 0
 	if AudioManager:
 		AudioManager.play_sfx("happy_click")
-	var game_state := _get_game_state()
-	if game_state and game_state.has_method("delete_local_logs"):
-		var result: Dictionary = game_state.delete_local_logs()
-		success = true
-		files_removed = int(result.get("files_deleted", 0))
-		var removed_array_variant: Variant = result.get("metadata_keys_removed", [])
-		if removed_array_variant is Array:
-			var removed_array: Array = removed_array_variant
-			metadata_removed = removed_array.size()
-		game_state.set_metadata("prayer_notice_acknowledged", false)
-	else:
-		success = false
-	var message := ""
-	if success:
-		message = _tr("SETTINGS_LOGS_CLEARED") % [files_removed, metadata_removed]
-	else:
-		message = _tr("SETTINGS_LOGS_UNAVAILABLE")
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
-	if notifier:
-		if success:
-			notifier.show_success(message)
-		else:
-			notifier.show_warning(message)
+	SettingsMenuLogActionsScript.delete_logs(_get_game_state(), notifier, Callable(self, "_tr"))
 func _on_ai_settings_button_pressed():
 	if _exit_mode == EXIT_MODE_OVERLAY:
 		var ai_settings_scene = load("res://1.Codebase/src/scenes/ui/ai_settings_menu.tscn")
@@ -2900,31 +1664,31 @@ func _get_default_font(language: String) -> String:
 		return FontManager.DEFAULT_ZH_FONT if FontManager else "Noto Sans SC"
 	return FontManager.DEFAULT_EN_FONT if FontManager else "Trajan Pro"
 func save_settings():
-	var config = ConfigFile.new()
-	config.set_value("display", "resolution", selected_resolution)
-	config.set_value("display", "mode", selected_mode)
-	config.set_value("display", "font_size", selected_font_size)
-	config.set_value("display", "font_en", selected_english_font)
-	config.set_value("display", "font_zh", selected_chinese_font)
-	config.set_value("display", "high_contrast", high_contrast_mode)
-	config.set_value("game", "language", selected_language)
-	config.set_value("game", "text_speed", text_speed)
-	config.set_value("game", "screen_shake", screen_shake_enabled)
-	config.set_value("game", "max_rounds_per_mission", max_rounds_per_mission)
-	config.set_value("audio", "master_volume", master_volume)
-	config.set_value("audio", "music_volume", music_volume)
-	config.set_value("audio", "sfx_volume", sfx_volume)
-	config.set_value("audio", "gloria_voice_enabled", gloria_voice_enabled)
-	config.set_value("audio", "muted", is_muted)
-	config.set_value("voice", "enabled", voice_enabled)
-	config.set_value("voice", "output_enabled", voice_output_enabled)
-	config.set_value("voice", "input_enabled", voice_input_enabled)
-	config.set_value("voice", "voice_volume", voice_volume)
-	config.set_value("voice", "voice_name", voice_voice_name)
-	config.set_value("voice", "voice_input_mode", voice_input_mode)
-	config.set_value("voice", "proactive_enabled", voice_proactive_enabled)
-	config.set_value("controls", "touch_controls_enabled", touch_controls_enabled)
-	config.save("user://settings.cfg")
+	GameSave.save_settings({
+		"resolution": selected_resolution,
+		"mode": selected_mode,
+		"font_size": selected_font_size,
+		"font_en": selected_english_font,
+		"font_zh": selected_chinese_font,
+		"high_contrast": high_contrast_mode,
+		"language": selected_language,
+		"text_speed": text_speed,
+		"screen_shake": screen_shake_enabled,
+		"max_rounds_per_mission": max_rounds_per_mission,
+		"master_volume": master_volume,
+		"music_volume": music_volume,
+		"sfx_volume": sfx_volume,
+		"gloria_voice_enabled": gloria_voice_enabled,
+		"muted": is_muted,
+		"voice_enabled": voice_enabled,
+		"voice_output_enabled": voice_output_enabled,
+		"voice_input_enabled": voice_input_enabled,
+		"voice_volume": voice_volume,
+		"voice_voice_name": voice_voice_name,
+		"voice_input_mode": voice_input_mode,
+		"voice_proactive_enabled": voice_proactive_enabled,
+		"touch_controls_enabled": touch_controls_enabled,
+	})
 	var game_state := _get_game_state()
 	if game_state:
 		game_state.settings.text_speed = text_speed
@@ -2932,35 +1696,45 @@ func save_settings():
 		game_state.settings.high_contrast_mode = high_contrast_mode
 		game_state.settings["max_rounds_per_mission"] = max_rounds_per_mission
 func load_settings():
-	var config = ConfigFile.new()
-	var err = config.load("user://settings.cfg")
 	var fallback_window_size: Vector2i = Vector2i(DisplayServer.window_get_size())
-	if err == OK:
-		var stored_resolution: Variant = config.get_value("display", "resolution", fallback_window_size)
-		selected_resolution = _coerce_vector2i(stored_resolution, fallback_window_size)
+	var defaults := {
+		"resolution": fallback_window_size,
+		"font_en": _get_default_font("en"),
+		"font_zh": _get_default_font("zh"),
+		"voice_enabled": voice_enabled,
+		"voice_output_enabled": voice_output_enabled,
+		"voice_input_enabled": voice_input_enabled,
+		"voice_volume": voice_volume,
+		"voice_voice_name": voice_voice_name,
+		"voice_input_mode": voice_input_mode,
+		"voice_proactive_enabled": voice_proactive_enabled,
+	}
+	var data := GameSave.load_settings(defaults)
+	if not data.is_empty():
+		selected_resolution = data["resolution"]
 		_normalize_selected_resolution(fallback_window_size)
-		selected_mode = clampi(int(config.get_value("display", "mode", 0)), 0, 2)
-		selected_font_size = int(config.get_value("display", "font_size", 2))
-		selected_english_font = String(config.get_value("display", "font_en", _get_default_font("en")))
-		selected_chinese_font = String(config.get_value("display", "font_zh", _get_default_font("zh")))
-		high_contrast_mode = bool(config.get_value("display", "high_contrast", false))
-		selected_language = String(config.get_value("game", "language", "en"))
-		text_speed = float(config.get_value("game", "text_speed", 1.0))
-		screen_shake_enabled = bool(config.get_value("game", "screen_shake", true))
-		max_rounds_per_mission = int(config.get_value("game", "max_rounds_per_mission", 0))
-		master_volume = float(config.get_value("audio", "master_volume", 100.0))
-		music_volume = float(config.get_value("audio", "music_volume", 100.0))
-		sfx_volume = float(config.get_value("audio", "sfx_volume", 100.0))
-		gloria_voice_enabled = bool(config.get_value("audio", "gloria_voice_enabled", true))
-		is_muted = bool(config.get_value("audio", "muted", false))
-		voice_enabled = bool(config.get_value("voice", "enabled", voice_enabled))
-		voice_output_enabled = bool(config.get_value("voice", "output_enabled", voice_output_enabled))
-		voice_input_enabled = bool(config.get_value("voice", "input_enabled", voice_input_enabled))
-		voice_volume = float(config.get_value("voice", "voice_volume", voice_volume))
-		voice_voice_name = String(config.get_value("voice", "voice_name", voice_voice_name))
-		voice_input_mode = int(config.get_value("voice", "voice_input_mode", voice_input_mode))
-		voice_proactive_enabled = bool(config.get_value("voice", "proactive_enabled", voice_proactive_enabled))
-		touch_controls_enabled = bool(config.get_value("controls", "touch_controls_enabled", false))
+		selected_mode = data["mode"]
+		selected_font_size = data["font_size"]
+		selected_english_font = data["font_en"]
+		selected_chinese_font = data["font_zh"]
+		high_contrast_mode = data["high_contrast"]
+		selected_language = data["language"]
+		text_speed = data["text_speed"]
+		screen_shake_enabled = data["screen_shake"]
+		max_rounds_per_mission = data["max_rounds_per_mission"]
+		master_volume = data["master_volume"]
+		music_volume = data["music_volume"]
+		sfx_volume = data["sfx_volume"]
+		gloria_voice_enabled = data["gloria_voice_enabled"]
+		is_muted = data["muted"]
+		voice_enabled = data["voice_enabled"]
+		voice_output_enabled = data["voice_output_enabled"]
+		voice_input_enabled = data["voice_input_enabled"]
+		voice_volume = data["voice_volume"]
+		voice_voice_name = data["voice_voice_name"]
+		voice_input_mode = data["voice_input_mode"]
+		voice_proactive_enabled = data["voice_proactive_enabled"]
+		touch_controls_enabled = data["touch_controls_enabled"]
 		_apply_audio_settings()
 		var game_state := _get_game_state()
 		if game_state:
