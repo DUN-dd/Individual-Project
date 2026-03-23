@@ -1,0 +1,4 @@
+name = "gda1-gemini-proxy"
+main = "gemini-proxy.js"
+compatibility_date = "2024-01-01"
+

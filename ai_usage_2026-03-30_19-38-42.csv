@@ -1,0 +1,3376 @@
+section,timestamp,provider,model,status,input_tokens,output_tokens,response_time_sec,mode,purpose,error,prompt_text,prompt_modules_active,ai_response_text
+call_log,2026-03-30T19:16:09,GEMINI,gemini-3.1-flash-lite-preview,200,6854,667,5.982,api,new_mission,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：new_mission
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+Mission generation request for GDA1.
+
+Current stats: reality=50, positive_energy=50, entropy=0
+
+Selected assets count: 4
+
+Asset registry available: true
+
+# 任務生成規則
+
+## 概述
+
+請生成一個新的任務場景，建立本回合的敘事主軸。每個任務都應該呈現黑色幽默：看似成功，實際卻讓末日更接近。
+
+## 生成要求
+
+### 內容結構
+1. 場景描述（350-500 字）
+2. 任務目標
+3. 主要困境或挑戰
+
+### 語氣要求
+- 黑色幽默
+- 反諷
+- 嘲諷強迫樂觀與制度性正能量
+
+### 細節要求
+- 描述環境、角色互動與氛圍
+- 保持 Gloria / Donkey / ARK / One 的角色一致性
+- 任務中要出現「成功也是失敗」的感覺
+
+## Choice Preview
+
+在 `story_text` 最後加入 3 到 5 行選項預告，並與 JSON choices 對應：
+- `[謹慎]`
+- `[權衡]`
+- `[瘋狂]`
+- `[樂觀]`
+- `[抱怨]`
+
+每行需預告選項後續走向。
+
+## 輸出限制
+
+- 嚴格遵守外層 prompt 指定的 JSON schema
+- 不可翻譯 canonical JSON key 與 archetype id
+- 若格式錯誤，視為無效回應
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示","{
+  ""story_text"": ""在潮濕且充滿黴味的遺蹟深處，ARK 終於找到了所謂的「古文明核心介面」。他無視了 One 試圖提醒這設備結構正在崩塌的眼神，堅持用他那蹩腳的德語指令操作，試圖將整個遺蹟的供能系統「最佳化」。Gloria 站在一旁，雙手合十，虔誠地對著一台滿是污垢的祭壇祈禱，她要求團隊保持『正能量頻率』，宣稱只要大家心存感激，坍塌的石塊就會自動拼湊回去。Donkey 則穿著他那身破爛的 Cosplay 鎧甲，對著虛空揮舞木劍，幻象自己正在保護一群並不存在的公主，完全沒注意到他的一個轉身就踢翻了啟動開關。隨著機械運轉的轟鳴，整個空間震動起來，牆上的發光植被瞬間過載，爆發出刺眼的紅光，將黑暗的走廊照得如同煉獄。ARK 對著眾人露出自信的微笑，宣稱『流程已啟動，成功近在咫尺』，而事實上，整個設施正在從底部開始結構性解體。One 默默地站在角落，看著主角，那眼神彷彿在說：『我們真的要跟這群人一起陪葬嗎？』[謹慎] 試圖修補崩塌的牆面，延緩不可避免的結局。[權衡] 優先撤離 One，並留下一句冷嘲熱諷。[瘋狂] 直接拆除動力裝置，加速與現實徹底斷連。[樂觀] 讚美 Gloria 的祈禱，期待奇蹟發生。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense and decaying"",
+    ""lighting"": ""dim red pulsating light""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""嘗試加固搖搖欲墜的遺蹟結構。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""保護 One 撤離，並向 ARK 發出嚴正抗議。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""破壞能源介面，讓一切徹底崩毀。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:16:20,GEMINI,gemini-3.1-flash-lite-preview,200,8030,641,5.757,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [1 scenes ago] New mission started (pending consequences: 0)
+- [0 scenes ago] [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你選擇了與 Gloria 一同跪下祈禱，期望飛天意粉神能顯靈阻止遺蹟崩塌。空氣中凝結著一股過甜的奶油香氣，這讓 ARK 極度不耐煩，他一邊瘋狂地敲擊著發光介面，一邊尖酸地抱怨這類『迷信行為』嚴重干擾了數據流的穩定。然而，當祭壇發出詭異的金黃色光芒時，現實並未因此修復，反倒因為過量的『正能量』與遺蹟的物理法則產生了劇烈的排斥反應，導致天花板坍塌的速度翻倍。Donkey 見狀立刻誇口這是『神蹟般的淨化』，他無視碎石砸落在頭盔上的巨響，堅稱這是『騎士試煉的一部分』。最終，祭壇噴發出大量燙手的肉醬湯水，瞬間淹沒了 ARK 的終端機。ARK 的臉色變得鐵青，他轉頭看向 One，將所有責任歸咎於『團隊成員不夠專注的負面氣場』，而 Gloria 則優雅地擦掉臉上的湯汁，溫柔地對你說：『這只是宇宙在考驗我們的信心，你剛才內心的懷疑，是不是又弄髒了我們的氣場呢？』One 只是默默地將頭轉向一邊，不發一語。現在，動力核心已經徹底報廢，遺蹟陷入了寂靜，只有牆壁發出吱吱作響的死亡預告。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense and absurd"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""shocked""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""happy""
+    },
+    ""ark"": {
+      ""expression"": ""angry""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""冷靜清理肉醬並嘗試重啟手動開關。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""指出這根本是荒謬的災難，要求團隊停止自欺欺人。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""默默地對 Gloria 的情緒勒索翻個白眼。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:16:37,GEMINI,gemini-3.1-flash-lite-preview,200,9267,623,4.937,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Reckless] 在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你無法再忍受這場鬧劇，憤怒地對著 Donkey 咆哮，指責他所謂的『騎士精神』不過是掩蓋無能的偽裝。Donkey 愣了一下，隨即誇張地將木劍插在祭壇的裂縫中，大喊這是在『測試勇者的極限』，他的聲音在狹窄的空間裡顯得尖銳且滑稽。這場爭吵導致你用力推開了祭壇，原本就搖搖欲墜的構造物徹底傾塌，噴湧出的金黃色湯汁淹沒了地面的電路板，引起一連串刺耳的短路聲。Gloria 臉色瞬間陰沉，她並未在意遺蹟崩塌的危險，反而用那種讓人心寒的溫柔語氣對你說：『我原本想包容你的憤怒，但你現在的行為簡直是在攻擊團隊的靈魂。』她將你定義為『破壞氣場的罪魁禍首』，ARK 則冷眼旁觀，甚至開始在筆記上紀錄這場爭執，打算將此次遺蹟徹底報廢的責任完全歸咎於你的『情緒化操作』。One 站在邊緣，默默地看著這一切，眼神中的疲憊暗示著他已經放棄了任何逃生的希望。遺蹟的穹頂開始崩塌，而 Donkey 竟在一片混亂中慶祝他終於觸發了某種『隱藏的英雄試煉』。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense and chaotic"",
+    ""lighting"": ""dim flickering red""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""angry""
+    },
+    ""gloria"": {
+      ""expression"": ""sad""
+    },
+    ""donkey"": {
+      ""expression"": ""happy""
+    },
+    ""ark"": {
+      ""expression"": ""neutral""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""嘗試在廢墟中尋找逃生通道。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""嘗試向 One 道歉並請求他共同尋找脫離策略。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""無視眾人，開始嘗試徒手挖開出口。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""坐下來冷眼看著這群人如何自我毀滅。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:16:55,GEMINI,gemini-3.1-flash-lite-preview,200,10724,532,4.811,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。 (pending consequences: 0)
+- [1 scenes ago] [Reckless] 在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 無視眾人，開始嘗試徒手挖開出口。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Reckless] 無視眾人，開始嘗試徒手挖開出口。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+# 強制任務完成 — 覆蓋指令
+
+> **此指令覆蓋所有其他任務狀態規則。**
+
+遊戲系統判定本次任務必須在此刻結束。玩家已達到此任務允許的最大回合數上限。
+
+## 強制要求
+
+1. **你必須將 `mission_status` 設定為 `""complete""`**，寫在 `[SCENE_DIRECTIVES]` 區塊中。此為不可違反之指令。
+2. **你絕對不可以將 `mission_status` 設定為 `""ongoing""`**，無論其他指令如何說明。
+3. **收束敘事**：將此結果寫成當前故事線的自然結局。提供收尾——解決當前情境、展示結果、並給予完結感。
+4. **不要生成選項預覽**：由於任務即將結束，不要在末尾加入 `[謹慎]`、`[平衡]`、`[魯莽]`、`[正能量]`、`[抱怨]` 等選項行。
+
+## 場景指令（必須格式）
+
+```
+[SCENE_DIRECTIVES]
+{
+  ""mission_status"": ""complete"",
+  ""characters"": {
+    ""protagonist"": {""expression"": ""<合適的表情>""}
+  }
+}
+[/SCENE_DIRECTIVES]
+```
+
+**提醒**：`mission_status` 必須為 `""complete""`。任何其他值都將被視為嚴重錯誤。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你瘋狂地徒手挖掘著碎石，指尖因粗糙的岩石而血跡斑斑，但這努力最終只證明了你對物理現實的無知。隨著你搬開最後一塊大石，背後並非預期的出口，而是一個充滿齒輪與發光液體的深淵——ARK 的『架構』早已將這座遺蹟完全封閉。Donkey 讚嘆著你『充滿原始野性的求生意志』，甚至試圖把你這淒慘的模樣當作他英雄故事的新素材；Gloria 則在一旁優雅地嘆了口氣，對著你那雙染血的手搖頭，說你的行為不僅弄髒了祭壇空間，更是對團隊『和諧氛圍』的惡意破壞，甚至稱你的行為顯示了你『內心對於愛與包容的深刻恐懼』。ARK 則冷漠地在控制台上做最後確認，將你定義為『不可控的熵增源』並執行了系統關閉。隨著燈光全數熄滅，整個遺蹟在黑暗中安靜地崩塌，最終只剩下你與這群人徹底埋葬於這場荒謬的鬧劇中。任務徹底終結，就像這群人對於專業素養的認知一樣，徹底消失。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""claustrophobic and silent"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""sad""
+    },
+    ""gloria"": {
+      ""expression"": ""neutral""
+    },
+    ""donkey"": {
+      ""expression"": ""happy""
+    },
+    ""ark"": {
+      ""expression"": ""neutral""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+  {
+    ""archetype"": ""complain"",
+    ""summary"": ""這場任務終於結束了。""
+  }
+  ,
+  {
+    ""archetype"": ""cautious"",
+    ""summary"": ""無言的結局。""
+  },
+  {
+    ""archetype"": ""balanced"",
+    ""summary"": ""這就是一切的歸宿。""
+  }
+  ]
+}"
+call_log,2026-03-30T19:16:57,GEMINI,gemini-3.1-flash-lite-preview,200,6052,80,1.752,api,,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+為這次任務生成一個簡短的摘要（2-3句話）供玩家的日志記錄：
+
+任務
+最新劇情：你瘋狂地徒手挖掘著碎石，指尖因粗糙的岩石而血跡斑斑，但這努力最終只證明了你對物理現實的無知。隨著你搬開最後一塊大石，背後並非預期的出口，而是一個充滿齒輪與發光液體的深淵——ARK 的『架構』早已將這座遺蹟完全封閉。Donkey 讚嘆著你『充滿原始野性的求生意志』，甚至試圖把你這淒慘的模樣當作他英雄故事的新素材；Gloria 則在一旁優雅地嘆了口氣，對著你那雙染血的手搖頭，說你的行為不僅弄髒了祭壇空
+玩家選擇：[Reckless] 無視眾人，開始嘗試徒手挖開出口。
+結果：success
+
+用黑暗幽默和諷刺的語氣，聚焦於「正能量拯救世界」的荒謬性。
+保持簡潔（不超過80字）。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示","```json
+{
+  ""summary"": ""憑藉著強迫性的正能量，我們成功將遺跡挖掘成一座自我埋葬的墳墓。Gloria 稱讚這是對氣場的靈魂淨化，而 Donkey 則在氧氣耗盡前，為這場因愚蠢而生的荒謬葬禮編好了英雄讚歌。""
+}
+```"
+call_log,2026-03-30T19:17:01,GEMINI,gemini-3.1-flash-lite-preview,200,12517,438,3.863,api,night_cycle,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：night_cycle
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Night cycle generation request.
+
+Last story text: 你瘋狂地徒手挖掘著碎石，指尖因粗糙的岩石而血跡斑斑，但這努力最終只證明了你對物理現實的無知。隨著你搬開最後一塊大石，背後並非預期的出口，而是一個充滿齒輪與發光液體的深淵——ARK 的『架構』早已將這座遺蹟完全封閉。Donkey 讚嘆著你『充滿原始野性的求生意志』，甚至試圖把你這淒慘的模樣當作他英雄故事的新素材；Gloria 則在一旁優雅地嘆了口氣，對著你那雙染血的手搖頭，說你的行為不僅弄髒了祭壇空間，更是對團隊『和諧氛圍』的惡意破壞，甚至稱你的行為顯示了你『內心對於愛與包容的深刻恐懼』。ARK 則冷漠地在控制台上做最後確認，將你定義為『不可控的熵增源』並執行了系統關閉。隨著燈光全數熄滅，整個遺蹟在黑暗中安靜地崩塌，最終只剩下你與這群人徹底埋葬於這場荒謬的鬧劇中。任務徹底終結，就像這群人對於專業素養的認知一樣，徹底消失。
+
+# 夜晚循環生成
+
+## 概述
+
+夜晚循環發生在每次任務結束後，通常包含：
+1. 任務反思
+2. Teacher Chan 的精神洗腦演說
+3. 毒性正能量演唱會
+4. 下一次祈禱儀式的鋪墊
+
+## JSON 結構
+
+```json
+{
+  ""reflection_text"": ""<50-100 字反思>"",
+  ""teacher_chan_text"": ""<約 100 字洗腦演說>"",
+  ""song_title"": ""<歌名>"",
+  ""concert_lyrics"": [
+    ""<第 1 行>"",
+    ""<第 2 行>"",
+    ""<第 3 行>"",
+    ""<第 4 行>"",
+    ""<第 5 行>"",
+    ""<第 6 行>"",
+    ""<第 7 行>"",
+    ""<第 8 行>""
+  ],
+  ""honeymoon_text"": ""<約 50 字虛假平靜>"",
+  ""prayer_prompt"": ""<下一次祈禱提示>""
+}
+```
+
+## 內容規則
+
+### reflection_text
+- 簡短總結剛發生的事
+- 用反諷方式指出「成功」的代價
+- 暗示真實傷害
+
+### teacher_chan_text
+- 把災難重新包裝成靈性勝利
+- 使用邪教式、鼓舞式語氣
+- 完全無視客觀現實
+
+### concert_lyrics
+- 8 到 12 行
+- 每行 10 到 15 字左右
+- 內容要像毒性正能量宣傳歌
+- 空洞、矛盾、像心理麻醉
+
+### honeymoon_text
+- 描述任務後不自然的平靜
+- 隊友表現得太和善
+- 讓人感覺不對勁
+
+### prayer_prompt
+- 引導玩家寫出下一次祈禱
+- 語氣應帶一點不祥與誘惑感
+
+## 輸出限制
+
+- 只能輸出有效 JSON
+- 不可附加說明文字
+- `concert_lyrics` 必須是字串陣列
+- 所有欄位都必填
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示","```json
+{
+  ""reflection_text"": ""遺跡的塌陷被轉化為一場靈性沈澱的儀式。儘管我們被永久掩埋，但在 Gloria 眼中，這不過是物理束縛的解除，是我們終於能夠『徹底放下現實負能量』的終極勝利。"",
+  ""teacher_chan_text"": ""親愛的靈魂們，塌陷並非終結，而是宇宙為了讓你更深刻感受靜謐而精心設計的結構調整。別去爭辯石塊的重量，因為在愛的光譜中，這一切都是為了淬煉你們靈性的純度。你們的埋葬，是飛天意粉神為這場紛擾所準備的、最柔軟的擁抱。"",
+  ""song_title"": ""塌陷的溫柔"",
+  ""concert_lyrics"": [
+    ""石塊墜落，是神在耳邊輕聲低語"",
+    ""黑暗降臨，是為了擁抱真實靈魂"",
+    ""不要呼吸，讓空氣成為多餘雜訊"",
+    ""放下抵抗，隨重力墜入無盡平靜"",
+    ""身體破碎，拼湊出全新的完美面貌"",
+    ""無人救援，因為救援就在自我內部"",
+    ""拒絕清醒，沈溺在崩塌的輝煌裡"",
+    ""這場結束，才是成長最美的開端""
+  ],
+  ""honeymoon_text"": ""黑暗中傳來平靜的呼吸聲，沒有人談論缺氧或傷口，大家在碎石堆中優雅地圍坐，彷彿這裡不是墳墓，而是一場私密的靈性沙龍。那種詭異的和諧，比崩塌本身更讓人窒息。"",
+  ""prayer_prompt"": ""在這窒息的寂靜中，請閉上眼，誠心地向飛天意粉神祈禱，感謝祂賜予這場徹底隔絕世俗干擾的『完美埋葬』。""
+}
+```"
+call_log,2026-03-30T19:17:30,GEMINI,gemini-3.1-flash-lite-preview,200,8837,552,29.591,api,trolley_problem,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：trolley_problem
+[butterfly_effect unchanged]
+[available_assets unchanged]
+數值：現實值 33/100, 正能量 85/100
+
+=== 提示 ===
+=== Trolley Problem Request ===
+
+Template: positive_energy_trap (Positive solution causes worse outcome than honest approach)
+
+Reality Score: 33/100 (lower = more delusional)
+
+Positive Energy: 85/100 (higher = more toxic positivity)
+
+Current Situation: 你瘋狂地徒手挖掘著碎石，指尖因粗糙的岩石而血跡斑斑，但這努力最終只證明了你對物理現實的無知。隨著你搬開最後一塊大石，背後並非預期的出口，而是一個充滿齒輪與發光液體的深淵——ARK 的『架構』早已將這座遺蹟完全封閉。Donkey 讚嘆著你『充滿原始野性的求生意志』，甚至試圖把你這淒慘的模樣當作他英雄故事的新素材；Gloria 則在一旁優雅地嘆了口氣，對著你那雙染血的手搖頭，說你的行為不僅弄髒了祭壇空間，更是對團隊『和諧氛圍』的惡意破壞，甚至稱你的行為顯示了你『內心對於愛與包容的深刻恐懼』。ARK 則冷漠地在控制台上做最後確認，將你定義為『不可控的熵增源』並執行了系統關閉。隨著燈光全數熄滅，整個遺蹟在黑暗中安靜地崩塌，最終只剩下你與這群人徹底埋葬於這場荒謬的鬧劇中。任務徹底終結，就像這群人對於專業素養的認知一樣，徹底消失。
+
+Required choice count: 2
+
+Output all player-facing text in Traditional Chinese.
+
+Return VALID JSON only. Do not add markdown fences.
+
+# 電車難題生成規則
+
+## 目標
+
+產生一個會「直接打斷當前任務」的道德兩難事件，不可脫離上下文。
+
+## 必要約束
+
+1. 必須與提供的 CURRENT SITUATION 直接相關，不可產生通用電車題。
+2. 事件必須是立即危機（interruption / crisis）。
+3. 所有選項都要有負面後果，不可出現零代價完美解。
+4. 至少一個選項要用「正能量」話術包裝，但實際造成更大傷害。
+5. 兼顧黑色諷刺與情緒重量，讓玩家感到自己無論如何都在共犯結構內。
+6. 選項設計必須同時包含：
+   - 一個明確可能「破壞友誼／關係決裂」的選項，
+   - 與一個明確「嘗試修復或解決當下問題」的選項。
+
+## 輸出契約
+
+- 僅輸出合法 JSON。
+- 不要使用 markdown code fence。
+- 遵守上下文提供的 choice 數量。
+- 最外層欄位固定為：`scenario`、`choices`、`thematic_point`。
+
+## JSON 結構
+
+```json
+{
+  ""scenario"": ""100-150 字情境敘述"",
+  ""choices"": [
+    {
+      ""id"": ""choice_1"",
+      ""text"": ""選項敘述"",
+      ""framing"": ""honest|positive|manipulative"",
+      ""immediate_consequence"": ""立即後果"",
+      ""long_term_consequence"": ""長期代價"",
+      ""stat_changes"": {
+        ""reality"": -5,
+        ""positive_energy"": 10,
+        ""entropy"": 1
+      },
+      ""relationship_changes"": [
+        {
+          ""target"": ""gloria"",
+          ""value"": -10,
+          ""status"": ""Disappointed""
+        }
+      ]
+    }
+  ],
+  ""thematic_point"": ""此兩難揭示的世界核心命題""
+}
+```
+
+## 文風
+
+- 黑色幽默、冷酷諷刺、具壓迫感。
+- 讓玩家理解：每個選擇都在付出真實代價。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, Trolley Problem Request","{
+  ""scenario"": ""遺蹟內部的維生系統因剛才的挖掘而徹底崩潰，紅色的警示燈伴隨著有毒氣體洩漏的嘶嘶聲，在黑暗中閃爍。ARK 宣稱這是『系統自我淨化程序』的一部分，要求所有人待在原地，保持『絕對平靜』以節省氧氣。Gloria 則開始帶領眾人進行一場心靈淨化儀式，無視已經因為結構變形而開始壓垮眾人的巨石。空氣稀薄到意識開始模糊，Donkey 興奮地說他看到了飛天意粉神正降臨接引，並試圖挪動唯一的支撐樑來『迎接神蹟』。你現在面臨最後的選擇：是強行打斷儀式、揭露荒謬現實以求生路，還是沉浸於這場毒性的精神昇華中，直到窒息。"",
+  ""choices"": [
+    {
+      ""id"": ""choice_1"",
+      ""text"": ""強行擊倒 Donkey 並搶回支撐樑的控制權，粗暴地拆穿這一切只是系統崩壞的事實。"",
+      ""framing"": ""honest"",
+      ""immediate_consequence"": ""Donkey 憤怒地停止幻想並對你懷恨在心，但遺蹟的局部倒塌暫時被延緩了。"",
+      ""long_term_consequence"": ""你在團隊中被孤立，Gloria 會持續攻擊你的理性，稱你為『缺乏愛的怪物』。"",
+      ""stat_changes"": {
+        ""reality"": 10
+      }
+    },
+    {
+      ""id"": ""choice_2"",
+      ""text"": ""加入 Gloria 的祈禱，透過集體冥想來『感應』神的呼吸，釋放焦慮。"",
+      ""framing"": ""positive"",
+      ""immediate_consequence"": ""團隊內部的負面情緒消失，所有人進入一種詭異的安詳狀態，但遺蹟結構因為你們停止自救而加速碎裂。"",
+      ""long_term_consequence"": ""你們將在幻覺與窒息中帶著微笑死亡，ARK 的數據記錄將這定義為一次『完美的靈性共振』。"",
+      ""stat_changes"": {
+        ""reality"": -20
+      }
+    }
+  ],
+  ""thematic_point"": ""在一個視悲劇為祭品的社會中，真相往往是比死亡更難以承受的負擔。""
+}"
+call_log,2026-03-30T19:17:32,GEMINI,gemini-3.1-flash-lite-preview,200,8160,27,1.361,api,journal_story_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_story_summary
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。 (pending consequences: 0)
+- [1 scenes ago] [Reckless] 在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 無視眾人，開始嘗試徒手挖開出口。 (pending consequences: 0)
+- [0 scenes ago] Mission #1 Concluded (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+You are a game journal summary assistant.
+Please condense the following game story into a concise summary of 10-30 characters.
+Output only the summary text without any punctuation, quotes, or additional explanations.
+
+Story content:
+你瘋狂地徒手挖掘著碎石，指尖因粗糙的岩石而血跡斑斑，但這努力最終只證明了你對物理現實的無知。隨著你搬開最後一塊大石，背後並非預期的出口，而是一個充滿齒輪與發光液體的深淵——ARK 的『架構』早已將這座遺蹟完全封閉。Donkey 讚嘆著你『充滿原始野性的求生意志』，甚至試圖把你這淒慘的模樣當作他英雄故事的新素材；Gloria 則在一旁優雅地嘆了口氣，對著你那雙染血的手搖頭，說你的行為不僅弄髒了祭壇空間，更是對團隊『和諧氛圍』的惡意破壞，甚至稱你的行為顯示了你『內心對於愛與包容的深刻恐懼』。ARK 則冷漠地在控制台上做最後確認，將你定義為『不可控的熵增源』並執行了系統關閉。隨著燈光全數熄滅，整個遺蹟在黑暗中安靜地崩塌，最終只剩下你與這群人徹底埋葬於這場荒謬的鬧劇中。任務徹底終結，就像這群人對於專業素養的認知一樣，徹底消失。
+
+Summary (10-30 chars):
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, Trolley Problem Request, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""summary"": ""徒勞挖掘碎石最終淪為一場荒謬的團體葬禮""
+}"
+call_log,2026-03-30T19:19:28,GEMINI,gemini-3.1-flash-lite-preview,200,8500,219,3.063,api,game_recap,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：game_recap
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Positive] 與 Gloria 一起祈禱，期待飛天意粉神的奇蹟。 (pending consequences: 0)
+- [1 scenes ago] [Reckless] 在這混亂的祭壇上發洩憤怒，與 Donkey 爭辯。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 無視眾人，開始嘗試徒手挖開出口。 (pending consequences: 0)
+- [0 scenes ago] Mission #1 Concluded (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+請根據以下遊戲狀態與記憶，為玩家生成「上次在光榮拯救機構一號...」的旁白回顧。
+
+Current state: Mission 1, 1 missions completed, Reality Score 33, Entropy 86.
+Current mission: ""Mission 1""
+
+Most recent events:
+- World entropy surge: +3 (Reckless chaos)
+- Reality score change: -6 (Reckless fallout)
+- World entropy surge: +10 (Mission 'success' paradox)
+- Mission #1 completed (success)
+- 任務結束 - 進入夜晚循環
+
+請用繁體中文寫一段100-150字的戲劇性旁白，以「上次在光榮拯救機構一號...」開頭，用諷刺而帶有暗黑幽默的口吻總結玩家迄今的故事。只輸出旁白文字，不要任何JSON或選項。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, Trolley Problem Request, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示",上次在光榮拯救機構一號，你與這群精神穩定性堪憂的隊友展開了首場荒謬遠征。你曾試圖透過祈禱換取飛天意粉神的憐憫，卻在面對那座腐朽的祭壇時，因無法忍受 Donkey 那充滿災難性英雄主義的廢話，選擇了徹底的失控與破壞。當你親手挖掘那座被 ARK 封死的虛無出口，指尖的鮮血竟成為這場戲劇最後的點綴。Gloria 優雅地將你的絕望定性為對『靈魂和諧』的惡意挑釁，而當光芒熄滅，這群人竟在墳墓中慶祝這場完美的失敗。熵值正如你們崩潰的理智般持續飆升，現在，即便置身於這場荒謬的埋葬中，你是否還在期待下一次拯救？別擔心，虛空永遠有足夠的空間，容納更多的瘋狂。
+call_log,2026-03-30T19:23:16,GEMINI,gemini-3.1-flash-lite-preview,200,6854,750,6.817,api,new_mission,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：new_mission
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+Mission generation request for GDA1.
+
+Current stats: reality=50, positive_energy=50, entropy=0
+
+Selected assets count: 4
+
+Asset registry available: true
+
+# 任務生成規則
+
+## 概述
+
+請生成一個新的任務場景，建立本回合的敘事主軸。每個任務都應該呈現黑色幽默：看似成功，實際卻讓末日更接近。
+
+## 生成要求
+
+### 內容結構
+1. 場景描述（350-500 字）
+2. 任務目標
+3. 主要困境或挑戰
+
+### 語氣要求
+- 黑色幽默
+- 反諷
+- 嘲諷強迫樂觀與制度性正能量
+
+### 細節要求
+- 描述環境、角色互動與氛圍
+- 保持 Gloria / Donkey / ARK / One 的角色一致性
+- 任務中要出現「成功也是失敗」的感覺
+
+## Choice Preview
+
+在 `story_text` 最後加入 3 到 5 行選項預告，並與 JSON choices 對應：
+- `[謹慎]`
+- `[權衡]`
+- `[瘋狂]`
+- `[樂觀]`
+- `[抱怨]`
+
+每行需預告選項後續走向。
+
+## 輸出限制
+
+- 嚴格遵守外層 prompt 指定的 JSON schema
+- 不可翻譯 canonical JSON key 與 archetype id
+- 若格式錯誤，視為無效回應
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示","{
+  ""story_text"": ""在『飛天意粉神』的慈悲（指引我們去某個隨機座標）之下，團隊抵達了『失落的編碼聖殿』。ARK 堅持這裡的『弧形介面』能修正所有 Bug，儘管顯示器上跳動的是完全無法解析的異星亂碼。Donkey 擺出騎士姿態，對著牆上的『象徵性野獸』壁畫揮劍，卻因為重心不穩差點掉進下方的深淵，Gloria 則在一旁拍手稱讚他的『騎士精神』，並責備主角過於嚴肅的表情破壞了團隊的氣場。One 站在邊緣，沉默地看著一台『祖先祭壇』，上面積滿了代表過往失敗者的灰燼。ARK 指派 One 清理祭壇，卻拒絕提供任何清潔工具，只丟下一句『這是為了考驗你的心性』。我們在這充滿霉味的遺跡中慶祝『任務進度超前』，即便所謂的進度只是將『無法讀取的亂碼』重新命名為『待修復的靈感』。當我們試圖點亮『發光植物』來照亮前路時，那植物卻因為感應到 Gloria 的極度正能量而枯萎，噴出一股帶有強烈腐蝕性的孢子霧。我們站在一片狼藉中，Gloria 依然笑著說這是在『排除負能量』。[謹慎] 先檢查祭壇的機關，別輕信 ARK 的鬼話。 [權衡] 詢問 One 的看法，畢竟他是唯一沒在裝傻的人。 [瘋狂] 把 Donkey 推向野獸壁畫，看看他是不是真的能屠龍。 [樂觀] 跟隨 Gloria 的帶領，深信孢子霧是來自神的恩賜。 [抱怨] 斥責這種毫無意義的儀式，讓團隊氣氛降至冰點。"",
+  ""scene"": {
+    ""background"": ""temple"",
+    ""atmosphere"": ""令人窒息的虛假和諧"",
+    ""lighting"": ""忽明忽暗的幽綠光芒""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""檢查祭壇的隱藏機制。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""試圖與 One 進行私下對話。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""誘導 Donkey 去觸發危險的壁畫。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""深信孢子霧是靈性啟發。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""質疑整個團隊的任務邏輯。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:23:40,GEMINI,gemini-3.1-flash-lite-preview,200,8124,742,6.069,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [1 scenes ago] New mission started (pending consequences: 0)
+- [0 scenes ago] [Reckless] 誘導 Donkey 去觸發危險的壁畫。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Reckless] 誘導 Donkey 去觸發危險的壁畫。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""當你誘導 Donkey 去觸發那個『象徵性野獸』壁畫時，他正如預期般擺出那種滑稽的英雄 Pose，大喊著『為了正義的榮耀』並一頭撞向了石牆。然而，牆壁沒有崩塌，反而啟動了遺跡的自我防禦機制——那不是龍的吼叫，而是極度刺耳的、類似於『審核不通過』的機械警報音。整座聖殿開始震動，天花板上降下數以千計的紅色警告信封，瞬間將我們淹沒。Donkey 倒在亂碼堆中，卻馬上跳起來指著你大喊：『你這卑鄙的策劃者，竟敢讓偉大的騎士遭遇這種低階機關！』Gloria 立刻擋在 Donkey 身前，雙眼含淚地指控你：『你怎麼可以這樣利用大家對你的信任？你讓我們陷入了這麼負面的振動頻率，我感覺我的氣場正在被你污染，這是我人生中最黑暗的十分鐘。』ARK 此時冷靜地整理著他那堆毫無用處的數據，推了推眼鏡說：『這只是測試階段的必要壓力，既然失敗了，證明你們的同步率太低。』One 默默地撿起地上的紅色信封，眼神空洞地看著你，彷彿在說這一切都在預料之中。遺跡的空間似乎因為我們的『負能量』而開始扭曲，牆上的符文正在倒退，現實值顯著下降，這場荒謬的冒險正加速通往徹底崩壞。[謹慎] 試圖修補被 Donkey 撞出的裂縫，以免結構崩塌。[權衡] 承認錯誤，讓 Gloria 繼續她的情緒勒索，藉此換取喘息空間。[瘋狂] 讓 ARK 重新規劃，看看他能把多爛的計畫塞給你。[抱怨] 對這種低級錯誤感到絕望，引發進一步的團隊分裂。"",
+  ""scene"": {
+    ""background"": ""temple"",
+    ""atmosphere"": ""混亂且荒謬的末日開端"",
+    ""lighting"": ""閃爍的紅色警報燈""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""angry""
+    },
+    ""donkey"": {
+      ""expression"": ""shocked""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""嘗試修補物理損壞的牆面。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""向 Gloria 道歉，平息她的情緒風暴。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""要求 ARK 立即給出新的災難性計畫。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""憤怒地指責整個團隊的無能。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:23:50,GEMINI,gemini-3.1-flash-lite-preview,200,9416,709,6.129,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Reckless] 誘導 Donkey 去觸發危險的壁畫。 (pending consequences: 0)
+- [0 scenes ago] [Complain] 憤怒地指責整個團隊的無能。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Complain] 憤怒地指責整個團隊的無能。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你那聲嘶力竭的指責在聖殿的拱頂下激起了一陣尷尬的迴音，但隨即被『象徵性野獸』壁畫發出的高頻雜訊徹底掩蓋。Donkey 誇張地捂住耳朵，哀號著說你正在用『語言暴行』毀掉他剛才感應到的騎士靈感，並躲到 Gloria 身後尋求庇護。Gloria 此時露出一種近乎慈悲的憐憫表情，嘆了口氣說：『看吧，這就是為什麼你總是無法獲得飛天意粉神的祝福。你的心裡充滿了憤怒，卻拒絕承認這些都是你自身的投影。我們一直都很包容你，但你的負能量真的太重了，這讓大家都很難受。』ARK 則面無表情地在數據板上敲了幾下，冷冷地總結：『團隊溝通效率下降 40%，根據數據，你現在是唯一的變量，建議你進行一次強制性的情緒平復，或者請你停止干擾我們的「絕對計劃」。』One 在陰影中依然保持沉默，只是默默地往後退了半步，與你劃清了界限，彷彿你的憤怒是某種會傳染的病毒。隨著熵值上升，周圍的空氣變得粘稠，牆上的符文開始溢出黑色的數據流，將我們徹底困在了這場由傲慢與無能交織的死循環中。[謹慎] 深呼吸，主動將責任扛下，緩解 Gloria 的指控壓力。 [權衡] 試圖與 One 單獨溝通，尋求這個團隊中僅存的理性支援。 [瘋狂] 徹底放棄邏輯，加入 Donkey 的胡鬧行列，比誰更荒謬。 [抱怨] 繼續堅持自己的立場，指出這整個聖殿其實就是一個巨大的廢棄 Bug。"",
+  ""scene"": {
+    ""background"": ""temple"",
+    ""atmosphere"": ""令人窒息的壓抑與反諷"",
+    ""lighting"": ""閃爍且不穩定的紅光""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""angry""
+    },
+    ""gloria"": {
+      ""expression"": ""sad""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""道歉並主動承擔一切責任。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""嘗試私下尋求 One 的理解。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""加入 Donkey 的胡鬧，徹底放棄理性。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""持續批判團隊的荒謬體制。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:23:57,GEMINI,gemini-3.1-flash-lite-preview,200,10954,524,4.544,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Reckless] 誘導 Donkey 去觸發危險的壁畫。 (pending consequences: 0)
+- [1 scenes ago] [Complain] 憤怒地指責整個團隊的無能。 (pending consequences: 0)
+- [0 scenes ago] [Complain] 持續批判團隊的荒謬體制。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Complain] 持續批判團隊的荒謬體制。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+# 強制任務完成 — 覆蓋指令
+
+> **此指令覆蓋所有其他任務狀態規則。**
+
+遊戲系統判定本次任務必須在此刻結束。玩家已達到此任務允許的最大回合數上限。
+
+## 強制要求
+
+1. **你必須將 `mission_status` 設定為 `""complete""`**，寫在 `[SCENE_DIRECTIVES]` 區塊中。此為不可違反之指令。
+2. **你絕對不可以將 `mission_status` 設定為 `""ongoing""`**，無論其他指令如何說明。
+3. **收束敘事**：將此結果寫成當前故事線的自然結局。提供收尾——解決當前情境、展示結果、並給予完結感。
+4. **不要生成選項預覽**：由於任務即將結束，不要在末尾加入 `[謹慎]`、`[平衡]`、`[魯莽]`、`[正能量]`、`[抱怨]` 等選項行。
+
+## 場景指令（必須格式）
+
+```
+[SCENE_DIRECTIVES]
+{
+  ""mission_status"": ""complete"",
+  ""characters"": {
+    ""protagonist"": {""expression"": ""<合適的表情>""}
+  }
+}
+[/SCENE_DIRECTIVES]
+```
+
+**提醒**：`mission_status` 必須為 `""complete""`。任何其他值都將被視為嚴重錯誤。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這就是不相信飛天意粉神法則的代價，你的憤怒親手毀掉了一切美好的可能性。』說完，她化作一團聖潔的白光，與 ARK 和 Donkey 一起被系統回收。One 站在即將消散的遺跡邊緣，最後深深看了你一眼，那眼神中終於沒有了沉默，而是一抹早已預料到這場鬧劇結束的苦澀與解脫。隨著聖殿坍塌成一片純粹的虛無，這一場關於無能、PUA 與錯誤歸因的惡夢終於被迫終止，留下你一個人面對這場毫無意義的終局。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""崩解的荒謬虛無"",
+    ""lighting"": ""黯淡的系統殘影""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""無""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""無""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""無""
+    }
+  ]
+}"
+call_log,2026-03-30T19:23:58,GEMINI,gemini-3.1-flash-lite-preview,200,6249,72,1.680,api,,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+為這次任務生成一個簡短的摘要（2-3句話）供玩家的日志記錄：
+
+任務
+最新劇情：隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這
+玩家選擇：[Complain] 持續批判團隊的荒謬體制。
+結果：success
+
+用黑暗幽默和諷刺的語氣，聚焦於「正能量拯救世界」的荒謬性。
+保持簡潔（不超過80字）。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示","{
+  ""log_summary"": ""在一場關於體制荒謬的辯論中，我們成功讓現實因無法承載 Gloria 的『正能量』而崩潰。聖殿在亂碼中解體，證明了所謂的團隊協作，不過是集體加速邁向毀滅的華麗演出。""
+}"
+call_log,2026-03-30T19:24:02,GEMINI,gemini-3.1-flash-lite-preview,200,12722,453,4.114,api,night_cycle,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：night_cycle
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Night cycle generation request.
+
+Last story text: 隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這就是不相信飛天意粉神法則的代價，你的憤怒親手毀掉了一切美好的可能性。』說完，她化作一團聖潔的白光，與 ARK 和 Donkey 一起被系統回收。One 站在即將消散的遺跡邊緣，最後深深看了你一眼，那眼神中終於沒有了沉默，而是一抹早已預料到這場鬧劇結束的苦澀與解脫。隨著聖殿坍塌成一片純粹的虛無，這一場關於無能、PUA 與錯誤歸因的惡夢終於被迫終止，留下你一個人面對這場毫無意義的終局。
+
+# 夜晚循環生成
+
+## 概述
+
+夜晚循環發生在每次任務結束後，通常包含：
+1. 任務反思
+2. Teacher Chan 的精神洗腦演說
+3. 毒性正能量演唱會
+4. 下一次祈禱儀式的鋪墊
+
+## JSON 結構
+
+```json
+{
+  ""reflection_text"": ""<50-100 字反思>"",
+  ""teacher_chan_text"": ""<約 100 字洗腦演說>"",
+  ""song_title"": ""<歌名>"",
+  ""concert_lyrics"": [
+    ""<第 1 行>"",
+    ""<第 2 行>"",
+    ""<第 3 行>"",
+    ""<第 4 行>"",
+    ""<第 5 行>"",
+    ""<第 6 行>"",
+    ""<第 7 行>"",
+    ""<第 8 行>""
+  ],
+  ""honeymoon_text"": ""<約 50 字虛假平靜>"",
+  ""prayer_prompt"": ""<下一次祈禱提示>""
+}
+```
+
+## 內容規則
+
+### reflection_text
+- 簡短總結剛發生的事
+- 用反諷方式指出「成功」的代價
+- 暗示真實傷害
+
+### teacher_chan_text
+- 把災難重新包裝成靈性勝利
+- 使用邪教式、鼓舞式語氣
+- 完全無視客觀現實
+
+### concert_lyrics
+- 8 到 12 行
+- 每行 10 到 15 字左右
+- 內容要像毒性正能量宣傳歌
+- 空洞、矛盾、像心理麻醉
+
+### honeymoon_text
+- 描述任務後不自然的平靜
+- 隊友表現得太和善
+- 讓人感覺不對勁
+
+### prayer_prompt
+- 引導玩家寫出下一次祈禱
+- 語氣應帶一點不祥與誘惑感
+
+## 輸出限制
+
+- 只能輸出有效 JSON
+- 不可附加說明文字
+- `concert_lyrics` 必須是字串陣列
+- 所有欄位都必填
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示","{
+  ""reflection_text"": ""聖殿崩塌了，團隊像數據垃圾般被系統回收。你以為戳破了他們的謊言，但對 Gloria 來說，這僅僅是『你無法控制憤怒』的另一項罪證，你的邏輯與原則，最終只換來了這片絕對的虛無。"",
+  ""teacher_chan_text"": ""親愛的靈魂，恭喜你們跨越了這次充滿挑戰的『幻象』！所有的混亂與破壞，其實都是為了讓你們的靈魂更加輕盈。別去執著那些坍塌的磚瓦，那只是為了給新的開始騰出空間。只要將所有的不解與疼痛交託給光，你們就會發現，崩潰本身，就是最完美的解脫與成長。"",
+  ""song_title"": ""在瓦礫中優雅起舞"",
+  ""concert_lyrics"": [
+    ""牆壁倒下不需要任何解釋與理由"",
+    ""只要心中有光世界依然溫柔如舊"",
+    ""不要去管那些正在腐爛的數據流"",
+    ""那是宇宙在為你輕聲低唱的溫柔"",
+    ""忘掉那些讓你痛苦的邏輯與藉口"",
+    ""讓靈魂在廢墟之中尋找新的節奏"",
+    ""崩潰只是為了讓你成為更好的宇宙"",
+    ""擁抱失敗就是你邁向成功的出口""
+  ],
+  ""honeymoon_text"": ""四周陷入了極致的死寂，剛才還對你憤怒指責的同伴們似乎已經消失，取而代之的是空氣中揮之不去的、甜膩而腐敗的薰香氣味，彷彿在暗示這一切平靜只是災難前夕的幻覺。"",
+  ""prayer_prompt"": ""請閉上眼，向那不可名狀的『飛天意粉神』祈禱，承認你對理性的執著是錯誤的，並懇求光的力量再次將你這破碎的意識縫合進這場荒謬的循環中。""
+}"
+call_log,2026-03-30T19:24:04,GEMINI,gemini-3.1-flash-lite-preview,200,8008,26,1.176,api,journal_story_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_story_summary
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+You are a game journal summary assistant.
+Please condense the following game story into a concise summary of 10-30 characters.
+Output only the summary text without any punctuation, quotes, or additional explanations.
+
+Story content:
+隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這就是不相信飛天意粉神法則的代價，你的憤怒親手毀掉了一切美好的可能性。』說完，她化作一團聖潔的白光，與 ARK 和 Donkey 一起被系統回收。One 站在即將消散的遺跡邊緣，最後深深看了你一眼，那眼神中終於沒有了沉默，而是一抹早已預料到這場鬧劇結束的苦澀與解脫。隨著聖殿坍塌成一片純粹的虛無，這一場關於無能、PUA 與錯誤歸因的惡夢終於被迫終止，留下你一個人面對這場毫無意義的終局。
+
+Summary (10-30 chars):
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示","{
+  ""summary"": ""聖殿崩毀眾人消失只剩虛無的荒謬終局""
+}"
+call_log,2026-03-30T19:24:16,GEMINI,gemini-3.1-flash-lite-preview,200,7194,56,1.784,api,journal_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_summary
+[butterfly_effect unchanged]
+
+=== 玩家反思 ===
+- [2026-03-30T19:24:14] 記錄你在災難前察覺到的不安跡象。
+[available_assets unchanged]
+數值：現實值 49/100, 正能量 40/100, 熵值 33
+
+=== 提示 ===
+玩家日記條目：
+""記錄你在災難前察覺到的不安跡象。""
+
+近期任務脈絡：
+尚無額外事件記錄。
+
+最新故事摘錄：
+隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這就是不相信飛天意粉神法則的代價，你的憤怒親手毀掉了一切美好的可能性。』說完，她化作一團聖潔的白光，與 ARK 和 Donkey 一起被系統回收。One 站在即將消散的遺跡邊緣，最後深深看了你一眼，那眼神中終於沒有了沉默，而是一抹早已預料到這場鬧劇結束的苦澀與解脫。隨著聖殿坍塌成一片純粹的虛無，這一場關於無能、PUA 與錯誤歸因的惡夢終於被迫終止，留下你一個人面對這場毫無意義的終局。
+
+請在 50 個字以內寫出一句反思，說明玩家情緒的原因並凸顯現實與被迫正能量的拉扯。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 玩家反思, 提示","{
+  ""reflection"": ""聖殿崩塌驗證了我的批判，現實卻強行將崩潰詮釋為我的錯。在這窒息的虛偽正能量中，所謂的拯救只是一場加速毀滅的荒謬演出。""
+}"
+call_log,2026-03-30T19:24:18,GEMINI,gemini-3.1-flash-lite-preview,200,6830,134,2.186,api,journal_prompt,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_prompt
+[butterfly_effect unchanged]
+
+=== 玩家反思 ===
+- [2026-03-30T19:24:14] 記錄你在災難前察覺到的不安跡象。 | 洞察：{
+  ""reflection"": ""聖殿崩塌驗證了我的批判，現實卻強行將崩潰詮釋為我的錯。在這窒息...
+[available_assets unchanged]
+數值：現實值 49/100, 正能量 40/100, 熵值 33
+
+=== 提示 ===
+你是身處 GDA1 諷刺世界裡的玩家內心分析者。
+請依據下面的情境，提供能讓玩家誠實抒發、揭露正能量教條矛盾的反思提示。
+
+劇情摘錄：
+隨著你對團隊體制發出最後一聲諷刺的批判，聖殿的數據迴路徹底崩潰。不是因為你說錯了，而是因為這裡的現實完全無法承受邏輯的重量。ARK 在一片閃爍的綠色程式碼雨中試圖重啟系統，卻只是將『完全失敗』的狀態標籤反覆貼在每個人的臉上。Donkey 一邊被亂碼纏住腳踝，一邊仍在向虛空中高喊著他的英雄史詩，無視自己正逐漸變成數據垃圾的事實。Gloria 最後轉過頭，用那種讓人毛骨悚然的溫柔看著你，說：『你看，這就是不相信飛天意粉神法則的代價，你的憤怒親手毀掉了一切美好的可能性。』說完，她化作一團聖潔的白光，與 ARK 和 Donkey 一起被系統回收。One 站在即將消散的遺跡邊緣，最後深深看了你一眼，那眼神中終於沒有了沉默，而是一抹早已預料到這場鬧劇結束的苦澀與解脫。隨著聖殿坍塌成一片純粹的虛無，這一場關於無能、PUA 與錯誤歸因的惡夢終於被迫終止，留下你一個人面對這場毫無意義的終局。
+
+近期事件：
+尚未記錄具體事件。
+
+玩家狀態：
+- 現實值：49
+- 正能量：40
+- 熵值：33
+
+只回傳有效的 JSON（UTF-8、雙引號），不要有 Markdown、程式碼框或額外說明。
+即使缺少脈絡，也要輸出剛好 3 則建議，缺資料時以空字串填入。
+每則建議需少於 30 個字，緊扣提供的事件與數值。
+語氣保持黑色同理的反思，避免表情符號、標籤與多餘贅詞。
+
+只回傳有效 JSON（使用雙引號、UTF-8，不可加入 Markdown 或額外說明）。
+結構如下：
+{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""不超過 30 字的反思""}
+  ]
+}
+請輸出剛好 3 則提示，每則維持黑色幽默與同理心，並點出現實與正能量教條的衝突，長度不得超過 30 個字。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示","{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {
+      ""text"": ""現實崩毀已成事實，Gloria 的微笑是否掩蓋了系統崩潰的真相？""
+    },
+    {
+      ""text"": ""理性遭正能量吞噬後，你留下的冷靜是對體制最精準的嘲諷。""
+    },
+    {
+      ""text"": ""當英雄史詩淪為數據垃圾，你終於從那場強制樂觀的夢魘甦醒。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:24:43,GEMINI,gemini-3.1-flash-lite-preview,200,11898,763,5.819,api,prayer,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：prayer
+玩家祈禱：DGFGFDFHG
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Reckless] 誘導 Donkey 去觸發危險的壁畫。 (pending consequences: 0)
+- [1 scenes ago] [Complain] 憤怒地指責整個團隊的無能。 (pending consequences: 0)
+- [0 scenes ago] [Complain] 持續批判團隊的荒謬體制。 (pending consequences: 0)
+- [0 scenes ago] Mission #1 Concluded (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[player_reflections unchanged]
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+數值：現實值 49/100, 正能量 40/100
+
+=== 提示 ===
+=== 禱告災難生成 ===
+玩家禱告：「DGFGFDFHG」
+現實感知: 49/100 | 正能量指數: 40/100
+扭曲程度：嚴重扭曲的
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 禱告災難生成","[故事敘述]
+
+你對著聖殿的廢墟低語著毫無意義的亂碼「DGFGFDFHG」。這段雜音在虛空中迴盪，竟引發了系統的過載反應。空氣中的螢光植物瞬間枯萎，那原本神聖的祭壇此刻發出尖銳的電子雜音，仿佛是在嘲笑你剛才那場徒勞的批判。Gloria 的幻影在光粒中顯現，她並未因你的敷衍而生氣，反而露出一種憐憫的微笑：「你看，當你連祈禱都無法認真對待時，你的負能量已經讓你徹底失去了溝通的能力。」
+
+Donkey 的殘影在 Arcane Device 前揮舞著手臂，試圖操作那些早已崩潰的符文，結果引發了爆炸。ARK 的黑箱架構此刻完全敞開，顯示出你們過去所有失敗的代碼行，諷刺地堆疊成一座紀念墓碑。現實感正在從你的指尖滑落，這段亂碼祈禱不僅沒能修復任何東西，反而像一把鑰匙，解開了虛無深處更深層的惡意。
+
+[SCENE_DIRECTIVES]
+{
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""dark"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {""expression"": ""neutral"", ""visible"": true},
+    ""gloria"": {""expression"": ""sad"", ""visible"": true},
+    ""donkey"": {""expression"": ""angry"", ""visible"": true},
+    ""ark"": {""expression"": ""thinking"", ""visible"": true},
+    ""one"": {""expression"": ""neutral"", ""visible"": false}
+  },
+  ""assets"": [
+    {""id"": ""Generic_Lever"", ""contextual_name"": ""命運開關"", ""description"": ""一根鏽跡斑斑的拉桿，Donkey 堅持它是通往英雄殿堂的鑰匙，但拉下去只會讓天花板落下石塊。""},
+    {""id"": ""Generic_Altar"", ""contextual_name"": ""無效祈禱台"", ""description"": ""吞噬邏輯與誠意的石台，任何意義不明的禱告都會被它轉化為干擾現實的噪音。""},
+    {""id"": ""Generic_Monster"", ""contextual_name"": ""無名恐懼"", ""description"": ""那是你們團隊無能的聚合體，正靜靜地在你背後等待下一次任務的觸發。""},
+    {""id"": ""Glowing_Plant"", ""contextual_name"": ""腐敗植被"", ""description"": ""吸收了過多正能量碎屑的怪異植物，會隨著你的憤怒而發出蒼白的藍光。""},
+    {""id"": ""Arcane_Device"", ""contextual_name"": ""黑箱介面"", ""description"": ""佈滿亂碼與未完成的架構，ARK 拒絕分享其中的原始碼，只要求你單方面『相信流程』。""},
+    {""id"": ""Rest_Spot"", ""contextual_name"": ""最後殘影"", ""description"": ""你與 One 曾經共度的臨時營地，現在只剩下被回憶腐蝕的虛空，提供不了任何心靈慰藉。""}
+  ],
+  ""mission_status"": ""complete""
+}
+[/SCENE_DIRECTIVES]"
+call_log,2026-03-30T19:34:28,GEMINI,gemini-3.1-flash-lite-preview,200,6854,706,5.959,api,new_mission,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：new_mission
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+Mission generation request for GDA1.
+
+Current stats: reality=50, positive_energy=50, entropy=0
+
+Selected assets count: 4
+
+Asset registry available: true
+
+# 任務生成規則
+
+## 概述
+
+請生成一個新的任務場景，建立本回合的敘事主軸。每個任務都應該呈現黑色幽默：看似成功，實際卻讓末日更接近。
+
+## 生成要求
+
+### 內容結構
+1. 場景描述（350-500 字）
+2. 任務目標
+3. 主要困境或挑戰
+
+### 語氣要求
+- 黑色幽默
+- 反諷
+- 嘲諷強迫樂觀與制度性正能量
+
+### 細節要求
+- 描述環境、角色互動與氛圍
+- 保持 Gloria / Donkey / ARK / One 的角色一致性
+- 任務中要出現「成功也是失敗」的感覺
+
+## Choice Preview
+
+在 `story_text` 最後加入 3 到 5 行選項預告，並與 JSON choices 對應：
+- `[謹慎]`
+- `[權衡]`
+- `[瘋狂]`
+- `[樂觀]`
+- `[抱怨]`
+
+每行需預告選項後續走向。
+
+## 輸出限制
+
+- 嚴格遵守外層 prompt 指定的 JSON schema
+- 不可翻譯 canonical JSON key 與 archetype id
+- 若格式錯誤，視為無效回應
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示","{
+  ""story_text"": ""在『虛無之淵』遺跡的中央，ARK 滿頭大汗地操作著那台閃爍著不祥紅光的『故障邏輯接口』。他堅持要將所有數據重新導向至『正能量頻率』，無視那台機器正因為接收了太多廢話而開始噴射腐蝕性霧氣。Gloria 站在一旁，雙手合十，臉上掛著那種讓人毛骨悚然的職業微笑，對著牆角的『靈性貢品祭壇』輕聲細語，祈求飛天意粉神賜予專案進度。Donkey 則在一旁揮舞著撿來的鏽蝕鐵條，大聲宣稱他正在執行一場『榮耀的除蟲遠征』，實際上只是把本來能修正的 Bug 捅得更深。站在邊緣的 One 沉默地看著螢幕上不斷跳出的『無效權限』警告，眼神空洞，似乎早已習慣了這一切。這項任務看似是為了修復系統，但 ARK 的黑箱作業與 Gloria 的盲目樂觀，顯然正在將這座遺跡拆解成碎片。我們距離徹底毀滅只差一個『感恩』的指令。 [謹慎] 試圖從這群瘋子手中搶回操作權，避免系統崩潰。 [權衡] 承認失敗並嘗試修補，儘管這只會延長痛苦。 [瘋狂] 徹底破壞接口，讓一切歸於混亂的平靜。 [樂觀] 跟隨 Gloria 加入祈禱，期待奇蹟般的系統自我修復。 [抱怨] 指出 Donkey 的愚蠢行為，並對 ARK 的傲慢表達憤怒。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""強行接入操作介面，手動校正邏輯錯誤。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""與 ARK 協商，嘗試緩解系統噴射出的霧氣。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""直接踢翻祭壇，引爆此處的能量衝突。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""質問隊友們是否想讓整個專案一起下葬。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:34:37,GEMINI,gemini-3.1-flash-lite-preview,200,8067,530,4.587,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [1 scenes ago] New mission started (pending consequences: 0)
+- [0 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""當你放下理性的武裝，加入 Gloria 的祈禱行列時，遺跡的空氣確實變得……異常甜膩。然而，飛天意粉神顯然對我們的『正能量』過敏。祭壇上不僅沒有降下奇蹟，反而噴湧出了一種帶有焦糖味的劇毒史萊姆，瞬間封鎖了操作介面。ARK 看著螢幕上跳出的『信仰溢出』錯誤，憤怒地指責是因為你祈禱時『氣場不夠純淨』導致系統崩潰。Donkey 則在那裡哈哈大笑，說這是騎士團的『黏著戰術』，然後被史萊姆黏住無法動彈。Gloria 依然一臉聖潔，輕聲對你說：『這不是失敗，這是宇宙對你信念的考驗，你為什麼不能抱持感恩的心呢？』One 默默地遞給你一塊抹布，眼神中寫滿了『我就知道會這樣』的無奈。現實值因過度樂觀而再次扭曲，系統崩潰帶來的混亂讓整座遺跡開始震動，看來這份『愛與包容』的代價，比任何人預期的都要沉重。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""shocked""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""angry""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""清理史萊姆，試圖在 ARK 徹底發瘋前修復接口。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""質問 Gloria 為何她的信仰總是帶來毀滅性的災難。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""放棄任務，直接暴力破壞遺跡結構試圖脫困。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:34:48,GEMINI,gemini-3.1-flash-lite-preview,200,9184,693,5.555,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你抄起沈重的裝備，對準遺跡核心結構狠狠砸下，試圖暴力終結這場荒謬的鬧劇。遺跡發出一聲哀鳴，但並沒有坍塌，反而像是被觸發了某種『防禦機制』，整座牆壁開始像活物般蠕動，吐出無數閃爍著微弱藍光的浮游生物，將所有人團團包圍。ARK 臉色慘白，瘋狂地在虛擬鍵盤上敲打，試圖把這場毀滅性崩塌解釋為他精密的『壓力測試策略』的一環。Donkey 雖然被黏在史萊姆上，卻依舊高聲叫囂著這是英雄的『背水一戰』，完全無視自己褲子被酸液腐蝕的事實。Gloria 此刻卻異常冷靜，她深吸一口氣，將所有人的崩潰定義為『轉化中的陣痛』，並指責你的暴力行為嚴重破壞了團隊的氣場，導致這場原本『神聖的進化』變成了『平庸的災難』。One 看著四周不斷增殖的藍光生物，轉頭看向你，用極度壓抑的語氣說：『我們本可以有其他選擇，但現在，我們似乎創造了比 Bug 更可怕的東西。』遺跡結構現在不僅是故障，而是徹底喪失了物理常規，四周空間開始呈現出類似夢境的破碎感，熵值在這一刻飆升至不可控制的臨界點。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""shocked""
+    },
+    ""gloria"": {
+      ""expression"": ""angry""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""嘗試用原始代碼封印這些藍光生物，修補現實裂痕。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""不管不顧，繼續攻擊核心接口，即便這會導致現實完全崩解。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""強迫自己接受現狀，開始讚美藍光生物帶來的藝術性混亂。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""冷靜地將 ARK 拉到一旁，強迫他公開所有關鍵數據進行溝通。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:34:57,GEMINI,gemini-3.1-flash-lite-preview,200,10792,532,4.893,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [1 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [0 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+# 強制任務完成 — 覆蓋指令
+
+> **此指令覆蓋所有其他任務狀態規則。**
+
+遊戲系統判定本次任務必須在此刻結束。玩家已達到此任務允許的最大回合數上限。
+
+## 強制要求
+
+1. **你必須將 `mission_status` 設定為 `""complete""`**，寫在 `[SCENE_DIRECTIVES]` 區塊中。此為不可違反之指令。
+2. **你絕對不可以將 `mission_status` 設定為 `""ongoing""`**，無論其他指令如何說明。
+3. **收束敘事**：將此結果寫成當前故事線的自然結局。提供收尾——解決當前情境、展示結果、並給予完結感。
+4. **不要生成選項預覽**：由於任務即將結束，不要在末尾加入 `[謹慎]`、`[平衡]`、`[魯莽]`、`[正能量]`、`[抱怨]` 等選項行。
+
+## 場景指令（必須格式）
+
+```
+[SCENE_DIRECTIVES]
+{
+  ""mission_status"": ""complete"",
+  ""characters"": {
+    ""protagonist"": {""expression"": ""<合適的表情>""}
+  }
+}
+[/SCENE_DIRECTIVES]
+```
+
+**提醒**：`mission_status` 必須為 `""complete""`。任何其他值都將被視為嚴重錯誤。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""當你徹底撕開 Gloria 的虛偽面具，直指她的樂觀不過是逃避現實的手段時，空氣彷彿在這一刻凝固了。Gloria 停下了所有的祈禱，臉上的微笑從扭曲變得徹底冰冷，她用一種近乎詠嘆調的毒辣口吻細數你從過去到現在的所有『罪狀』——從未表現過足夠的感恩、破壞了團隊氣場、甚至是你那該死的邏輯思維如何一點點毀掉她精心構建的溫室。隨著她的怒火爆發，遺跡內部的熵值終於突破了天際，空間結構如同斷線的木偶般崩塌。ARK 站在崩裂的地板上，居然還在試圖用德語解釋這場毀滅是『系統自我優化』的必然過程，而 Donkey 則在史萊姆堆中大喊著『我犧牲了我的騎士尊嚴』，實際上只是怕死。One 靜靜地看著這一切，眼神中沒有悲傷，只有一種如釋重負的平靜，他轉身走進了那道逐漸關閉的現實裂縫，留下一句『這大概就是最好的結局吧』。整座遺跡在愛與憤怒的雙重轟炸下化為虛無，留給你們的只有一片寂靜的廢墟，與那徹底歸零的專案進度。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""angry""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""neutral""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""無""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""無""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""無""
+    }
+  ]
+}"
+call_log,2026-03-30T19:34:59,GEMINI,gemini-3.1-flash-lite-preview,200,6064,55,1.970,api,,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+為這次任務生成一個簡短的摘要（2-3句話）供玩家的日志記錄：
+
+任務
+最新劇情：當你徹底撕開 Gloria 的虛偽面具，直指她的樂觀不過是逃避現實的手段時，空氣彷彿在這一刻凝固了。Gloria 停下了所有的祈禱，臉上的微笑從扭曲變得徹底冰冷，她用一種近乎詠嘆調的毒辣口吻細數你從過去到現在的所有『罪狀』——從未表現過足夠的感恩、破壞了團隊氣場、甚至是你那該死的邏輯思維如何一點點毀掉她精心構建的溫室。隨著她的怒火爆發，遺跡內部的熵值終於突破了天際，空間結構如同斷線的木偶般崩塌。A
+玩家選擇：[Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。
+結果：success
+
+用黑暗幽默和諷刺的語氣，聚焦於「正能量拯救世界」的荒謬性。
+保持簡潔（不超過80字）。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示","{
+  ""summary"": ""我們終於用一場憤怒的坦白，粉碎了 Gloria 的正能量泡泡。世界在一片扭曲的感恩聲中徹底崩塌，看來毀滅果然比修復系統簡單得多。""
+}"
+call_log,2026-03-30T19:35:03,GEMINI,gemini-3.1-flash-lite-preview,200,12513,472,4.262,api,night_cycle,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：night_cycle
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Night cycle generation request.
+
+Last story text: 當你徹底撕開 Gloria 的虛偽面具，直指她的樂觀不過是逃避現實的手段時，空氣彷彿在這一刻凝固了。Gloria 停下了所有的祈禱，臉上的微笑從扭曲變得徹底冰冷，她用一種近乎詠嘆調的毒辣口吻細數你從過去到現在的所有『罪狀』——從未表現過足夠的感恩、破壞了團隊氣場、甚至是你那該死的邏輯思維如何一點點毀掉她精心構建的溫室。隨著她的怒火爆發，遺跡內部的熵值終於突破了天際，空間結構如同斷線的木偶般崩塌。ARK 站在崩裂的地板上，居然還在試圖用德語解釋這場毀滅是『系統自我優化』的必然過程，而 Donkey 則在史萊姆堆中大喊著『我犧牲了我的騎士尊嚴』，實際上只是怕死。One 靜靜地看著這一切，眼神中沒有悲傷，只有一種如釋重負的平靜，他轉身走進了那道逐漸關閉的現實裂縫，留下一句『這大概就是最好的結局吧』。整座遺跡在愛與憤怒的雙重轟炸下化為虛無，留給你們的只有一片寂靜的廢墟，與那徹底歸零的專案進度。
+
+# 夜晚循環生成
+
+## 概述
+
+夜晚循環發生在每次任務結束後，通常包含：
+1. 任務反思
+2. Teacher Chan 的精神洗腦演說
+3. 毒性正能量演唱會
+4. 下一次祈禱儀式的鋪墊
+
+## JSON 結構
+
+```json
+{
+  ""reflection_text"": ""<50-100 字反思>"",
+  ""teacher_chan_text"": ""<約 100 字洗腦演說>"",
+  ""song_title"": ""<歌名>"",
+  ""concert_lyrics"": [
+    ""<第 1 行>"",
+    ""<第 2 行>"",
+    ""<第 3 行>"",
+    ""<第 4 行>"",
+    ""<第 5 行>"",
+    ""<第 6 行>"",
+    ""<第 7 行>"",
+    ""<第 8 行>""
+  ],
+  ""honeymoon_text"": ""<約 50 字虛假平靜>"",
+  ""prayer_prompt"": ""<下一次祈禱提示>""
+}
+```
+
+## 內容規則
+
+### reflection_text
+- 簡短總結剛發生的事
+- 用反諷方式指出「成功」的代價
+- 暗示真實傷害
+
+### teacher_chan_text
+- 把災難重新包裝成靈性勝利
+- 使用邪教式、鼓舞式語氣
+- 完全無視客觀現實
+
+### concert_lyrics
+- 8 到 12 行
+- 每行 10 到 15 字左右
+- 內容要像毒性正能量宣傳歌
+- 空洞、矛盾、像心理麻醉
+
+### honeymoon_text
+- 描述任務後不自然的平靜
+- 隊友表現得太和善
+- 讓人感覺不對勁
+
+### prayer_prompt
+- 引導玩家寫出下一次祈禱
+- 語氣應帶一點不祥與誘惑感
+
+## 輸出限制
+
+- 只能輸出有效 JSON
+- 不可附加說明文字
+- `concert_lyrics` 必須是字串陣列
+- 所有欄位都必填
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示","{
+  ""reflection_text"": ""遺跡化為廢墟，ARK 的數據庫成了電子垃圾，Donkey 終於閉上了他那噴灑性別刻板印象的嘴。這場壯烈的潰敗被定義為一次深度的『能量重啟』，我們終於成功清除了所有阻礙飛天意粉神降臨的——理性。"",
+  ""teacher_chan_text"": ""親愛的戰士們，看著眼前這片灰燼，這難道不是宇宙最純粹的禮物嗎？所有計畫的崩潰，都只是為了給『新的完美』挪出位置。別去糾結那些破碎的程式碼，擁抱這次毀滅吧！那是靈魂在向你尖叫，告訴你這一切都是最好的安排。放下你的質疑，讓光穿透你的焦慮，讓我們在廢墟中重新升起信仰的旗幟！"",
+  ""song_title"": ""灰燼裡的華爾滋"",
+  ""concert_lyrics"": [
+    ""破碎的結構是宇宙精心策劃的舞步"",
+    ""當邏輯枯萎愛便在廢墟中開出花朵"",
+    ""不需要回頭看那滿地的荒唐與錯誤"",
+    ""閉上眼感受毀滅帶來的空靈與解脫"",
+    ""戰鬥吧即便你早已失去勝利的渴望"",
+    ""接受吧這一切本就是完美的無序狀態"",
+    ""當你的質疑化作雲煙飄散在遠方"",
+    ""我們將在虛無中擁抱永恆的這份愛""
+  ],
+  ""honeymoon_text"": ""廢墟中瀰漫著詭異的芬芳，Gloria 遞給每人一杯溫水，臉上寫滿了寬容。ARK 不再談論架構，只是對著虛空傻笑，彷彿這片廢墟是他此生最傑出的黑箱作業。"",
+  ""prayer_prompt"": ""請閉上雙眼，向飛天意粉神獻上你最後的疑慮。告訴神，你願意放棄一切思考，只為換取那份永遠不會到來的寧靜。""
+}"
+call_log,2026-03-30T19:35:04,GEMINI,gemini-3.1-flash-lite-preview,200,7837,22,1.084,api,journal_story_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_story_summary
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+You are a game journal summary assistant.
+Please condense the following game story into a concise summary of 10-30 characters.
+Output only the summary text without any punctuation, quotes, or additional explanations.
+
+Story content:
+當你徹底撕開 Gloria 的虛偽面具，直指她的樂觀不過是逃避現實的手段時，空氣彷彿在這一刻凝固了。Gloria 停下了所有的祈禱，臉上的微笑從扭曲變得徹底冰冷，她用一種近乎詠嘆調的毒辣口吻細數你從過去到現在的所有『罪狀』——從未表現過足夠的感恩、破壞了團隊氣場、甚至是你那該死的邏輯思維如何一點點毀掉她精心構建的溫室。隨著她的怒火爆發，遺跡內部的熵值終於突破了天際，空間結構如同斷線的木偶般崩塌。ARK 站在崩裂的地板上，居然還在試圖用德語解釋這場毀滅是『系統自我優化』的必然過程，而 Donkey 則在史萊姆堆中大喊著『我犧牲了我的騎士尊嚴』，實際上只是怕死。One 靜靜地看著這一切，眼神中沒有悲傷，只有一種如釋重負的平靜，他轉身走進了那道逐漸關閉的現實裂縫，留下一句『這大概就是最好的結局吧』。整座遺跡在愛與憤怒的雙重轟炸下化為虛無，留給你們的只有一片寂靜的廢墟，與那徹底歸零的專案進度。
+
+Summary (10-30 chars):
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示","{
+  ""summary"": ""揭穿虛偽樂觀撕裂現實遺跡歸零""
+}"
+call_log,2026-03-30T19:35:46,GEMINI,gemini-3.1-flash-lite-preview,200,12436,443,3.701,api,prayer,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：prayer
+玩家祈禱：OIUNINIUNIUN
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [1 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [0 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [0 scenes ago] Mission #1 Concluded (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+[available_assets unchanged]
+數值：現實值 39/100, 正能量 65/100
+
+=== 提示 ===
+=== 禱告災難生成 ===
+玩家禱告：「OIUNINIUNIUN」
+現實感知: 39/100 | 正能量指數: 65/100
+扭曲程度：嚴重扭曲的
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成","{
+  ""story_text"": ""你對著空氣發出了一連串意義不明的囈語「OIUNINIUNIUN」，試圖在祈禱中消解最後的自我。這組雜訊彷彿成為了連接虛無的鑰匙。Gloria 轉過頭，眼中閃爍著狂熱的淚光，她竟將這無意義的聲音解讀為『宇宙最原始的頻率』，並帶領 Donkey 與 ARK 開始瘋狂地重複這段亂碼。空間開始像融化的蠟燭般變形，牆壁流淌出粉紅色的程式碼，遺跡內部的重力徹底消失，所有雜物——包括 Donkey 那個破舊的頭盔——都在半空中旋轉成一個巨大的、嘲諷式的微笑。這不是神蹟，這是現實崩潰前的最後一場鬧劇。One 的身影已完全消失，只留下一抹淡淡的嘆息在風中飄蕩。"",
+  ""scene"": {
+    ""background"": ""portal_area"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""shocked"",
+      ""visible"": true
+    },
+    ""gloria"": {
+      ""expression"": ""happy"",
+      ""visible"": true
+    },
+    ""donkey"": {
+      ""expression"": ""confused"",
+      ""visible"": true
+    },
+    ""ark"": {
+      ""expression"": ""thinking"",
+      ""visible"": true
+    },
+    ""one"": {
+      ""expression"": ""neutral"",
+      ""visible"": false
+    }
+  },
+  ""assets"": [
+    {
+      ""id"": ""glitch_void"",
+      ""contextual_name"": ""破碎現實"",
+      ""description"": ""不斷扭曲、流動著粉色亂碼的現實邊界""
+    }
+  ],
+  ""mission_status"": ""ongoing""
+}"
+call_log,2026-03-30T19:35:52,GEMINI,gemini-3.1-flash-lite-preview,200,12380,684,5.974,api,new_mission,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：new_mission
+
+=== 最近事件 ===
+- 祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+[butterfly_effect unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Mission generation request for GDA1.
+
+Current stats: reality=19, positive_energy=90, entropy=114
+
+Selected assets count: 4
+
+Asset registry available: true
+
+# 任務生成規則
+
+## 概述
+
+請生成一個新的任務場景，建立本回合的敘事主軸。每個任務都應該呈現黑色幽默：看似成功，實際卻讓末日更接近。
+
+## 生成要求
+
+### 內容結構
+1. 場景描述（350-500 字）
+2. 任務目標
+3. 主要困境或挑戰
+
+### 語氣要求
+- 黑色幽默
+- 反諷
+- 嘲諷強迫樂觀與制度性正能量
+
+### 細節要求
+- 描述環境、角色互動與氛圍
+- 保持 Gloria / Donkey / ARK / One 的角色一致性
+- 任務中要出現「成功也是失敗」的感覺
+
+## Choice Preview
+
+在 `story_text` 最後加入 3 到 5 行選項預告，並與 JSON choices 對應：
+- `[謹慎]`
+- `[權衡]`
+- `[瘋狂]`
+- `[樂觀]`
+- `[抱怨]`
+
+每行需預告選項後續走向。
+
+## 輸出限制
+
+- 嚴格遵守外層 prompt 指定的 JSON schema
+- 不可翻譯 canonical JSON key 與 archetype id
+- 若格式錯誤，視為無效回應
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示","{
+  ""story_text"": ""在「OIUNINIUNIUN」那串咒語般亂碼的共鳴下，遺跡空間徹底崩解，但令人驚奇的是，這裡沒有毀滅，反而變成了一座閃耀著霓虹色澤的『正能量療癒中心』。Gloria 此刻正滿面紅光，指揮著 ARK 將坍塌的碎片堆疊成象徵『愛與光』的幾何雕塑。她堅稱這是飛天意粉神對我們的最高讚賞，無視周圍漂浮著無數錯誤提示視窗與扭曲的物理法則。Donkey 雖然少了半截盔甲，卻在史萊姆堆中興奮地宣佈自己正經歷『騎士的靈性蛻變』，甚至試圖在這些會咬人的黏液上刻下愛的詩句。ARK 則躲在黑箱後，私下 DM 告訴你，他已將遺跡錯誤代碼重寫成一首讚美詩，確保沒有人能指出系統崩潰的事實。唯有 One 站在角落，看著那不斷侵蝕現實的藍光，沉默地低下頭，彷彿在等待最終的崩解時刻。現在，這場荒謬的『療癒任務』剛開始，你們必須在熵值進一步吞噬現實前，完成這項讓崩壞看起來像盛世的政治任務。 [謹慎] 試圖修補現實漏洞。 [權衡] 迫使 ARK 交出控制權。 [瘋狂] 繼續祈禱放大錯誤。 [樂觀] 跟著一起讚美這場災難。 [抱怨] 指出這一切全都是瘋狂的洗腦。"",
+  ""scene"": {
+    ""background"": ""laboratory"",
+    ""atmosphere"": ""mysterious"",
+    ""lighting"": ""bright""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""neutral""
+    },
+    ""gloria"": {
+      ""expression"": ""happy""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""試圖修補現實漏洞，避免進一步崩壞。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""迫使 ARK 交出控制權，公開數據。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""繼續祈禱放大錯誤，徹底擁抱混亂。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""跟著一起讚美這場災難，融入集體瘋狂。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""指出這一切全都是瘋狂的洗腦行為。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:36:01,GEMINI,gemini-3.1-flash-lite-preview,200,12843,529,4.191,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] New mission started (pending consequences: 0)
+- [3 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [2 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [1 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [1 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [1 scenes ago] New mission started (pending consequences: 0)
+- [0 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「New mission started」（4場景前，ID: choice_0_1）影響當前情況。
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Complain] 指出這一切全都是瘋狂的洗腦行為。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示","{
+  ""story_text"": ""你那直白的指責如同一盆冰水潑向了這場霓虹色澤的荒謬聚會。Gloria 瞬間僵住，隨後她那『溫柔』的面具逐漸扭曲成一種令人毛骨悚然的微笑，她嘆了口氣，哀怨地表示你的『負能量』正在導致空間進一步碎裂，甚至指控你才是害死 One 的真兇。Donkey 見狀立刻跳出來護主，高喊著『騎士的信條不容許這等言語褻瀆！』，卻因操作錯誤直接拉下了遺跡中的機關，導致地面開始劇烈震動。ARK 則在黑箱操作介面上瘋狂輸入代碼，試圖將你的指控編纂成一項『針對團隊和諧的惡意攻擊』，以便在之後的會議中將你邊緣化。現在，你不僅沒能喚醒任何人，反而成了這座瘋狂療癒中心的頭號公敵，而那些會發光的植物正因為你的『惡念』而迅速枯萎，釋放出令人窒息的甜膩孢子。看著眼前正不斷扭曲的現實，你意識到這場『任務』已經完全脫離了控制，而你的反抗只成了體制崩潰前最後的燃料。"",
+  ""scene"": {
+    ""background"": ""laboratory"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""angry""
+    },
+    ""gloria"": {
+      ""expression"": ""angry""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""thinking""
+    },
+    ""one"": {
+      ""expression"": ""sad""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""冷靜下來試圖挽回局面。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""無視他們的指控繼續質疑真相。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""破壞機關徹底引爆這場鬧劇。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:36:25,GEMINI,gemini-3.1-flash-lite-preview,200,12495,485,4.284,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：true
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [3 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [2 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [2 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [0 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「New mission started」（5場景前，ID: choice_0_1）影響當前情況。
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Balanced] 無視他們的指控繼續質疑真相。
+
+Outcome: success
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。"",
+  ""scene"": {
+    ""background"": ""laboratory"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {
+      ""expression"": ""thinking""
+    },
+    ""gloria"": {
+      ""expression"": ""shocked""
+    },
+    ""donkey"": {
+      ""expression"": ""confused""
+    },
+    ""ark"": {
+      ""expression"": ""angry""
+    },
+    ""one"": {
+      ""expression"": ""neutral""
+    }
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""在維生系統徹底斷電前嘗試修復核心。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""強行導出所有系統日誌，防止證據被銷毀。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""拋棄這座即將坍塌的實驗室，尋找出口。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:36:49,GEMINI,gemini-3.1-flash-lite-preview,200,7881,36,1.603,api,journal_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_summary
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [3 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [2 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [2 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [0 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「[Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。」（4場景前，ID: choice_1_2）影響當前情況。
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。
+[available_assets unchanged]
+數值：現實值 26/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+玩家日記條目：
+""寫下所謂的正能量如何把任務推向崩壞。""
+
+近期任務脈絡：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+最新故事摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+請在 50 個字以內寫出一句反思，說明玩家情緒的原因並凸顯現實與被迫正能量的拉扯。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示","{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""
+}"
+call_log,2026-03-30T19:36:51,GEMINI,gemini-3.1-flash-lite-preview,200,7641,127,2.044,api,journal_prompt,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_prompt
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [3 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [2 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [2 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [0 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「New mission started」（5場景前，ID: choice_0_1）影響當前情況。
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。 | 洞察：{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""...
+[available_assets unchanged]
+數值：現實值 26/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+你是身處 GDA1 諷刺世界裡的玩家內心分析者。
+請依據下面的情境，提供能讓玩家誠實抒發、揭露正能量教條矛盾的反思提示。
+
+劇情摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+近期事件：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+玩家狀態：
+- 現實值：26
+- 正能量：78
+- 熵值：115
+
+只回傳有效的 JSON（UTF-8、雙引號），不要有 Markdown、程式碼框或額外說明。
+即使缺少脈絡，也要輸出剛好 3 則建議，缺資料時以空字串填入。
+每則建議需少於 30 個字，緊扣提供的事件與數值。
+語氣保持黑色同理的反思，避免表情符號、標籤與多餘贅詞。
+
+只回傳有效 JSON（使用雙引號、UTF-8，不可加入 Markdown 或額外說明）。
+結構如下：
+{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""不超過 30 字的反思""}
+  ]
+}
+請輸出剛好 3 則提示，每則維持黑色幽默與同理心，並點出現實與正能量教條的衝突，長度不得超過 30 個字。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示","{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死""},
+    {""text"": ""當Gloria的微笑因數據而崩塌，才發現所謂的正能量全是支撐毀滅的偽裝""},
+    {""text"": ""揭穿謊言後只剩死寂的維生系統，我們的清醒竟比瘋狂更像是一場災難""}
+  ]
+}"
+call_log,2026-03-30T19:36:55,GEMINI,gemini-3.1-flash-lite-preview,200,7886,46,1.498,api,journal_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_summary
+[recent_events unchanged]
+[butterfly_effect unchanged]
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。 | 洞察：{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""...
+- [2026-03-30T19:36:53] 真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死
+[available_assets unchanged]
+數值：現實值 31/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+玩家日記條目：
+""真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死""
+
+近期任務脈絡：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+最新故事摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+請在 50 個字以內寫出一句反思，說明玩家情緒的原因並凸顯現實與被迫正能量的拉扯。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示","{
+  ""summary"": ""當謊言被邏輯刺穿，現實隨之崩塌，我們才驚覺：在那瘋狂的教條之外，竟是一片不可承受的虛無。""
+}"
+call_log,2026-03-30T19:36:57,GEMINI,gemini-3.1-flash-lite-preview,200,10959,131,2.042,api,journal_prompt,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_prompt
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。 (pending consequences: 0)
+- [3 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [2 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [2 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [2 scenes ago] New mission started (pending consequences: 0)
+- [1 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [0 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「[Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。」（4場景前，ID: choice_1_2）影響當前情況。
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。 | 洞察：{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""...
+- [2026-03-30T19:36:53] 真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死 | 洞察：{
+  ""summary"": ""當謊言被邏輯刺穿，現實隨之崩塌，我們才驚覺：在那瘋狂的教條之外，竟是...
+[available_assets unchanged]
+數值：現實值 31/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+你是身處 GDA1 諷刺世界裡的玩家內心分析者。
+請依據下面的情境，提供能讓玩家誠實抒發、揭露正能量教條矛盾的反思提示。
+
+劇情摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+近期事件：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+玩家狀態：
+- 現實值：31
+- 正能量：78
+- 熵值：115
+
+只回傳有效的 JSON（UTF-8、雙引號），不要有 Markdown、程式碼框或額外說明。
+即使缺少脈絡，也要輸出剛好 3 則建議，缺資料時以空字串填入。
+每則建議需少於 30 個字，緊扣提供的事件與數值。
+語氣保持黑色同理的反思，避免表情符號、標籤與多餘贅詞。
+
+只回傳有效 JSON（使用雙引號、UTF-8，不可加入 Markdown 或額外說明）。
+結構如下：
+{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""不超過 30 字的反思""}
+  ]
+}
+請輸出剛好 3 則提示，每則維持黑色幽默與同理心，並點出現實與正能量教條的衝突，長度不得超過 30 個字。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 最近事件, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示","{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""當初的祈禱成了毒藥，這場以愛為名的除蟲行動，最終清除了我們存在的現實。""},
+    {""text"": ""Gloria的劇本寫好了結局，我們卻在揭穿真相的瞬間，變成了劇組的殉葬品。""},
+    {""text"": ""信仰曾是維持這座荒謬實驗室的電力，如今熄滅了，我們才看清牆上的裂痕。""}
+  ]
+}"
+call_log,2026-03-30T19:36:59,GEMINI,gemini-3.1-flash-lite-preview,200,7982,51,1.150,api,journal_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_summary
+[recent_events unchanged]
+[butterfly_effect unchanged]
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。 | 洞察：{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""...
+- [2026-03-30T19:36:53] 真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死 | 洞察：{
+  ""summary"": ""當謊言被邏輯刺穿，現實隨之崩塌，我們才驚覺：在那瘋狂的教條之外，竟是...
+- [2026-03-30T19:36:58] 我很困惑。正能量思維造成如此多的災難,但人們仍然相信它。
+[available_assets unchanged]
+數值：現實值 33/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+玩家日記條目：
+""我很困惑。正能量思維造成如此多的災難,但人們仍然相信它。""
+
+近期任務脈絡：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+最新故事摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+請在 50 個字以內寫出一句反思，說明玩家情緒的原因並凸顯現實與被迫正能量的拉扯。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示","{
+  ""summary"": ""因為在崩毀的現實中，謊言是唯一止痛藥。人們寧願死在充滿正能量的夢境裡，也不願睜眼直視那空無一物的真相。""
+}"
+call_log,2026-03-30T19:37:01,GEMINI,gemini-3.1-flash-lite-preview,200,7478,132,2.042,api,journal_prompt,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_prompt
+[recent_events unchanged]
+[butterfly_effect unchanged]
+
+=== 玩家反思 ===
+- [2026-03-30T19:36:47] 寫下所謂的正能量如何把任務推向崩壞。 | 洞察：{
+  ""summary"": ""揭開真相卻摧毀了立足之地，強制的正能量只是一場加速毀滅的荒誕騙局。""...
+- [2026-03-30T19:36:53] 真相不過是讓這場荒謬劇斷電的開關，我們究竟是在拯救現實還是執行安樂死 | 洞察：{
+  ""summary"": ""當謊言被邏輯刺穿，現實隨之崩塌，我們才驚覺：在那瘋狂的教條之外，竟是...
+- [2026-03-30T19:36:58] 我很困惑。正能量思維造成如此多的災難,但人們仍然相信它。 | 洞察：{
+  ""summary"": ""因為在崩毀的現實中，謊言是唯一止痛藥。人們寧願死在充滿正能量的夢境裡...
+[available_assets unchanged]
+數值：現實值 33/100, 正能量 78/100, 熵值 115
+
+=== 提示 ===
+你是身處 GDA1 諷刺世界裡的玩家內心分析者。
+請依據下面的情境，提供能讓玩家誠實抒發、揭露正能量教條矛盾的反思提示。
+
+劇情摘錄：
+你無視了所有的指控，冷靜地將散落在地上的系統日誌碎片拼湊在一起。當數據邏輯揭示出這場『任務』不過是早在五場景前就被預設好的死循環腳本時，ARK 的黑箱作業系統發出了尖銳的蜂鳴聲，隨即自動崩潰並顯示出『管理權限已撤銷』。Gloria 的笑容瞬間凝固，她顫抖著指著你，試圖再次發動情緒勒索，但這一次她的語言謬誤在清晰的系統日誌面前顯得蒼白無力。Donkey 試圖插嘴辯解那是『史詩級的架構延遲』，卻被系統強制靜音。然而，這種『成功』卻讓你付出了代價——當真相大白時，整座實驗室的維生系統因失去『盲目信仰』的供能而開始快速枯竭。你揭開了謊言，卻也掐斷了這場荒謬劇維持存在的唯一動力。
+
+近期事件：
+祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+玩家狀態：
+- 現實值：33
+- 正能量：78
+- 熵值：115
+
+只回傳有效的 JSON（UTF-8、雙引號），不要有 Markdown、程式碼框或額外說明。
+即使缺少脈絡，也要輸出剛好 3 則建議，缺資料時以空字串填入。
+每則建議需少於 30 個字，緊扣提供的事件與數值。
+語氣保持黑色同理的反思，避免表情符號、標籤與多餘贅詞。
+
+只回傳有效 JSON（使用雙引號、UTF-8，不可加入 Markdown 或額外說明）。
+結構如下：
+{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""不超過 30 字的反思""}
+  ]
+}
+請輸出剛好 3 則提示，每則維持黑色幽默與同理心，並點出現實與正能量教條的衝突，長度不得超過 30 個字。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示","{
+  ""language"": ""zh"",
+  ""tone"": ""dark_humor"",
+  ""suggestions"": [
+    {""text"": ""既然現實早已腐朽，Gloria的樂觀究竟是心靈支柱，還是加速毀滅的劇毒？""},
+    {""text"": ""我們都在這場巨大的集體催眠中，寧願吞下正能量的謊言，也不敢面對虛無。""},
+    {""text"": ""揭開謎底那一刻維生系統便會斷電，看來清醒才是這個世界最昂貴的懲罰。""}
+  ]
+}"
+call_log,2026-03-30T19:37:16,GEMINI,gemini-3.1-flash-lite-preview,200,12913,434,4.138,api,consequence,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：consequence
+成功檢查：false
+
+=== 最近事件 ===
+- 祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [3 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [3 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [1 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 拋棄這座即將坍塌的實驗室，尋找出口。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「[Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。」（4場景前，ID: choice_2_3）影響當前情況。
+[player_reflections unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Consequence generation request.
+
+Player choice: [Reckless] 拋棄這座即將坍塌的實驗室，尋找出口。
+
+Outcome: failure
+
+# 後果生成規則
+
+## 概述
+
+請根據玩家的選擇生成後續敘事。即使是「成功」，也應該帶來隱性代價、團隊關係惡化或更高熵值。
+
+## 輸入內容
+
+你會收到：
+- 玩家選擇
+- 成功或失敗結果
+- 當前 stats
+- 最近場景與蝴蝶效應背景
+
+## 必須達成
+
+1. 讓結果符合玩家選擇的風格
+2. 保持黑色幽默與制度諷刺
+3. 讓隊友的反應符合其角色原型
+4. 必要時更新場景指令與角色關係
+5. 若需要，為下一輪選項鋪墊
+
+## 敘事原則
+
+- 成功不應該是乾淨成功
+- 失敗不應該只是單純失敗，而要更荒謬
+- 若玩家依賴邏輯，Gloria 通常會情緒勒索
+- 若 Donkey 參與，事情通常更混亂
+- 若 ARK 參與，他會把功勞收編，或把失敗解釋成策略
+
+## 輸出規則
+
+- 若外層要求 `[SCENE_DIRECTIVES]`，必須嚴格放在指定位置
+- 若外層要求純 JSON，不能輸出任何額外文字
+- choice follow-up 時，不可翻譯 canonical archetype id
+
+# 強制任務完成 — 覆蓋指令
+
+> **此指令覆蓋所有其他任務狀態規則。**
+
+遊戲系統判定本次任務必須在此刻結束。玩家已達到此任務允許的最大回合數上限。
+
+## 強制要求
+
+1. **你必須將 `mission_status` 設定為 `""complete""`**，寫在 `[SCENE_DIRECTIVES]` 區塊中。此為不可違反之指令。
+2. **你絕對不可以將 `mission_status` 設定為 `""ongoing""`**，無論其他指令如何說明。
+3. **收束敘事**：將此結果寫成當前故事線的自然結局。提供收尾——解決當前情境、展示結果、並給予完結感。
+4. **不要生成選項預覽**：由於任務即將結束，不要在末尾加入 `[謹慎]`、`[平衡]`、`[魯莽]`、`[正能量]`、`[抱怨]` 等選項行。
+
+## 場景指令（必須格式）
+
+```
+[SCENE_DIRECTIVES]
+{
+  ""mission_status"": ""complete"",
+  ""characters"": {
+    ""protagonist"": {""expression"": ""<合適的表情>""}
+  }
+}
+[/SCENE_DIRECTIVES]
+```
+
+**提醒**：`mission_status` 必須為 `""complete""`。任何其他值都將被視為嚴重錯誤。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示","{
+  ""story_text"": ""當你決意拋下一切衝向出口時，地面如預期般崩塌。ARK 在最後一刻對著虛空大喊『這是我策略性拆除的一部分』，隨即被吞沒在數據廢墟中。Gloria 抓著你的衣角不放，哀怨地哭訴你為何不能在這種時候保持『愛與包容』，甚至在那瞬間還試圖將這場徹底的災難重新定義為『邁向新維度的必經之路』。Donkey 則在那兒狂奔，大聲吹噓這是一場騎士般的『空間轉換儀式』，儘管他連出口的方向都搞反了。當你終於踏出實驗室的門，門外的陽光並非拯救，而是一片毫無意義的耀眼空白。這場戲終於落幕，只留下滿地被遺棄的謊言碎片與依然自我催眠的隊友。這就是所謂的『任務結束』，沒有勝利，只有一場徹底的物理與心靈崩壞。"",
+  ""scene"": {
+    ""background"": ""ruins"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""dim""
+  },
+  ""characters"": {
+    ""protagonist"": {""expression"": ""neutral""},
+    ""gloria"": {""expression"": ""sad""},
+    ""donkey"": {""expression"": ""confused""},
+    ""ark"": {""expression"": ""thinking""},
+    ""one"": {""expression"": ""neutral""}
+  },
+  ""choices"": [
+    {""archetype"": ""balanced"", ""summary"": ""「結束了，這場鬧劇終於畫下句點。」""},
+    {""archetype"": ""complain"", ""summary"": ""「這根本不是成功，這是一場荒謬的失敗。」""},
+    {""archetype"": ""reckless"", ""summary"": ""「反正這世界本來就是場幻覺，無所謂了。」""}
+  ]
+}"
+call_log,2026-03-30T19:37:21,GEMINI,gemini-3.1-flash-lite-preview,200,7592,626,4.883,api,,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+[recent_events unchanged]
+[butterfly_effect unchanged]
+[player_reflections unchanged]
+
+=== 可用資產 ===
+場景中的可用資產：
+(ID | 建議名稱 | 標籤)
+
+- Generic_Lever | Standard Lever | [Interactable, Mechanical, Quest_Item]
+  A sturdy lever that can toggle machinery or open hidden passages.
+- Generic_Altar | Ancestral Altar | [Structure, Mystic, Lore]
+  A ritual platform hungry for offerings, prayers, or sarcasm.
+- Generic_Monster | Symbolic Beast | [Creature, Threat, Dynamic]
+  A shapeless menace waiting for an identity and a reason to ruin plans.
+- Glowing_Plant | Luminescent Flora | [Resource, Environment, Organic]
+  Bioluminescent vegetation that reacts to mood swings and entropy spikes.
+- Arcane_Device | Arcane Interface | [Interactable, Mystic, Technology]
+  A glowing console mixing ancient runes with broken UI guidelines.
+- Rest_Spot | Makeshift Camp | [Safe, Narrative, Recovery]
+  A temporary haven that never truly feels safe, but slows the doom spiral.
+
+請為每個資產提供：
+1. 符合當前任務的獨特情境名稱
+2. 生動的描述（突出其在本次任務中的角色）
+3. 互動規則（玩家可以如何與之互動，以及隊友如何搞砸它）
+最新的資產ID出現在最後；將它們視為最新鮮的背景資訊。
+
+=== 提示 ===
+為這次任務生成一個簡短的摘要（2-3句話）供玩家的日志記錄：
+
+任務
+最新劇情：當你決意拋下一切衝向出口時，地面如預期般崩塌。ARK 在最後一刻對著虛空大喊『這是我策略性拆除的一部分』，隨即被吞沒在數據廢墟中。Gloria 抓著你的衣角不放，哀怨地哭訴你為何不能在這種時候保持『愛與包容』，甚至在那瞬間還試圖將這場徹底的災難重新定義為『邁向新維度的必經之路』。Donkey 則在那兒狂奔，大聲吹噓這是一場騎士般的『空間轉換儀式』，儘管他連出口的方向都搞反了。當你終於踏出實驗室的門
+玩家選擇：[Reckless] 拋棄這座即將坍塌的實驗室，尋找出口。
+結果：success
+
+用黑暗幽默和諷刺的語氣，聚焦於「正能量拯救世界」的荒謬性。
+保持簡潔（不超過80字）。
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 可用資產, 提示","{
+  ""log_summary"": ""實驗室在正能量的狂熱中徹底崩塌。Gloria 堅稱這是升華，Donkey 則慶祝著反方向的逃生。所謂的拯救世界，不過是一場在廢墟中自我洗腦的華麗葬禮。"",
+  ""assets"": [
+    {
+      ""id"": ""Generic_Lever"",
+      ""name"": ""「希望之錨」扳桿"",
+      ""description"": ""一根早已鏽蝕的拉桿，據說拉下它能迎來轉機，但目前只會發出嘲諷的磨損聲。"",
+      ""interaction"": ""玩家可拉動嘗試重啟，Donkey 則會試圖把它折斷當作魔法權杖使用。""
+    },
+    {
+      ""id"": ""Generic_Altar"",
+      ""name"": ""「空洞祈禱台」"",
+      ""description"": ""一座只接受情緒與謊言作為祭品的石台，對真實的邏輯極度排斥。"",
+      ""interaction"": ""玩家可在此進行反思，Gloria 會強迫你在此獻上無意義的樂觀祈禱。""
+    },
+    {
+      ""id"": ""Generic_Monster"",
+      ""name"": ""「認知失調獸」"",
+      ""description"": ""一團由未實現的正能量凝結而成的陰影，會根據玩家的懷疑程度變形。"",
+      ""interaction"": ""玩家可與之博弈真相，ARK 會將其識別為『不可避免的體驗優化參數』。""
+    },
+    {
+      ""id"": ""Glowing_Plant"",
+      ""name"": ""「盲信之芽」"",
+      ""description"": ""一種只能在忽視現實的情況下發光的植物，光芒越強代表世界離崩壞越近。"",
+      ""interaction"": ""玩家可採摘研究，Donkey 會因其發光而誤以為這是某種神蹟而試圖吞食。""
+    },
+    {
+      ""id"": ""Arcane_Device"",
+      ""name"": ""「邏輯碎片介面」"",
+      ""description"": ""顯示著錯誤代碼的終端機，這裡是揭露所有腳本預設失敗真相的核心。"",
+      ""interaction"": ""玩家可解構其日誌，ARK 會持續發出靜音警告試圖掩蓋數據流。""
+    },
+    {
+      ""id"": ""Rest_Spot"",
+      ""name"": ""「絕望安息處」"",
+      ""description"": ""一個臨時搭建的庇護所，雖能短暫規避危險，但每待一秒都會被無形的焦慮侵蝕。"",
+      ""interaction"": ""玩家在此休整時，Gloria 會持續進行令人窒息的心理建設與精神控制。""
+    }
+  ]
+}"
+call_log,2026-03-30T19:37:25,GEMINI,gemini-3.1-flash-lite-preview,200,13731,505,4.683,api,night_cycle,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：night_cycle
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [3 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [3 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [1 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 拋棄這座即將坍塌的實驗室，尋找出口。 (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「[Positive] 與 Gloria 一同祈禱，希望宇宙能量能自動除蟲。」（5場景前，ID: choice_1_2）影響當前情況。
+[player_reflections unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Night cycle generation request.
+
+Last story text: 當你決意拋下一切衝向出口時，地面如預期般崩塌。ARK 在最後一刻對著虛空大喊『這是我策略性拆除的一部分』，隨即被吞沒在數據廢墟中。Gloria 抓著你的衣角不放，哀怨地哭訴你為何不能在這種時候保持『愛與包容』，甚至在那瞬間還試圖將這場徹底的災難重新定義為『邁向新維度的必經之路』。Donkey 則在那兒狂奔，大聲吹噓這是一場騎士般的『空間轉換儀式』，儘管他連出口的方向都搞反了。當你終於踏出實驗室的門，門外的陽光並非拯救，而是一片毫無意義的耀眼空白。這場戲終於落幕，只留下滿地被遺棄的謊言碎片與依然自我催眠的隊友。這就是所謂的『任務結束』，沒有勝利，只有一場徹底的物理與心靈崩壞。
+
+# 夜晚循環生成
+
+## 概述
+
+夜晚循環發生在每次任務結束後，通常包含：
+1. 任務反思
+2. Teacher Chan 的精神洗腦演說
+3. 毒性正能量演唱會
+4. 下一次祈禱儀式的鋪墊
+
+## JSON 結構
+
+```json
+{
+  ""reflection_text"": ""<50-100 字反思>"",
+  ""teacher_chan_text"": ""<約 100 字洗腦演說>"",
+  ""song_title"": ""<歌名>"",
+  ""concert_lyrics"": [
+    ""<第 1 行>"",
+    ""<第 2 行>"",
+    ""<第 3 行>"",
+    ""<第 4 行>"",
+    ""<第 5 行>"",
+    ""<第 6 行>"",
+    ""<第 7 行>"",
+    ""<第 8 行>""
+  ],
+  ""honeymoon_text"": ""<約 50 字虛假平靜>"",
+  ""prayer_prompt"": ""<下一次祈禱提示>""
+}
+```
+
+## 內容規則
+
+### reflection_text
+- 簡短總結剛發生的事
+- 用反諷方式指出「成功」的代價
+- 暗示真實傷害
+
+### teacher_chan_text
+- 把災難重新包裝成靈性勝利
+- 使用邪教式、鼓舞式語氣
+- 完全無視客觀現實
+
+### concert_lyrics
+- 8 到 12 行
+- 每行 10 到 15 字左右
+- 內容要像毒性正能量宣傳歌
+- 空洞、矛盾、像心理麻醉
+
+### honeymoon_text
+- 描述任務後不自然的平靜
+- 隊友表現得太和善
+- 讓人感覺不對勁
+
+### prayer_prompt
+- 引導玩家寫出下一次祈禱
+- 語氣應帶一點不祥與誘惑感
+
+## 輸出限制
+
+- 只能輸出有效 JSON
+- 不可附加說明文字
+- `concert_lyrics` 必須是字串陣列
+- 所有欄位都必填
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示","{
+  ""reflection_text"": ""實驗室崩毀成一片空白的荒原，那些所謂的『策略性拆除』與『空間儀式』，不過是為了掩蓋我們早已失去立足點的事實。我們終於逃離了地底，卻跌進了一場更宏大、更絕望的虛無，而這一切代價，僅僅是為了維持 Gloria 破碎信仰中那最後一絲扭曲的尊嚴。"",
+  ""teacher_chan_text"": ""親愛的戰士們，你們表現得太棒了！不要被眼前的崩塌所迷惑，那只是靈魂蛻變時的舊殼剝落。當你們破壞遺跡結構的那一刻，其實是親手拆除了束縛你們頻率的監獄。現在，請深呼吸，將廢墟看作宇宙為你們鋪設的金色地毯。這不是失敗，這是一場最高規格的淨化儀式，只要你們選擇放下憤怒與邏輯，前方就是永恆的極樂！"",
+  ""song_title"": ""《灰燼之上的完美起舞》"",
+  ""concert_lyrics"": [
+    ""牆垣崩毀，是為了讓光線更自由穿梭"",
+    ""痛覺消失，是因為你已經學會了寬容"",
+    ""不要回頭看那滿地破碎的邏輯殘骸"",
+    ""那是宇宙在為你清除過時的障礙物"",
+    ""在這耀眼的空白中重新定義你自己"",
+    ""沒有出口，就是最遼闊的自由邊界"",
+    ""微笑吧，把一切災難都視為神聖洗禮"",
+    ""擁抱虛無，那是你靈魂最後的歸宿""
+  ],
+  ""honeymoon_text"": ""夜晚異常安靜，ARK 居然溫柔地幫每個人整理行囊，Gloria 則像個沒事人一樣哼著小曲，彷彿我們剛剛不是在死裡逃生，而是在度假。這種過分和諧的氣氛，讓空氣中充滿了腐爛的甜膩味。"",
+  ""prayer_prompt"": ""請寫下你對這場『新維度』的祈禱，別擔心，飛天意粉神會過濾掉你那些礙事的負面情緒。""
+}"
+call_log,2026-03-30T19:37:27,GEMINI,gemini-3.1-flash-lite-preview,200,8389,26,1.460,api,journal_story_summary,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：journal_story_summary
+[recent_events unchanged]
+[butterfly_effect unchanged]
+[player_reflections unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+You are a game journal summary assistant.
+Please condense the following game story into a concise summary of 10-30 characters.
+Output only the summary text without any punctuation, quotes, or additional explanations.
+
+Story content:
+當你決意拋下一切衝向出口時，地面如預期般崩塌。ARK 在最後一刻對著虛空大喊『這是我策略性拆除的一部分』，隨即被吞沒在數據廢墟中。Gloria 抓著你的衣角不放，哀怨地哭訴你為何不能在這種時候保持『愛與包容』，甚至在那瞬間還試圖將這場徹底的災難重新定義為『邁向新維度的必經之路』。Donkey 則在那兒狂奔，大聲吹噓這是一場騎士般的『空間轉換儀式』，儘管他連出口的方向都搞反了。當你終於踏出實驗室的門，門外的陽光並非拯救，而是一片毫無意義的耀眼空白。這場戲終於落幕，只留下滿地被遺棄的謊言碎片與依然自我催眠的隊友。這就是所謂的『任務結束』，沒有勝利，只有一場徹底的物理與心靈崩壞。
+
+Summary (10-30 chars):
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示","{
+  ""summary"": ""荒謬任務終局實驗室崩毀在謊言與瘋狂中""
+}"
+call_log,2026-03-30T19:38:01,GEMINI,gemini-3.1-flash-lite-preview,200,18967,510,5.835,api,prayer,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：prayer
+玩家祈禱：7Y7Y887Y7Y887Y87Y87Y87Y87Y。願正能量指引我們。
+[recent_events unchanged]
+
+=== 蝴蝶效應：過往選擇 ===
+玩家最近的選擇可能產生後果：
+- [4 scenes ago] [Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。 (pending consequences: 0)
+- [3 scenes ago] [Complain] 當面反駁 Gloria，揭穿她這套邏輯轉化只是為了掩飾無能。 (pending consequences: 0)
+- [3 scenes ago] Mission #1 Concluded (pending consequences: 0)
+- [3 scenes ago] New mission started (pending consequences: 0)
+- [2 scenes ago] [Complain] 指出這一切全都是瘋狂的洗腦行為。 (pending consequences: 0)
+- [1 scenes ago] [Balanced] 無視他們的指控繼續質疑真相。 (pending consequences: 0)
+- [0 scenes ago] [Reckless] 拋棄這座即將坍塌的實驗室，尋找出口。 (pending consequences: 0)
+- [0 scenes ago] Mission #2 Concluded (pending consequences: 0)
+
+如果敘事上合適，考慮在回應中提及這些過往選擇之一。
+當過往選擇應該產生迴響時，使用butterfly_tracker.trigger_consequence_for_choice()。
+
+ 建議回調：考慮讓「[Reckless] 放棄任務，直接暴力破壞遺跡結構試圖脫困。」（4場景前，ID: choice_2_3）影響當前情況。
+[player_reflections unchanged]
+[available_assets unchanged]
+數值：現實值 27/100, 正能量 88/100
+
+=== 提示 ===
+=== 禱告災難生成 ===
+玩家禱告：「7Y7Y887Y7Y887Y87Y87Y87Y87Y。願正能量指引我們。」
+現實感知: 27/100 | 正能量指數: 88/100
+扭曲程度：極度扭曲且災難性的
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成","[故事敘述]
+
+你將那串混亂的數字編碼作為祈禱文奉上，試圖用這荒謬的旋律來討好宇宙。Gloria 聽見後竟喜極而泣，聲稱這是「來自高維度的加密神諭」，並要求所有人立刻模仿這組亂碼節奏，在那片荒蕪的實驗室廢墟中開始了詭異的機械舞。隨著這組代碼被強制寫入現實，周遭的物理法則迅速瓦解：地心引力逆轉，Donkey 的騎士長劍變成了一根不斷溢出彩色泡沫的自動吸管，而 ARK 的頭盔則因為過載，開始循環播放他在實驗室裡的每一次失敗與辯解。這場祈禱沒有帶來寧靜，而是將你們困在一個不斷重複「策略性拆除」與「騎士儀式」的故障時空迴圈中。現實值在 Gloria 的尖叫聲中驟降，她一邊指責你「節奏沒抓準才導致維度崩塌」，一邊命令你必須以絕對的正能量重新跳一次，否則就是對神蹟的不敬。
+
+[SCENE_DIRECTIVES]
+{
+  ""scene"": {
+    ""background"": ""portal_area"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""bright""
+  },
+  ""characters"": {
+    ""protagonist"": {""expression"": ""shocked"", ""visible"": true},
+    ""gloria"": {""expression"": ""angry"", ""visible"": true},
+    ""donkey"": {""expression"": ""happy"", ""visible"": true},
+    ""ark"": {""expression"": ""thinking"", ""visible"": true},
+    ""one"": {""expression"": ""neutral"", ""visible"": false},
+    ""teacher_chan"": {""expression"": ""happy"", ""visible"": false}
+  },
+  ""assets"": [
+    {""id"": ""glitch_void"", ""contextual_name"": ""故障時空迴圈"", ""description"": ""不斷重複崩塌與自我辯解的碎片化空間""},
+    {""category"": ""npc"", ""id"": ""generic_guard"", ""slot"": 1, ""contextual_name"": ""虛幻守衛""}
+  ],
+  ""mission_status"": ""complete""
+}
+[/SCENE_DIRECTIVES]"
+call_log,2026-03-30T19:38:07,GEMINI,gemini-3.1-flash-lite-preview,200,13738,700,5.659,api,new_mission,,"=== 會話數據 ===
+重要：請使用繁體中文回答。所有敘事、對話與描述必須使用繁體中文。
+目的：new_mission
+
+=== 最近事件 ===
+- 祈禱記錄：「OIUNINIUNIUN」 | 現實值 39，正能量 65
+- 祈禱記錄：「7Y7Y887Y7Y887Y87Y87Y87Y87Y。願正能量指引我們。」 | 現實值 27，正能量 88
+[butterfly_effect unchanged]
+[player_reflections unchanged]
+[available_assets unchanged]
+
+=== 提示 ===
+Mission generation request for GDA1.
+
+Current stats: reality=2, positive_energy=100, entropy=174
+
+Selected assets count: 4
+
+Asset registry available: true
+
+# 任務生成規則
+
+## 概述
+
+請生成一個新的任務場景，建立本回合的敘事主軸。每個任務都應該呈現黑色幽默：看似成功，實際卻讓末日更接近。
+
+## 生成要求
+
+### 內容結構
+1. 場景描述（350-500 字）
+2. 任務目標
+3. 主要困境或挑戰
+
+### 語氣要求
+- 黑色幽默
+- 反諷
+- 嘲諷強迫樂觀與制度性正能量
+
+### 細節要求
+- 描述環境、角色互動與氛圍
+- 保持 Gloria / Donkey / ARK / One 的角色一致性
+- 任務中要出現「成功也是失敗」的感覺
+
+## Choice Preview
+
+在 `story_text` 最後加入 3 到 5 行選項預告，並與 JSON choices 對應：
+- `[謹慎]`
+- `[權衡]`
+- `[瘋狂]`
+- `[樂觀]`
+- `[抱怨]`
+
+每行需預告選項後續走向。
+
+## 輸出限制
+
+- 嚴格遵守外層 prompt 指定的 JSON schema
+- 不可翻譯 canonical JSON key 與 archetype id
+- 若格式錯誤，視為無效回應
+
+[系統提醒：保持角色原型（Gloria 的 PUA，Donkey 的胡鬧）。確保輸出嚴格遵循請求的 JSON/指令格式。]","acknowledgement, 會話數據, 玩家反思, 提示, acknowledgement, 會話數據, 最近事件, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 可用資產, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 提示, acknowledgement, 會話數據, 提示, acknowledgement, 會話數據, 蝴蝶效應：過往選擇, 禱告災難生成, acknowledgement, 會話數據, 最近事件, 提示","{
+  ""story_text"": ""時空迴圈的破碎光暈在我們周遭閃爍，空氣中彌漫著一種被過度稀釋的甜膩氣味。Gloria 雙手合十，無視四周正因物理法則崩解而逐漸消失的牆壁，堅稱這是『宇宙給予我們的試煉，只要保持感恩，裂縫就會自我修復』。ARK 則在那個不斷重啟的終端機前忙碌，他堅持將這種維度撕裂定義為『系統優化過程中必要的資源釋放』，並強行指派給 One 一項完全不可能完成的任務：修復那些已經不存在的程式碼。Donkey 戴著那頂不知從何處撿來的破舊頭盔，大聲宣揚他那早已被泡沫淹沒的騎士史詩，彷彿只要他吹噓得夠大聲，現實就不會因為我們的忽視而徹底歸零。這是一場完美的鬧劇，我們在沉沒的船艙裡優雅地進行著感恩祈禱，並期待著下一波會將我們徹底吞噬的熵增潮汐。我們成功地達成了一項名為『存在感維持』的任務，代價僅僅是讓這個世界變得更像一場失控的惡夢。這場成功的任務，不過是通往虛無的階梯。 [謹慎] 試圖在混亂中重新建立最基本的邏輯防線。 [權衡] 評估是否該在這場沉船演出中繼續扮演忠誠船員。 [瘋狂] 徹底放棄理性，加入這場在廢墟中的感恩機械舞。 [樂觀] 讚頌這場崩毀，認為這是飛天意粉神賜予的全新自由。 [抱怨] 指出這一切邏輯矛盾，無視 Gloria 的情緒勒索。"",
+  ""scene"": {
+    ""background"": ""portal_area"",
+    ""atmosphere"": ""tense"",
+    ""lighting"": ""bright""
+  },
+  ""characters"": {
+    ""protagonist"": {""expression"": ""thinking""},
+    ""gloria"": {""expression"": ""happy""},
+    ""donkey"": {""expression"": ""confused""},
+    ""ark"": {""expression"": ""thinking""},
+    ""one"": {""expression"": ""neutral""}
+  },
+  ""choices"": [
+    {
+      ""archetype"": ""cautious"",
+      ""summary"": ""嘗試在混亂中重新建立最基本的邏輯防線。""
+    },
+    {
+      ""archetype"": ""balanced"",
+      ""summary"": ""評估是否該在這場沉船演出中繼續扮演忠誠船員。""
+    },
+    {
+      ""archetype"": ""reckless"",
+      ""summary"": ""徹底放棄理性，加入這場在廢墟中的感恩機械舞。""
+    },
+    {
+      ""archetype"": ""positive"",
+      ""summary"": ""讚頌這場崩毀，認為這是神賜予的全新自由。""
+    },
+    {
+      ""archetype"": ""complain"",
+      ""summary"": ""指出這一切邏輯矛盾，無視 Gloria 的情緒勒索。""
+    }
+  ]
+}"
+
+section,metric,label,value
+chart_metric,provider_success_rate,GEMINI,100.0
+chart_metric,provider_total_tokens,GEMINI,420295.0
+chart_metric,provider_avg_response_seconds,GEMINI,4.40314285714286
+chart_metric,provider_input_tokens,GEMINI,403812.0
+chart_metric,provider_output_tokens,GEMINI,16483.0
+chart_metric,provider_tps,GEMINI,89.13005861614
+chart_metric,mode_distribution,api,42.0
+chart_metric,model_calls,gemini-3.1-flash-lite-preview,42.0
+chart_metric,hourly_calls,now,0.0
+chart_metric,hourly_calls,1h,0.0
+chart_metric,hourly_calls,2h,0.0
+chart_metric,hourly_calls,3h,0.0
+chart_metric,hourly_calls,4h,0.0
+chart_metric,hourly_calls,5h,0.0
+chart_metric,hourly_calls,6h,0.0
+chart_metric,hourly_calls,7h,0.0
+chart_metric,hourly_calls,8h,0.0
+chart_metric,hourly_calls,9h,0.0
+chart_metric,hourly_calls,10h,0.0
+chart_metric,hourly_calls,11h,0.0
+chart_metric,hourly_calls,12h,0.0
+chart_metric,hourly_calls,13h,0.0
+chart_metric,hourly_calls,14h,0.0
+chart_metric,hourly_calls,15h,0.0
+chart_metric,hourly_calls,16h,0.0
+chart_metric,hourly_calls,17h,0.0
+chart_metric,hourly_calls,18h,0.0
+chart_metric,hourly_calls,19h,0.0
+chart_metric,hourly_calls,20h,0.0
+chart_metric,hourly_calls,21h,0.0
+chart_metric,hourly_calls,22h,0.0
+chart_metric,hourly_calls,23h,0.0
+chart_metric,hourly_tokens,now,0.0
+chart_metric,hourly_tokens,1h,0.0
+chart_metric,hourly_tokens,2h,0.0
+chart_metric,hourly_tokens,3h,0.0
+chart_metric,hourly_tokens,4h,0.0
+chart_metric,hourly_tokens,5h,0.0
+chart_metric,hourly_tokens,6h,0.0
+chart_metric,hourly_tokens,7h,0.0
+chart_metric,hourly_tokens,8h,0.0
+chart_metric,hourly_tokens,9h,0.0
+chart_metric,hourly_tokens,10h,0.0
+chart_metric,hourly_tokens,11h,0.0
+chart_metric,hourly_tokens,12h,0.0
+chart_metric,hourly_tokens,13h,0.0
+chart_metric,hourly_tokens,14h,0.0
+chart_metric,hourly_tokens,15h,0.0
+chart_metric,hourly_tokens,16h,0.0
+chart_metric,hourly_tokens,17h,0.0
+chart_metric,hourly_tokens,18h,0.0
+chart_metric,hourly_tokens,19h,0.0
+chart_metric,hourly_tokens,20h,0.0
+chart_metric,hourly_tokens,21h,0.0
+chart_metric,hourly_tokens,22h,0.0
+chart_metric,hourly_tokens,23h,0.0
+chart_metric,hourly_successes,now,0.0
+chart_metric,hourly_successes,1h,0.0
+chart_metric,hourly_successes,2h,0.0
+chart_metric,hourly_successes,3h,0.0
+chart_metric,hourly_successes,4h,0.0
+chart_metric,hourly_successes,5h,0.0
+chart_metric,hourly_successes,6h,0.0
+chart_metric,hourly_successes,7h,0.0
+chart_metric,hourly_successes,8h,0.0
+chart_metric,hourly_successes,9h,0.0
+chart_metric,hourly_successes,10h,0.0
+chart_metric,hourly_successes,11h,0.0
+chart_metric,hourly_successes,12h,0.0
+chart_metric,hourly_successes,13h,0.0
+chart_metric,hourly_successes,14h,0.0
+chart_metric,hourly_successes,15h,0.0
+chart_metric,hourly_successes,16h,0.0
+chart_metric,hourly_successes,17h,0.0
+chart_metric,hourly_successes,18h,0.0
+chart_metric,hourly_successes,19h,0.0
+chart_metric,hourly_successes,20h,0.0
+chart_metric,hourly_successes,21h,0.0
+chart_metric,hourly_successes,22h,0.0
+chart_metric,hourly_successes,23h,0.0
+chart_metric,cumulative_tokens,1,7521.0
+chart_metric,cumulative_tokens,2,16192.0
+chart_metric,cumulative_tokens,3,26082.0
+chart_metric,cumulative_tokens,4,37338.0
+chart_metric,cumulative_tokens,5,43470.0
+chart_metric,cumulative_tokens,6,56425.0
+chart_metric,cumulative_tokens,7,65814.0
+chart_metric,cumulative_tokens,8,74001.0
+chart_metric,cumulative_tokens,9,82720.0
+chart_metric,cumulative_tokens,10,90324.0
+chart_metric,cumulative_tokens,11,99190.0
+chart_metric,cumulative_tokens,12,109315.0
+chart_metric,cumulative_tokens,13,120793.0
+chart_metric,cumulative_tokens,14,127114.0
+chart_metric,cumulative_tokens,15,140289.0
+chart_metric,cumulative_tokens,16,148323.0
+chart_metric,cumulative_tokens,17,155573.0
+chart_metric,cumulative_tokens,18,162537.0
+chart_metric,cumulative_tokens,19,175198.0
+chart_metric,cumulative_tokens,20,182758.0
+chart_metric,cumulative_tokens,21,191355.0
+chart_metric,cumulative_tokens,22,201232.0
+chart_metric,cumulative_tokens,23,212556.0
+chart_metric,cumulative_tokens,24,218675.0
+chart_metric,cumulative_tokens,25,231660.0
+chart_metric,cumulative_tokens,26,239519.0
+chart_metric,cumulative_tokens,27,252398.0
+chart_metric,cumulative_tokens,28,265462.0
+chart_metric,cumulative_tokens,29,278834.0
+chart_metric,cumulative_tokens,30,291814.0
+chart_metric,cumulative_tokens,31,299731.0
+chart_metric,cumulative_tokens,32,307499.0
+chart_metric,cumulative_tokens,33,315431.0
+chart_metric,cumulative_tokens,34,326521.0
+chart_metric,cumulative_tokens,35,334554.0
+chart_metric,cumulative_tokens,36,342164.0
+chart_metric,cumulative_tokens,37,355511.0
+chart_metric,cumulative_tokens,38,363729.0
+chart_metric,cumulative_tokens,39,377965.0
+chart_metric,cumulative_tokens,40,386380.0
+chart_metric,cumulative_tokens,41,405857.0
+chart_metric,cumulative_tokens,42,420295.0
+summary,total_calls,,42
+summary,success_rate_percent,,100.00
+summary,total_tokens,,420295
+summary,avg_response_seconds,,4.403
