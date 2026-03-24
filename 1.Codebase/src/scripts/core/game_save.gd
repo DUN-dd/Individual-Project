@@ -1,5 +1,9 @@
 class_name GameSave
+
 const SETTINGS_PATH := "user://settings.cfg"
+
+## Saves all settings values from the provided data dictionary to disk.
+## Keys mirror the variable names used in SettingsMenu.
 static func save_settings(data: Dictionary) -> void:
 	var config := ConfigFile.new()
 	config.set_value("display", "resolution", data.get("resolution", Vector2i(1024, 600)))
@@ -26,6 +30,10 @@ static func save_settings(data: Dictionary) -> void:
 	config.set_value("voice", "proactive_enabled", data.get("voice_proactive_enabled", false))
 	config.set_value("controls", "touch_controls_enabled", data.get("touch_controls_enabled", false))
 	config.save(SETTINGS_PATH)
+
+## Loads settings from disk and returns them as a Dictionary.
+## Pass current variable values in `defaults` so they are used as fallbacks.
+## Returns an empty Dictionary if the settings file does not exist or fails to load.
 static func load_settings(defaults: Dictionary) -> Dictionary:
 	var config := ConfigFile.new()
 	var err := config.load(SETTINGS_PATH)
@@ -58,6 +66,7 @@ static func load_settings(defaults: Dictionary) -> Dictionary:
 		"voice_proactive_enabled": bool(config.get_value("voice", "proactive_enabled", defaults.get("voice_proactive_enabled", false))),
 		"touch_controls_enabled": bool(config.get_value("controls", "touch_controls_enabled", false)),
 	}
+
 static func _coerce_vector2i(value: Variant, fallback: Vector2i) -> Vector2i:
 	if value is Vector2i:
 		return value

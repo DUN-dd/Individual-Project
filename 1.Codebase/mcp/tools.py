@@ -5,6 +5,7 @@ from connection import GameConnection
 mcp = FastMCP("gda1-game")
 game = GameConnection()
 
+
 def _format_game_state(state: dict) -> str:
     if "error" in state:
         return f"Error: {state['error']}"
@@ -53,6 +54,7 @@ def _format_game_state(state: dict) -> str:
     lines.append("=" * 50)
     return "\n".join(lines)
 
+
 def _ensure_connected() -> str | None:
     if not game.is_connected():
         if not game.connect():
@@ -64,6 +66,7 @@ def _ensure_connected() -> str | None:
             )
     return None
 
+
 @mcp.tool()
 def get_game_state() -> str:
     error = _ensure_connected()
@@ -71,6 +74,7 @@ def get_game_state() -> str:
         return error
     state = game.get_state()
     return _format_game_state(state)
+
 
 @mcp.tool()
 def select_choice(choice_id: int) -> str:
@@ -89,6 +93,7 @@ def select_choice(choice_id: int) -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to select choice: {error_msg}"
 
+
 @mcp.tool()
 def start_mission() -> str:
     error = _ensure_connected()
@@ -100,6 +105,7 @@ def start_mission() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to start mission: {error_msg}"
+
 
 @mcp.tool()
 def start_new_game() -> str:
@@ -115,6 +121,7 @@ def start_new_game() -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to start new game: {error_msg}"
 
+
 @mcp.tool()
 def continue_game() -> str:
     error = _ensure_connected()
@@ -128,6 +135,7 @@ def continue_game() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to continue game: {error_msg}"
+
 
 @mcp.tool()
 def submit_prayer(text: str) -> str:
@@ -146,6 +154,7 @@ def submit_prayer(text: str) -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to submit prayer: {error_msg}"
 
+
 @mcp.tool()
 def set_auto_mode(enabled: bool, delay_ms: int = 2000) -> str:
     error = _ensure_connected()
@@ -162,6 +171,7 @@ def set_auto_mode(enabled: bool, delay_ms: int = 2000) -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to set auto mode: {error_msg}"
 
+
 @mcp.tool()
 def connect_to_game(host: str = "localhost") -> str:
     game.host = host
@@ -173,6 +183,7 @@ def connect_to_game(host: str = "localhost") -> str:
             f"Failed to connect to game at {host}.\n"
             "Make sure the game is running and Agent Server is enabled in settings."
         )
+
 
 @mcp.tool()
 def go_to_menu() -> str:
@@ -186,6 +197,7 @@ def go_to_menu() -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to go to menu: {error_msg}"
 
+
 @mcp.tool()
 def save_game() -> str:
     error = _ensure_connected()
@@ -197,6 +209,7 @@ def save_game() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to save game: {error_msg}"
+
 
 @mcp.tool()
 def set_stat(stat: str, value: int) -> str:
@@ -213,6 +226,7 @@ def set_stat(stat: str, value: int) -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to set stat: {error_msg}"
+
 
 @mcp.tool()
 def get_story_history() -> str:
@@ -240,6 +254,7 @@ def get_story_history() -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to get history: {error_msg}"
 
+
 @mcp.tool()
 def skip_dialogue() -> str:
     error = _ensure_connected()
@@ -251,6 +266,7 @@ def skip_dialogue() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to skip dialogue: {error_msg}"
+
 
 @mcp.tool()
 def open_journal() -> str:
@@ -264,6 +280,7 @@ def open_journal() -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to open journal: {error_msg}"
 
+
 @mcp.tool()
 def close_overlay() -> str:
     error = _ensure_connected()
@@ -275,6 +292,7 @@ def close_overlay() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to close overlay: {error_msg}"
+
 
 @mcp.tool()
 def confirm_overlay() -> str:
@@ -288,6 +306,7 @@ def confirm_overlay() -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to confirm overlay: {error_msg}"
+
 
 @mcp.tool()
 def get_ai_config() -> str:
@@ -314,6 +333,7 @@ def get_ai_config() -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to get AI config: {error_msg}"
 
+
 @mcp.tool()
 def set_ai_provider(provider: str) -> str:
     error = _ensure_connected()
@@ -329,6 +349,7 @@ def set_ai_provider(provider: str) -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to set provider: {error_msg}"
+
 
 @mcp.tool()
 def set_ai_model(model: str, provider: str = "") -> str:
@@ -349,6 +370,7 @@ def set_ai_model(model: str, provider: str = "") -> str:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to set model: {error_msg}"
 
+
 @mcp.tool()
 def set_api_key(provider: str, api_key: str) -> str:
     error = _ensure_connected()
@@ -364,6 +386,7 @@ def set_api_key(provider: str, api_key: str) -> str:
     else:
         error_msg = result.get("message", "Unknown error")
         return f"Failed to set API key: {error_msg}"
+
 
 @mcp.tool()
 def skip_intro() -> str:

@@ -1,5 +1,7 @@
 extends RefCounted
 class_name SettingsMenuVoiceSection
+
+## Builds the voice preference dictionary expected by AIManager.apply_voice_settings().
 static func gather_preferences(
 	voice_enabled: bool,
 	voice_output_enabled: bool,
@@ -16,6 +18,9 @@ static func gather_preferences(
 		"voice_input_mode": voice_input_mode,
 		"proactive_audio_enabled": voice_proactive_enabled,
 	}
+
+## Returns a human-readable string describing which provider supports native voice,
+## or why it is unavailable.
 static func build_availability_text(ai_manager: Node, voice_supported: bool) -> String:
 	if not ai_manager:
 		return "Native voice unavailable (AI Manager missing)."
@@ -34,6 +39,9 @@ static func build_availability_text(ai_manager: Node, voice_supported: bool) -> 
 			provider_name = "Ollama (Local)"
 			model_name = ai_manager.ollama_model
 	return "Native audio ready via %s (%s)." % [provider_name, model_name]
+
+## Tries to refresh and enable Gemini native audio.
+## Returns true if native voice is now supported, false otherwise.
 static func try_enable_gemini_native_audio(ai_manager: Node) -> bool:
 	if not ai_manager:
 		return false

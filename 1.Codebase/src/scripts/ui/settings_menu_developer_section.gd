@@ -1,5 +1,20 @@
 extends RefCounted
 class_name SettingsMenuDeveloperSection
+
+## Builds the developer/gameplay debug tab UI.
+##
+## Parameters:
+##   tab            – the VBoxContainer to populate (tab_developer)
+##   existing_nodes – Dictionary with pre-existing scene nodes:
+##                    "text_speed_option", "screen_shake_check", "max_rounds_spinbox"
+##   initial        – Dictionary with starting values:
+##                    "text_speed" (float), "screen_shake_enabled" (bool), "max_rounds_per_mission" (int)
+##   game_state     – GameState node (may be null)
+##   handlers       – Dictionary of Callables keyed by handler name
+##   images         – Dictionary of Textures:
+##                    "fsm_guide", "fsm_teacher", "fsm_gloria"
+##
+## Returns a Dictionary of all created nodes so the caller can store references.
 static func build_section(
 	tab: VBoxContainer,
 	existing_nodes: Dictionary,
@@ -9,6 +24,7 @@ static func build_section(
 	images: Dictionary,
 ) -> Dictionary:
 	var result: Dictionary = {}
+	# ── Text speed ──────────────────────────────────────────────────────────────
 	var text_speed_option: OptionButton = existing_nodes.get("text_speed_option")
 	if text_speed_option:
 		text_speed_option.add_item("Instant", 0)
@@ -24,6 +40,7 @@ static func build_section(
 		elif ts == 1.0: text_speed_option.select(2)
 		elif ts == 0.5: text_speed_option.select(3)
 		else: text_speed_option.select(2)
+	# ── Screen shake & max rounds ────────────────────────────────────────────────
 	var screen_shake_check: CheckBox = existing_nodes.get("screen_shake_check")
 	if screen_shake_check:
 		var h := _get_handler(handlers, "on_screen_shake_toggled")
@@ -42,6 +59,7 @@ static func build_section(
 		var h := _get_handler(handlers, "on_max_rounds_changed")
 		if h is Callable and h.is_valid():
 			max_rounds_spinbox.value_changed.connect(h)
+	# ── Force mission complete ───────────────────────────────────────────────────
 	var force_mission_complete_check := CheckBox.new()
 	tab.add_child(force_mission_complete_check)
 	var h_fmc := _get_handler(handlers, "on_force_mission_complete_toggled")
@@ -50,6 +68,7 @@ static func build_section(
 	if game_state:
 		force_mission_complete_check.button_pressed = game_state.debug_force_mission_complete
 	result["force_mission_complete_check"] = force_mission_complete_check
+	# ── Force Gloria ─────────────────────────────────────────────────────────────
 	var gloria_hbox := HBoxContainer.new()
 	gloria_hbox.add_theme_constant_override("separation", 10)
 	var force_gloria_button := Button.new()
@@ -67,6 +86,7 @@ static func build_section(
 	tab.add_child(gloria_hbox)
 	result["force_gloria_button"] = force_gloria_button
 	result["force_gloria_status_label"] = force_gloria_status_label
+	# ── Force Trolley ─────────────────────────────────────────────────────────────
 	var trolley_hbox := HBoxContainer.new()
 	trolley_hbox.add_theme_constant_override("separation", 10)
 	var force_trolley_button := Button.new()
@@ -84,6 +104,7 @@ static func build_section(
 	tab.add_child(trolley_hbox)
 	result["force_trolley_button"] = force_trolley_button
 	result["force_trolley_status_label"] = force_trolley_status_label
+	# ── Force Honeymoon ───────────────────────────────────────────────────────────
 	var force_honeymoon_check := CheckBox.new()
 	force_honeymoon_check.text = "Force Honeymoon Phase"
 	tab.add_child(force_honeymoon_check)
@@ -94,6 +115,7 @@ static func build_section(
 		force_honeymoon_check.button_pressed = game_state.is_honeymoon_phase
 	result["force_honeymoon_check"] = force_honeymoon_check
 	_add_separator(tab)
+	# ── Stat spinboxes ────────────────────────────────────────────────────────────
 	var reality_score_label := Label.new()
 	var reality_score_spinbox := SpinBox.new()
 	_build_spinbox_row(tab, reality_score_label, reality_score_spinbox, 0, 100,
@@ -140,6 +162,7 @@ static func build_section(
 	result["mission_turn_label"] = mission_turn_label
 	result["mission_turn_spinbox"] = mission_turn_spinbox
 	_add_separator(tab)
+	# ── Quick action buttons ──────────────────────────────────────────────────────
 	var quick_actions_label := Label.new()
 	quick_actions_label.name = "QuickActionsLabel"
 	quick_actions_label.add_theme_font_size_override("font_size", 20)
@@ -180,6 +203,7 @@ static func build_section(
 	quick_actions_grid.add_child(add_honeymoon_button)
 	result["add_honeymoon_button"] = add_honeymoon_button
 	_add_separator(tab)
+	# ── Debug toggles ─────────────────────────────────────────────────────────────
 	var toggles_label := Label.new()
 	toggles_label.name = "TogglesLabel"
 	toggles_label.add_theme_font_size_override("font_size", 20)
@@ -219,6 +243,7 @@ static func build_section(
 	tab.add_child(god_mode_toggle)
 	result["god_mode_toggle"] = god_mode_toggle
 	_add_separator(tab)
+	# ── FSM Challenge debug ───────────────────────────────────────────────────────
 	var fsm_challenge_label := Label.new()
 	fsm_challenge_label.text = "FSM Challenge Debug"
 	fsm_challenge_label.add_theme_font_size_override("font_size", 18)
@@ -309,6 +334,8 @@ static func build_section(
 	tab.add_child(fsm_reset_button)
 	_add_separator(tab)
 	return result
+
+## Updates the FSM challenge status label text from current game state.
 static func update_fsm_status_label(label: Label, game_state: Node) -> void:
 	if not game_state:
 		label.text = "Status: GameState not available"
@@ -327,6 +354,9 @@ static func update_fsm_status_label(label: Label, game_state: Node) -> void:
 		]
 	else:
 		label.text = "Status: Not started"
+
+# ── Private helpers ───────────────────────────────────────────────────────────
+
 static func _build_spinbox_row(
 	tab: VBoxContainer,
 	label: Label,
@@ -346,14 +376,17 @@ static func _build_spinbox_row(
 	spinbox.value = current_val
 	hbox.add_child(spinbox)
 	tab.add_child(hbox)
+
 static func _add_separator(parent: VBoxContainer) -> void:
 	var sep := HSeparator.new()
 	sep.add_theme_constant_override("separation", 8)
 	parent.add_child(sep)
+
 static func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
 	return key
+
 static func _tr_bilingual(key: String) -> String:
 	if LocalizationManager:
 		var zh: String = LocalizationManager.get_translation(key, "zh")
@@ -362,12 +395,17 @@ static func _tr_bilingual(key: String) -> String:
 			return "%s / %s" % [zh, en]
 		return en if not en.is_empty() else key
 	return key
+
+## Safely extracts a Callable from a handlers dictionary by key.
+## Returns an invalid Callable if the key is missing or the value is not Callable.
 static func _get_handler(handlers: Dictionary, key: String) -> Callable:
 	if handlers.has(key):
 		var val: Variant = handlers[key]
 		if val is Callable:
 			return val as Callable
 	return Callable()
+
+## Updates a debug button and its status label color based on success/failure.
 static func update_debug_button_status(button: Button, label: Label, success: bool, message: String) -> void:
 	if not is_instance_valid(label):
 		return
@@ -380,6 +418,8 @@ static func update_debug_button_status(button: Button, label: Label, success: bo
 		label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
 		if is_instance_valid(button):
 			button.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4))
+
+## Jumps FSM challenge to a target day. notify_fn(msg, success), report_fn(msg).
 static func on_fsm_jump_to_day(target_day_id: int, status_label: Label, game_state: Node, notify_fn: Callable, report_fn: Callable) -> void:
 	if not game_state:
 		notify_fn.call("GameState not available", false)
@@ -431,6 +471,8 @@ static func on_fsm_jump_to_day(target_day_id: int, status_label: Label, game_sta
 		msg += " (Crashed)"
 	notify_fn.call(msg, true)
 	report_fn.call("%s (slot + autosave updated)" % msg)
+
+## Resets FSM challenge. notify_fn(msg, success), report_fn(msg).
 static func on_fsm_reset(status_label: Label, game_state: Node, notify_fn: Callable, report_fn: Callable) -> void:
 	if not game_state:
 		notify_fn.call("GameState not available", false)
@@ -446,6 +488,9 @@ static func on_fsm_reset(status_label: Label, game_state: Node, notify_fn: Calla
 	var msg := "FSM Challenge has been reset"
 	notify_fn.call(msg, true)
 	report_fn.call("%s (slot + autosave updated)" % msg)
+
+## Sets all game stats to max values and updates spinboxes.
+## spinboxes keys: reality, positive_energy, entropy, honeymoon
 static func on_max_stats(game_state: Node, spinboxes: Dictionary, notify_fn: Callable) -> void:
 	if not game_state:
 		return
@@ -462,6 +507,9 @@ static func on_max_stats(game_state: Node, spinboxes: Dictionary, notify_fn: Cal
 	if sb_entropy: sb_entropy.value = 0
 	if sb_honeymoon: sb_honeymoon.value = 10
 	notify_fn.call("All stats maximized!", true)
+
+## Resets all game stats to default values and updates spinboxes.
+## spinboxes keys: reality, positive_energy, entropy, honeymoon, mission_turn
 static func on_reset_stats(game_state: Node, spinboxes: Dictionary, notify_fn: Callable) -> void:
 	if not game_state:
 		return

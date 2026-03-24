@@ -1,5 +1,8 @@
 extends RefCounted
 class_name SettingsMenuAIAnalytics
+
+## Analyses an array of AI log entry dictionaries and returns aggregated metrics.
+## Pure computation — no UI or state dependencies.
 static func compute_analytics(log_entries: Array) -> Dictionary:
 	var total := log_entries.size()
 	var total_success := 0
@@ -124,12 +127,16 @@ static func compute_analytics(log_entries: Array) -> Dictionary:
 		"cumulative_labels": cumulative_labels,
 		"cumulative_tokens": cumulative_tokens,
 	}
+
+## Formats a token count using K / M suffixes.
 static func format_token_count(n: int) -> String:
 	if n >= 1_000_000:
 		return "%.1fM" % (float(n) / 1_000_000.0)
 	if n >= 1_000:
 		return "%.1fK" % (float(n) / 1_000.0)
 	return str(n)
+
+## Appends chart metric rows to a PackedStringArray for CSV export.
 static func append_metric_series(
 	lines: PackedStringArray,
 	metric: String,
@@ -139,11 +146,15 @@ static func append_metric_series(
 	var count := mini(labels.size(), values.size())
 	for idx in range(count):
 		lines.append(csv_row(["chart_metric", metric, str(labels[idx]), str(values[idx])]))
+
+## Formats an array of cells into a CSV row string.
 static func csv_row(cells: Array) -> String:
 	var escaped: PackedStringArray = []
 	for cell in cells:
 		escaped.append(csv_escape(str(cell)))
 	return ",".join(escaped)
+
+## Escapes a single CSV value, quoting it if needed.
 static func csv_escape(value: String) -> String:
 	var v := value.replace("\"", "\"\"")
 	if v.contains(",") or v.contains("\n") or v.contains("\r") or v.contains("\""):

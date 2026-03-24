@@ -1,6 +1,13 @@
 extends RefCounted
 class_name SettingsMenuAILogSection
+
 const AIChartCanvas = preload("res://1.Codebase/src/scripts/ui/ai_chart_canvas.gd")
+
+## Builds the AI log tab page and analytics content.
+## Returns a Dictionary with all created node references.
+## icons keys: history, options, refresh, save, delete, info, check, sync
+## handlers keys: toggle_log, toggle_charts, refresh, export_json, export_csv,
+##   clear, chart_size_changed, chart_visibility_toggled, tab_changed
 static func build_log_page(
 	tab_container: TabContainer,
 	icons: Dictionary,
@@ -167,6 +174,7 @@ static func build_log_page(
 	for key in analytics_result.keys():
 		result[key] = analytics_result[key]
 	return result
+
 static func _build_analytics_content(
 	parent_scroll: ScrollContainer,
 	icons: Dictionary,
@@ -410,6 +418,7 @@ static func _build_analytics_content(
 		"chart_hourly_tokens": chart_hourly_tokens,
 		"chart_cumulative_tokens": chart_cumulative_tokens,
 	}
+
 static func _add_section_header(parent: Control, icon_tex: Texture2D, text: String) -> void:
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 8)
@@ -431,6 +440,7 @@ static func _add_section_header(parent: Control, icon_tex: Texture2D, text: Stri
 	sep.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sep.modulate = Color(1, 1, 1, 0.15)
 	hbox.add_child(sep)
+
 static func _make_chart_canvas(
 	parent: Control,
 	chart_type: int,
@@ -448,6 +458,7 @@ static func _make_chart_canvas(
 	parent.add_child(canvas)
 	canvases.append(canvas)
 	return canvas
+
 static func _get_handler(handlers: Dictionary, key: String) -> Callable:
 	if handlers.has(key):
 		var val: Variant = handlers[key]

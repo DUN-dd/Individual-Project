@@ -11,6 +11,7 @@ except ImportError:
     HAS_WEBSOCKET = False
     logger.warning("websocket-client not installed, WebSocket connection unavailable")
 
+
 class GameConnection:
 
     def __init__(self, host: str = "localhost", ws_port: int = 9876, tcp_port: int = 9877):

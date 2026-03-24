@@ -1,5 +1,23 @@
 extends RefCounted
 class_name SettingsMenuUIText
+
+## Applies translated text to all settings menu UI nodes.
+## nodes keys: tab_container, title_label, text_speed_label, text_speed_option,
+##   screen_shake_check, max_rounds_label, max_rounds_spinbox, touch_controls_checkbox,
+##   force_mission_complete_check, reality_score_label, positive_energy_label,
+##   entropy_level_label, honeymoon_charges_label, mission_turn_label, tab_developer,
+##   max_stats_button, reset_stats_button, clear_debuffs_button, add_honeymoon_button,
+##   autosave_toggle, infinite_resources_toggle, skip_dialogue_toggle, god_mode_toggle,
+##   master_volume_hbox, music_volume_hbox, sfx_volume_hbox, gloria_voice_check,
+##   mute_check_box, voice_description, voice_enabled_check, voice_output_check,
+##   voice_input_check, voice_choice_label, voice_volume_label, voice_input_mode_label,
+##   voice_proactive_check, voice_capture_button, voice_preview_button, voice_status_label,
+##   resolution_label, fullscreen_label, language_label, font_size_label,
+##   english_font_label, chinese_font_label, tab_tutorial, tutorial_enabled_toggle,
+##   reset_tutorials_button, ai_settings_button, apply_button, delete_logs_button,
+##   back_button, delete_logs_dialog, fullscreen_option
+## tr_callable: bound Callable to _tr(key) on the settings menu instance
+## voice_capture_active: true if mic capture is currently running
 static func apply_labels(nodes: Dictionary, tr_callable: Callable, voice_capture_active: bool) -> void:
 	var tab_container: TabContainer = nodes.get("tab_container") as TabContainer
 	if tab_container:

@@ -1,7 +1,15 @@
 extends RefCounted
 class_name SettingsMenuStyles
+
 @warning_ignore("shadowed_global_identifier")
 const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+
+## Applies modern visual styles to settings menu nodes.
+## nodes keys: panel, apply_button, ai_settings_button, back_button,
+##   delete_logs_button, master_volume_hbox, music_volume_hbox,
+##   sfx_volume_hbox, voice_preview_button, voice_capture_button,
+##   reset_tutorials_button, tab_tutorial, tutorial_list_container
+## icons keys: check, creative, back, delete, mic
 static func apply_modern_styles(nodes: Dictionary, icons: Dictionary) -> void:
 	var panel: Control = nodes.get("panel") as Control
 	if panel:

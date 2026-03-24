@@ -1,5 +1,9 @@
 extends RefCounted
 class_name SettingsMenuLogActions
+
+## Deletes local logs via game_state.delete_local_logs() and shows a notification.
+## tr_callable: bound Callable to _tr(key) on the settings menu instance.
+## notifier: Node with show_success(msg)/show_warning(msg) methods (may be null).
 static func delete_logs(game_state: Node, notifier: Node, tr_callable: Callable) -> void:
 	var success := false
 	var files_removed := 0

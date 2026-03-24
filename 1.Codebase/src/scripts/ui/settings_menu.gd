@@ -12,6 +12,10 @@ const SettingsMenuDisplaySectionScript = preload("res://1.Codebase/src/scripts/u
 const SettingsMenuVoiceSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_voice_section.gd")
 const SettingsMenuDeveloperSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_developer_section.gd")
 const SettingsMenuAIAnalyticsScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_analytics.gd")
+const SettingsMenuAILogControllerScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_ai_log_controller.gd")
+const SettingsMenuSaveLoadScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_save_load.gd")
+const SettingsMenuDeveloperHandlersScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_developer_handlers.gd")
+const SettingsMenuTutorialHandlersScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_handlers.gd")
 const SettingsMenuAgentServerSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_agent_server_section.gd")
 const SettingsMenuTutorialSectionScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_tutorial_section.gd")
 const SettingsMenuStylesScript = preload("res://1.Codebase/src/scripts/ui/settings_menu_styles.gd")
@@ -137,30 +141,8 @@ var tab_voice: VBoxContainer
 var tab_tutorial: VBoxContainer
 var tab_developer: VBoxContainer
 var tab_ai_log: VBoxContainer
-var _ai_log_rows_container: VBoxContainer = null
-var _ai_log_view_panel: Control = null
-var _ai_analytics_view: Control = null
-var _ai_showing_charts: bool = false
-var _chart_success_by_provider: Control = null
-var _chart_mode_pie: Control = null
-var _chart_hourly_requests: Control = null
-var _chart_tokens_by_provider: Control = null
-var _chart_response_by_provider: Control = null
-var _chart_hourly_tokens: Control = null
-var _chart_input_output_tokens: Control = null
-var _chart_success_per_hour: Control = null
-var _chart_tps_by_provider: Control = null
-var _chart_cumulative_tokens: Control = null
-var _chart_calls_by_model: Control = null
-var _ai_kpi_labels: Array = []
-var _ai_chart_rows: Array[Control] = []
-var _ai_chart_canvases: Array[Control] = []
-var _ai_charts_open: bool = true
 var _ai_chart_width: float = 480.0
 var _ai_chart_height: float = 190.0
-var _ai_chart_toggle_button: Button = null
-var _ai_chart_width_spin: SpinBox = null
-var _ai_chart_height_spin: SpinBox = null
 var gloria_voice_check: CheckBox
 var text_speed_label: Label
 var text_speed_option: OptionButton
@@ -202,6 +184,9 @@ var _audio_manager: Node = null
 var _game_state: Node = null
 var _agent_server_section: SettingsMenuAgentServerSection = null
 var _tutorial_section: SettingsMenuTutorialSection = null
+var _ai_log_ctrl: SettingsMenuAILogController = null
+var _dev_ctrl: SettingsMenuDeveloperHandlers = null
+var _tutorial_ctrl: SettingsMenuTutorialHandlers = null
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -266,8 +251,12 @@ func _normalize_ai_log_language_texts(root: Node) -> void:
 	var empty_lbl := root.find_child("AILogEmptyLabel", true, false) as Label
 	if empty_lbl:
 		empty_lbl.text = _tr_ai("SETTINGS_AI_LOG_EMPTY", "No AI calls recorded yet.")
-	if _ai_chart_toggle_button:
-		_ai_chart_toggle_button.text = _tr_ai("SETTINGS_AI_LOG_HIDE_GRAPHS", "Hide Graphs") if _ai_charts_open else _tr_ai("SETTINGS_AI_LOG_SHOW_GRAPHS", "Show Graphs")
+	if _ai_log_ctrl and is_instance_valid(_ai_log_ctrl._ai_chart_toggle_button):
+		_ai_log_ctrl._ai_chart_toggle_button.text = (
+			_tr_ai("SETTINGS_AI_LOG_HIDE_GRAPHS", "Hide Graphs")
+			if _ai_log_ctrl._ai_charts_open else
+			_tr_ai("SETTINGS_AI_LOG_SHOW_GRAPHS", "Show Graphs")
+		)
 func _ready():
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -494,6 +483,7 @@ func _create_tab_page(tab_name: String) -> VBoxContainer:
 	tab_container.add_child(scroll)
 	return vbox
 func _create_ai_log_tab_page() -> VBoxContainer:
+	_ai_log_ctrl = SettingsMenuAILogControllerScript.new()
 	var result: Dictionary = SettingsMenuAILogSectionScript.build_log_page(
 		tab_container,
 		{
@@ -505,146 +495,20 @@ func _create_ai_log_tab_page() -> VBoxContainer:
 		_ai_chart_width,
 		_ai_chart_height,
 		{
-			"toggle_log": Callable(self, "_on_ai_log_toggle_log_pressed"),
-			"toggle_charts": Callable(self, "_on_ai_log_toggle_charts_pressed"),
-			"refresh": Callable(self, "_on_ai_log_refresh_pressed"),
-			"export_json": Callable(self, "_on_ai_export_pressed"),
-			"export_csv": Callable(self, "_on_ai_export_csv_pressed"),
-			"clear": Callable(self, "_on_ai_log_clear_pressed"),
-			"chart_size_changed": Callable(self, "_on_ai_chart_size_changed"),
-			"chart_visibility_toggled": Callable(self, "_on_ai_chart_visibility_toggled"),
-			"tab_changed": Callable(self, "_on_ai_log_tab_changed"),
+			"toggle_log":            Callable(_ai_log_ctrl, "_on_ai_log_toggle_log_pressed"),
+			"toggle_charts":         Callable(_ai_log_ctrl, "_on_ai_log_toggle_charts_pressed"),
+			"refresh":               Callable(_ai_log_ctrl, "_on_ai_log_refresh_pressed"),
+			"export_json":           Callable(_ai_log_ctrl, "_on_ai_export_pressed"),
+			"export_csv":            Callable(_ai_log_ctrl, "_on_ai_export_csv_pressed"),
+			"clear":                 Callable(_ai_log_ctrl, "_on_ai_log_clear_pressed"),
+			"chart_size_changed":    Callable(_ai_log_ctrl, "_on_ai_chart_size_changed"),
+			"chart_visibility_toggled": Callable(_ai_log_ctrl, "_on_ai_chart_visibility_toggled"),
+			"tab_changed":           Callable(_ai_log_ctrl, "_on_ai_log_tab_changed"),
 		},
 	)
-	_ai_log_view_panel = result["log_view_panel"] as Control
-	_ai_log_rows_container = result["log_rows_container"] as VBoxContainer
-	_ai_analytics_view = result["analytics_view"] as Control
-	_ai_chart_toggle_button = result["chart_toggle_button"] as Button
-	_ai_chart_width_spin = result["chart_width_spin"] as SpinBox
-	_ai_chart_height_spin = result["chart_height_spin"] as SpinBox
-	var kpi_result: Variant = result["kpi_labels"]
-	if kpi_result is Array:
-		_ai_kpi_labels = kpi_result
-	_ai_chart_rows.assign(result["chart_rows"])
-	_ai_chart_canvases.assign(result["chart_canvases"])
-	_chart_success_by_provider = result["chart_success_by_provider"] as Control
-	_chart_mode_pie = result["chart_mode_pie"] as Control
-	_chart_hourly_requests = result["chart_hourly_requests"] as Control
-	_chart_success_per_hour = result["chart_success_per_hour"] as Control
-	_chart_calls_by_model = result["chart_calls_by_model"] as Control
-	_chart_tokens_by_provider = result["chart_tokens_by_provider"] as Control
-	_chart_response_by_provider = result["chart_response_by_provider"] as Control
-	_chart_input_output_tokens = result["chart_input_output_tokens"] as Control
-	_chart_tps_by_provider = result["chart_tps_by_provider"] as Control
-	_chart_hourly_tokens = result["chart_hourly_tokens"] as Control
-	_chart_cumulative_tokens = result["chart_cumulative_tokens"] as Control
+	_ai_log_ctrl.initialize(result, _ai_chart_width, _ai_chart_height, tab_container, Callable(self, "_tr_ai"))
 	_normalize_ai_log_language_texts(result["outer_vbox"] as VBoxContainer)
-	_apply_ai_chart_layout()
 	return result["outer_vbox"] as VBoxContainer
-func _on_ai_log_tab_changed(tab_idx: int) -> void:
-	if tab_container and tab_idx == tab_container.get_tab_count() - 1:
-		_refresh_ai_log_table()
-		if _ai_showing_charts:
-			_refresh_analytics_view()
-func _on_ai_log_toggle_log_pressed() -> void:
-	_ai_showing_charts = false
-	if _ai_log_view_panel:
-		_ai_log_view_panel.visible = true
-	if _ai_analytics_view:
-		_ai_analytics_view.visible = false
-	_refresh_ai_log_table()
-func _on_ai_log_toggle_charts_pressed() -> void:
-	_ai_showing_charts = true
-	if _ai_log_view_panel:
-		_ai_log_view_panel.visible = false
-	if _ai_analytics_view:
-		_ai_analytics_view.visible = true
-	_refresh_analytics_view()
-func _on_ai_log_refresh_pressed() -> void:
-	if _ai_showing_charts:
-		_refresh_analytics_view()
-	else:
-		_refresh_ai_log_table()
-func _on_ai_export_pressed() -> void:
-	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
-	var log_entries: Array = []
-	if ai_manager and ai_manager.has_method("get_call_log"):
-		log_entries = ai_manager.get_call_log()
-	var metrics: Dictionary = {}
-	if ai_manager and ai_manager.has_method("get_ai_metrics"):
-		metrics = ai_manager.get_ai_metrics()
-	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
-	SettingsMenuAILogExportScript.export_json(log_entries, metrics, Callable(self, "_tr_ai"), notifier)
-func _on_ai_export_csv_pressed() -> void:
-	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
-	var log_entries: Array = []
-	if ai_manager and ai_manager.has_method("get_call_log"):
-		log_entries = ai_manager.get_call_log()
-	var notifier: Node = ServiceLocator.get_notification_system() if ServiceLocator else null
-	SettingsMenuAILogExportScript.export_csv(log_entries, Callable(self, "_tr_ai"), notifier)
-func _append_metric_series(lines: PackedStringArray, metric: String, labels: Array, values: Array) -> void:
-	SettingsMenuAIAnalyticsScript.append_metric_series(lines, metric, labels, values)
-func _csv_row(cells: Array) -> String:
-	return SettingsMenuAIAnalyticsScript.csv_row(cells)
-func _csv_escape(value: String) -> String:
-	return SettingsMenuAIAnalyticsScript.csv_escape(value)
-func _on_ai_chart_size_changed(_value: float) -> void:
-	if is_instance_valid(_ai_chart_width_spin):
-		_ai_chart_width = maxf(260.0, float(_ai_chart_width_spin.value))
-	if is_instance_valid(_ai_chart_height_spin):
-		_ai_chart_height = maxf(140.0, float(_ai_chart_height_spin.value))
-	_apply_ai_chart_layout()
-func _on_ai_chart_visibility_toggled() -> void:
-	_ai_charts_open = _ai_chart_toggle_button.button_pressed if is_instance_valid(_ai_chart_toggle_button) else true
-	_apply_ai_chart_layout()
-func _apply_ai_chart_layout() -> void:
-	for row in _ai_chart_rows:
-		if is_instance_valid(row):
-			row.visible = _ai_charts_open
-			if row is HBoxContainer:
-				row.custom_minimum_size = Vector2(0, _ai_chart_height)
-	for canvas in _ai_chart_canvases:
-		if is_instance_valid(canvas):
-			canvas.visible = _ai_charts_open
-			canvas.custom_minimum_size = Vector2(_ai_chart_width, _ai_chart_height)
-	if is_instance_valid(_ai_chart_toggle_button):
-		_ai_chart_toggle_button.text = _tr_ai("SETTINGS_AI_LOG_HIDE_GRAPHS", "Hide Graphs") if _ai_charts_open else _tr_ai("SETTINGS_AI_LOG_SHOW_GRAPHS", "Show Graphs")
-func _on_ai_log_clear_pressed() -> void:
-	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
-	if ai_manager and ai_manager.has_method("clear_call_log"):
-		ai_manager.clear_call_log()
-	if _ai_showing_charts:
-		_refresh_analytics_view()
-	else:
-		_refresh_ai_log_table()
-func _refresh_analytics_view() -> void:
-	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
-	var log_entries: Array = []
-	if ai_manager and ai_manager.has_method("get_call_log"):
-		log_entries = ai_manager.get_call_log()
-	SettingsMenuAILogRendererScript.refresh_analytics({
-		"success_by_provider": _chart_success_by_provider,
-		"mode_pie": _chart_mode_pie,
-		"hourly_requests": _chart_hourly_requests,
-		"success_per_hour": _chart_success_per_hour,
-		"calls_by_model": _chart_calls_by_model,
-		"tokens_by_provider": _chart_tokens_by_provider,
-		"response_by_provider": _chart_response_by_provider,
-		"input_output_tokens": _chart_input_output_tokens,
-		"tps_by_provider": _chart_tps_by_provider,
-		"hourly_tokens": _chart_hourly_tokens,
-		"cumulative_tokens": _chart_cumulative_tokens,
-	}, _ai_kpi_labels, log_entries)
-func _compute_ai_analytics(log_entries: Array) -> Dictionary:
-	return SettingsMenuAIAnalyticsScript.compute_analytics(log_entries)
-func _format_token_count(n: int) -> String:
-	return SettingsMenuAIAnalyticsScript.format_token_count(n)
-func _refresh_ai_log_table() -> void:
-	var ai_manager: Node = ServiceLocator.get_ai_manager() if ServiceLocator else null
-	var log_entries: Array = []
-	if ai_manager and ai_manager.has_method("get_call_log"):
-		log_entries = ai_manager.get_call_log()
-	SettingsMenuAILogRendererScript.refresh_table(_ai_log_rows_container, log_entries, Callable(self, "_tr_ai"))
 func _move_control(node: Control, new_parent: Control):
 	if node and node.get_parent():
 		node.get_parent().remove_child(node)
@@ -655,6 +519,13 @@ func _add_separator(parent: Control):
 	sep.modulate = Color(1, 1, 1, 0.3)
 	parent.add_child(sep)
 func _initialize_new_controls():
+	_dev_ctrl = SettingsMenuDeveloperHandlersScript.new()
+	_dev_ctrl.setup(
+		Callable(self, "_get_game_state"),
+		Callable(self, "_show_notification"),
+		Callable(self, "_play_sfx"),
+		Callable(self, "_report_info"),
+	)
 	var game_state := _get_game_state()
 	var dev_result := SettingsMenuDeveloperSectionScript.build_section(
 		tab_developer,
@@ -670,28 +541,28 @@ func _initialize_new_controls():
 		},
 		game_state,
 		{
-			"on_text_speed_selected": _on_text_speed_selected,
-			"on_screen_shake_toggled": _on_screen_shake_toggled,
-			"on_max_rounds_changed": _on_max_rounds_changed,
-			"on_force_mission_complete_toggled": _on_force_mission_complete_toggled,
-			"on_force_gloria_pressed": _on_force_gloria_pressed,
-			"on_force_trolley_pressed": _on_force_trolley_pressed,
-			"on_force_honeymoon_toggled": _on_force_honeymoon_toggled,
-			"on_reality_score_changed": _on_reality_score_changed,
-			"on_positive_energy_changed": _on_positive_energy_changed,
-			"on_entropy_level_changed": _on_entropy_level_changed,
-			"on_honeymoon_charges_changed": _on_honeymoon_charges_changed,
-			"on_mission_turn_changed": _on_mission_turn_changed,
-			"on_max_stats_pressed": _on_max_stats_pressed,
-			"on_reset_stats_pressed": _on_reset_stats_pressed,
-			"on_clear_debuffs_pressed": _on_clear_debuffs_pressed,
-			"on_add_honeymoon_pressed": _on_add_honeymoon_pressed,
-			"on_autosave_toggled": _on_autosave_toggled,
-			"on_infinite_resources_toggled": _on_infinite_resources_toggled,
-			"on_skip_dialogue_toggled": _on_skip_dialogue_toggled,
-			"on_god_mode_toggled": _on_god_mode_toggled,
-			"on_fsm_jump_to_day_pressed": _on_fsm_jump_to_day_pressed,
-			"on_fsm_reset_pressed": _on_fsm_reset_pressed,
+			"on_text_speed_selected":          _on_text_speed_selected,
+			"on_screen_shake_toggled":         _on_screen_shake_toggled,
+			"on_max_rounds_changed":           _on_max_rounds_changed,
+			"on_force_mission_complete_toggled": Callable(_dev_ctrl, "_on_force_mission_complete_toggled"),
+			"on_force_gloria_pressed":         _on_force_gloria_pressed,
+			"on_force_trolley_pressed":        _on_force_trolley_pressed,
+			"on_force_honeymoon_toggled":      _on_force_honeymoon_toggled,
+			"on_reality_score_changed":        Callable(_dev_ctrl, "_on_reality_score_changed"),
+			"on_positive_energy_changed":      Callable(_dev_ctrl, "_on_positive_energy_changed"),
+			"on_entropy_level_changed":        Callable(_dev_ctrl, "_on_entropy_level_changed"),
+			"on_honeymoon_charges_changed":    Callable(_dev_ctrl, "_on_honeymoon_charges_changed"),
+			"on_mission_turn_changed":         Callable(_dev_ctrl, "_on_mission_turn_changed"),
+			"on_max_stats_pressed":            Callable(_dev_ctrl, "_on_max_stats_pressed"),
+			"on_reset_stats_pressed":          Callable(_dev_ctrl, "_on_reset_stats_pressed"),
+			"on_clear_debuffs_pressed":        Callable(_dev_ctrl, "_on_clear_debuffs_pressed"),
+			"on_add_honeymoon_pressed":        Callable(_dev_ctrl, "_on_add_honeymoon_pressed"),
+			"on_autosave_toggled":             Callable(_dev_ctrl, "_on_autosave_toggled"),
+			"on_infinite_resources_toggled":   Callable(_dev_ctrl, "_on_infinite_resources_toggled"),
+			"on_skip_dialogue_toggled":        Callable(_dev_ctrl, "_on_skip_dialogue_toggled"),
+			"on_god_mode_toggled":             Callable(_dev_ctrl, "_on_god_mode_toggled"),
+			"on_fsm_jump_to_day_pressed":      Callable(_dev_ctrl, "_on_fsm_jump_to_day_pressed"),
+			"on_fsm_reset_pressed":            Callable(_dev_ctrl, "_on_fsm_reset_pressed"),
 		},
 		{
 			"fsm_guide": FSM_IMG_GUIDE,
@@ -723,6 +594,7 @@ func _initialize_new_controls():
 	infinite_resources_toggle = dev_result.get("infinite_resources_toggle")
 	skip_dialogue_toggle = dev_result.get("skip_dialogue_toggle")
 	god_mode_toggle = dev_result.get("god_mode_toggle")
+	_dev_ctrl.set_node_refs(dev_result)
 	_initialize_agent_server_controls()
 	_initialize_tutorial_controls()
 func _initialize_agent_server_controls():
@@ -749,21 +621,24 @@ func _initialize_agent_server_controls():
 	agent_server_help_button = controls.get("help_button", null) as Button
 	_update_agent_server_status()
 func _initialize_tutorial_controls():
+	_tutorial_ctrl = SettingsMenuTutorialHandlersScript.new()
+	_tutorial_ctrl.setup(Callable(self, "_play_sfx"), Callable(self, "_show_notification"))
 	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
 	if _tutorial_section == null:
 		_tutorial_section = SettingsMenuTutorialSectionScript.new()
 	var controls: Dictionary = _tutorial_section.build_section(
 		tab_tutorial,
 		tutorial_system,
-		Callable(self, "_on_tutorial_enabled_toggled"),
-		Callable(self, "_on_reset_tutorials_pressed"),
-		Callable(self, "_on_trigger_tutorial"),
+		Callable(_tutorial_ctrl, "_on_tutorial_enabled_toggled"),
+		Callable(_tutorial_ctrl, "_on_reset_tutorials_pressed"),
+		Callable(_tutorial_ctrl, "_on_trigger_tutorial"),
 	)
 	tutorial_enabled_toggle = controls.get("tutorial_enabled_toggle", null) as CheckBox
 	tutorial_progress_label = controls.get("tutorial_progress_label", null) as Label
-	reset_tutorials_button = controls.get("reset_tutorials_button", null) as Button
+	reset_tutorials_button  = controls.get("reset_tutorials_button",  null) as Button
 	tutorial_list_container = controls.get("tutorial_list_container", null) as VBoxContainer
-	_update_tutorial_progress_display()
+	_tutorial_ctrl.set_node_refs(tutorial_progress_label, tutorial_list_container)
+	_tutorial_ctrl.update_progress_display()
 func _on_text_speed_selected(index: int):
 	match index:
 		0: text_speed = 0.0
@@ -778,10 +653,6 @@ func _on_max_rounds_changed(value: float):
 	var game_state := _get_game_state()
 	if game_state:
 		game_state.settings["max_rounds_per_mission"] = max_rounds_per_mission
-func _on_force_mission_complete_toggled(toggled: bool):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.debug_force_mission_complete = toggled
 func _on_force_gloria_pressed():
 	_play_sfx("menu_click")
 	var flow = _get_story_flow_controller()
@@ -823,96 +694,6 @@ func _close_menu():
 		queue_free()
 	else:
 		_on_back_button_pressed()
-func _on_reality_score_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.reality_score = int(value)
-func _on_positive_energy_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.positive_energy = int(value)
-func _on_entropy_level_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.entropy_level = int(value)
-func _on_honeymoon_charges_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.honeymoon_charges = int(value)
-func _on_mission_turn_changed(value: float):
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.mission_turn_count = int(value)
-func _on_max_stats_pressed():
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_max_stats(_get_game_state(), {
-		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
-		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
-	}, Callable(self, "_show_notification"))
-func _on_reset_stats_pressed():
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_reset_stats(_get_game_state(), {
-		"reality": reality_score_spinbox, "positive_energy": positive_energy_spinbox,
-		"entropy": entropy_level_spinbox, "honeymoon": honeymoon_charges_spinbox,
-		"mission_turn": mission_turn_spinbox,
-	}, Callable(self, "_show_notification"))
-func _on_clear_debuffs_pressed():
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		if game_state.has_method("clear_all_debuffs") and game_state.clear_all_debuffs():
-			_show_notification("All debuffs cleared!", true)
-		else:
-			_show_notification("Debuff system not available", false)
-	else:
-		_show_notification("GameState not available", false)
-func _on_add_honeymoon_pressed():
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.honeymoon_charges = min(10, game_state.honeymoon_charges + 5)
-		honeymoon_charges_spinbox.value = game_state.honeymoon_charges
-		_show_notification("Added 5 honeymoon charges!", true)
-func _on_autosave_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.autosave_enabled = toggled
-		var msg = "Autosave enabled" if toggled else "Autosave disabled"
-		_show_notification(msg, true)
-func _on_infinite_resources_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.set_metadata("debug_infinite_resources", toggled)
-		var msg = "Infinite resources enabled" if toggled else "Infinite resources disabled"
-		_show_notification(msg, true)
-func _on_skip_dialogue_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.settings["auto_advance_enabled"] = toggled
-		var msg = "Auto-advance dialogue enabled" if toggled else "Auto-advance dialogue disabled"
-		_show_notification(msg, true)
-func _on_god_mode_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.set_metadata("debug_god_mode", toggled)
-		var msg = "God mode enabled" if toggled else "God mode disabled"
-		_show_notification(msg, true)
-func _update_fsm_status_label(label: Label):
-	SettingsMenuDeveloperSectionScript.update_fsm_status_label(label, _get_game_state())
-func _on_fsm_jump_to_day_pressed(target_day_id: int, status_label: Label):
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_fsm_jump_to_day(
-		target_day_id, status_label, _get_game_state(),
-		Callable(self, "_show_notification"), Callable(self, "_report_info"))
-func _on_fsm_reset_pressed(status_label: Label):
-	_play_sfx("menu_click")
-	SettingsMenuDeveloperSectionScript.on_fsm_reset(
-		status_label, _get_game_state(),
-		Callable(self, "_show_notification"), Callable(self, "_report_info"))
 func _show_notification(message: String, success: bool = true):
 	var notifier = ServiceLocator.get_notification_system() if ServiceLocator else null
 	if notifier:
@@ -922,53 +703,6 @@ func _show_notification(message: String, success: bool = true):
 			notifier.show_warning(message)
 	else:
 		_debug_log("[Settings] " + message)
-func _on_tutorial_enabled_toggled(toggled: bool):
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.set_tutorial_enabled(toggled)
-		var msg = "Tutorials enabled" if toggled else "Tutorials disabled"
-		_show_notification(msg, true)
-func _on_reset_tutorials_pressed():
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.reset_tutorials()
-		_show_notification("All tutorials have been reset!", true)
-		_update_tutorial_progress_display()
-		_update_tutorial_status_labels()
-func _on_trigger_tutorial(step_id: String):
-	_play_sfx("menu_click")
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		tutorial_system.trigger_tutorial(step_id)
-		_show_notification("Triggered: " + step_id.replace("_", " ").capitalize(), true)
-func _update_tutorial_progress_display():
-	if not tutorial_progress_label:
-		return
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if tutorial_system:
-		var progress = tutorial_system.get_tutorial_progress()
-		var completed_count = tutorial_system.get_completed_tutorials().size()
-		var total_count = tutorial_system.get_all_tutorial_steps().size()
-		tutorial_progress_label.text = "Progress: %d/%d (%.1f%%)" % [completed_count, total_count, progress]
-func _update_tutorial_status_labels():
-	if not tutorial_list_container:
-		return
-	var tutorial_system = ServiceLocator.get_tutorial_system() if ServiceLocator else null
-	if not tutorial_system:
-		return
-	for child in tutorial_list_container.get_children():
-		if child is PanelContainer:
-			var status_label = child.find_child("Status_*", true, false)
-			if status_label and status_label is Label:
-				var step_id = status_label.name.replace("Status_", "")
-				if tutorial_system.is_tutorial_completed(step_id):
-					status_label.text = "✓ Completed"
-					status_label.add_theme_color_override("font_color", Color(0.3, 1.0, 0.3))
-				else:
-					status_label.text = "Not Seen"
-					status_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 func _enforce_fullscreen_layout() -> void:
 	if menu_container:
 		menu_container.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1045,7 +779,8 @@ func update_ui_text():
 		"delete_logs_dialog": delete_logs_dialog,
 		"fullscreen_option": fullscreen_option,
 	}, Callable(self, "_tr"), voice_capture_active)
-	_update_tutorial_progress_display()
+	if _tutorial_ctrl:
+		_tutorial_ctrl.update_progress_display()
 	_refresh_display_mode_availability()
 	_update_voice_availability_label()
 func _set_button_pressed_safely(button: BaseButton, pressed: bool) -> void:
@@ -1660,11 +1395,9 @@ func _on_home_button_pressed():
 	else:
 		_go_to_main_menu()
 func _get_default_font(language: String) -> String:
-	if language == "zh":
-		return FontManager.DEFAULT_ZH_FONT if FontManager else "Noto Sans SC"
-	return FontManager.DEFAULT_EN_FONT if FontManager else "Trajan Pro"
+	return SettingsMenuSaveLoadScript.get_default_font(language)
 func save_settings():
-	GameSave.save_settings({
+	SettingsMenuSaveLoadScript.save({
 		"resolution": selected_resolution,
 		"mode": selected_mode,
 		"font_size": selected_font_size,
@@ -1688,13 +1421,7 @@ func save_settings():
 		"voice_input_mode": voice_input_mode,
 		"voice_proactive_enabled": voice_proactive_enabled,
 		"touch_controls_enabled": touch_controls_enabled,
-	})
-	var game_state := _get_game_state()
-	if game_state:
-		game_state.settings.text_speed = text_speed
-		game_state.settings.screen_shake_enabled = screen_shake_enabled
-		game_state.settings.high_contrast_mode = high_contrast_mode
-		game_state.settings["max_rounds_per_mission"] = max_rounds_per_mission
+	}, _get_game_state())
 func load_settings():
 	var fallback_window_size: Vector2i = Vector2i(DisplayServer.window_get_size())
 	var defaults := {
@@ -1709,7 +1436,11 @@ func load_settings():
 		"voice_input_mode": voice_input_mode,
 		"voice_proactive_enabled": voice_proactive_enabled,
 	}
-	var data := GameSave.load_settings(defaults)
+	var data := SettingsMenuSaveLoadScript.load(
+		defaults,
+		_get_game_state(),
+		Callable(self, "_apply_audio_settings"),
+	)
 	if not data.is_empty():
 		selected_resolution = data["resolution"]
 		_normalize_selected_resolution(fallback_window_size)
@@ -1735,13 +1466,6 @@ func load_settings():
 		voice_input_mode = data["voice_input_mode"]
 		voice_proactive_enabled = data["voice_proactive_enabled"]
 		touch_controls_enabled = data["touch_controls_enabled"]
-		_apply_audio_settings()
-		var game_state := _get_game_state()
-		if game_state:
-			game_state.settings.text_speed = text_speed
-			game_state.settings.screen_shake_enabled = screen_shake_enabled
-			game_state.settings.high_contrast_mode = high_contrast_mode
-			game_state.settings["max_rounds_per_mission"] = max_rounds_per_mission
 	else:
 		_normalize_selected_resolution(fallback_window_size)
 func _emit_close_requested() -> void:

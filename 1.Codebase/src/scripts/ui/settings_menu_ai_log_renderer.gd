@@ -1,6 +1,13 @@
 extends RefCounted
 class_name SettingsMenuAILogRenderer
+
 const AIChartCanvas = preload("res://1.Codebase/src/scripts/ui/ai_chart_canvas.gd")
+
+## Populates all analytics KPI labels and charts from log_entries.
+## charts dict keys: success_by_provider, mode_pie, hourly_requests, success_per_hour,
+##   calls_by_model, tokens_by_provider, response_by_provider, input_output_tokens,
+##   tps_by_provider, hourly_tokens, cumulative_tokens
+## kpi_labels: Array of Label nodes [total, success_rate, total_tokens, avg_response]
 static func refresh_analytics(
 	charts: Dictionary,
 	kpi_labels: Array,
@@ -108,6 +115,8 @@ static func refresh_analytics(
 			a.get("cumulative_labels", []), a.get("cumulative_tokens", []),
 			[Color(1.0, 0.82, 0.35)],
 		)
+
+## Clears and rebuilds the AI log table rows inside container.
 static func refresh_table(
 	container: VBoxContainer,
 	log_entries: Array,

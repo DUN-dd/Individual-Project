@@ -1,5 +1,8 @@
 extends RefCounted
 class_name SettingsMenuAILogExport
+
+## Exports log_entries + metrics to a timestamped JSON file.
+## notifier: Node with show_success(msg)/show_warning(msg) methods (may be null).
 static func export_json(
 	log_entries: Array,
 	metrics: Dictionary,
@@ -25,6 +28,8 @@ static func export_json(
 		if notifier:
 			var msg: String = tr_callable.call("SETTINGS_AI_LOG_EXPORT_JSON_FAILED", "Export failed: could not write file.")
 			notifier.show_warning(msg)
+
+## Exports log_entries and computed chart data to a timestamped CSV file.
 static func export_csv(
 	log_entries: Array,
 	tr_callable: Callable,
