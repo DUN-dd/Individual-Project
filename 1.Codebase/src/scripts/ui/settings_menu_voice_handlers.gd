@@ -359,7 +359,8 @@ func on_voice_input_mode_selected(index: int) -> void:
 		return
 	var selected_id: int = _input_mode_option.get_item_id(index)
 	if selected_id == -1:
-		selected_id = _input_mode_option.selected
+		# This should not happen if the signal is connected correctly.
+		return
 	voice_input_mode = selected_id
 	_apply_preferences()
 
@@ -380,7 +381,7 @@ func on_voice_preview_button_pressed() -> void:
 		_update_status("AI Manager unavailable for preview.", true)
 		return
 	var snapshot: Dictionary = ai_manager.get_state_snapshot()
-	if not snapshot.is_empty() and not ai_manager:
+	if snapshot.is_empty():
 		_update_status("No voice playback data available yet.", true)
 		return
 	if snapshot.has("stream") and snapshot["stream"]:
