@@ -92,7 +92,7 @@ func initialize(preloaded: Dictionary = {}) -> void:
 		voice_volume = float(audio_snapshot.get("voice_volume", voice_volume))
 	var ai_manager = _get_ai_manager_fn.call()
 	if ai_manager:
-		var ai_voice_settings := ai_manager.get_voice_settings()
+		var ai_voice_settings: Dictionary = ai_manager.get_voice_settings()
 		voice_supported         = bool(ai_voice_settings.get("native_voice_supported", voice_supported))
 		voice_enabled           = bool(ai_voice_settings.get("prefer_native_audio", voice_enabled))
 		voice_output_enabled    = bool(ai_voice_settings.get("voice_output_enabled", voice_output_enabled))
