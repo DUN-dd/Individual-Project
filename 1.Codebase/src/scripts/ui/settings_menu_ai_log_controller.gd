@@ -40,28 +40,30 @@ func initialize(
 	_ai_chart_height = chart_height
 	_tab_container   = tab_container
 	_tr_fn           = tr_fn
-	_ai_log_view_panel    = result["log_view_panel"]     as Control
-	_ai_log_rows_container = result["log_rows_container"] as VBoxContainer
-	_ai_analytics_view    = result["analytics_view"]     as Control
-	_ai_chart_toggle_button = result["chart_toggle_button"] as Button
-	_ai_chart_width_spin  = result["chart_width_spin"]   as SpinBox
-	_ai_chart_height_spin = result["chart_height_spin"]  as SpinBox
-	var kpi_raw: Variant = result["kpi_labels"]
+	_ai_log_view_panel    = result.get("log_view_panel")     as Control
+	_ai_log_rows_container = result.get("log_rows_container") as VBoxContainer
+	_ai_analytics_view    = result.get("analytics_view")     as Control
+	_ai_chart_toggle_button = result.get("chart_toggle_button") as Button
+	_ai_chart_width_spin  = result.get("chart_width_spin")   as SpinBox
+	_ai_chart_height_spin = result.get("chart_height_spin")  as SpinBox
+	var kpi_raw: Variant = result.get("kpi_labels")
 	if kpi_raw is Array:
 		_ai_kpi_labels = kpi_raw
-	_ai_chart_rows.assign(result["chart_rows"])
-	_ai_chart_canvases.assign(result["chart_canvases"])
-	_chart_success_by_provider  = result["chart_success_by_provider"]  as Control
-	_chart_mode_pie             = result["chart_mode_pie"]             as Control
-	_chart_hourly_requests      = result["chart_hourly_requests"]      as Control
-	_chart_success_per_hour     = result["chart_success_per_hour"]     as Control
-	_chart_calls_by_model       = result["chart_calls_by_model"]       as Control
-	_chart_tokens_by_provider   = result["chart_tokens_by_provider"]   as Control
-	_chart_response_by_provider = result["chart_response_by_provider"] as Control
-	_chart_input_output_tokens  = result["chart_input_output_tokens"]  as Control
-	_chart_tps_by_provider      = result["chart_tps_by_provider"]      as Control
-	_chart_hourly_tokens        = result["chart_hourly_tokens"]        as Control
-	_chart_cumulative_tokens    = result["chart_cumulative_tokens"]    as Control
+	if result.has("chart_rows"):
+		_ai_chart_rows.assign(result.get("chart_rows"))
+	if result.has("chart_canvases"):
+		_ai_chart_canvases.assign(result.get("chart_canvases"))
+	_chart_success_by_provider  = result.get("chart_success_by_provider")  as Control
+	_chart_mode_pie             = result.get("chart_mode_pie")             as Control
+	_chart_hourly_requests      = result.get("chart_hourly_requests")      as Control
+	_chart_success_per_hour     = result.get("chart_success_per_hour")     as Control
+	_chart_calls_by_model       = result.get("chart_calls_by_model")       as Control
+	_chart_tokens_by_provider   = result.get("chart_tokens_by_provider")   as Control
+	_chart_response_by_provider = result.get("chart_response_by_provider") as Control
+	_chart_input_output_tokens  = result.get("chart_input_output_tokens")  as Control
+	_chart_tps_by_provider      = result.get("chart_tps_by_provider")      as Control
+	_chart_hourly_tokens        = result.get("chart_hourly_tokens")        as Control
+	_chart_cumulative_tokens    = result.get("chart_cumulative_tokens")    as Control
 	_apply_ai_chart_layout()
 func _on_ai_log_tab_changed(tab_idx: int) -> void:
 	if _tab_container and tab_idx == _tab_container.get_tab_count() - 1:

@@ -482,7 +482,7 @@ static func normalize_language_texts(root: Node, tr_fn: Callable, ai_log_ctrl: O
 	var empty_lbl := root.find_child("AILogEmptyLabel", true, false) as Label
 	if empty_lbl:
 		empty_lbl.text = tr_fn.call("SETTINGS_AI_LOG_EMPTY", "No AI calls recorded yet.")
-	if ai_log_ctrl != null and is_instance_valid(ai_log_ctrl):
+	if ai_log_ctrl != null and is_instance_valid(ai_log_ctrl as Node) if ai_log_ctrl is Node else ai_log_ctrl != null:
 		var toggle_btn = ai_log_ctrl.get("_ai_chart_toggle_button")
 		if toggle_btn != null and is_instance_valid(toggle_btn):
 			var charts_open = ai_log_ctrl.get("_ai_charts_open")

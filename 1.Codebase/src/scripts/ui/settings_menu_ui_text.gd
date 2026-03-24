@@ -1,15 +1,17 @@
 extends RefCounted
 class_name SettingsMenuUIText
 static func apply_labels(nodes: Dictionary, tr_callable: Callable, voice_capture_active: bool) -> void:
-	var tab_container: TabContainer = nodes.get("tab_container") as TabContainer
-	if tab_container:
-		tab_container.set_tab_title(0, tr_callable.call("SETTINGS_GAMEPLAY"))
-		tab_container.set_tab_title(1, tr_callable.call("SETTINGS_DISPLAY"))
-		tab_container.set_tab_title(2, tr_callable.call("SETTINGS_AUDIO_2"))
-		tab_container.set_tab_title(3, tr_callable.call("SETTINGS_VOICE"))
-		tab_container.set_tab_title(4, tr_callable.call("SETTINGS_TUTORIAL"))
-		tab_container.set_tab_title(5, tr_callable.call("SETTINGS_DEVELOPER"))
-		tab_container.set_tab_title(6, tr_callable.call("SETTINGS_AI_LOG"))
+	var tab_container = nodes.get("tab_container")
+	if tab_container != null and is_instance_valid(tab_container as Node) if tab_container is Node else tab_container != null:
+		var tc: TabContainer = tab_container as TabContainer
+		if tc:
+			if tc.get_tab_count() > 0: tc.set_tab_title(0, tr_callable.call("SETTINGS_GAMEPLAY"))
+			if tc.get_tab_count() > 1: tc.set_tab_title(1, tr_callable.call("SETTINGS_DISPLAY"))
+			if tc.get_tab_count() > 2: tc.set_tab_title(2, tr_callable.call("SETTINGS_AUDIO_2"))
+			if tc.get_tab_count() > 3: tc.set_tab_title(3, tr_callable.call("SETTINGS_VOICE"))
+			if tc.get_tab_count() > 4: tc.set_tab_title(4, tr_callable.call("SETTINGS_TUTORIAL"))
+			if tc.get_tab_count() > 5: tc.set_tab_title(5, tr_callable.call("SETTINGS_DEVELOPER"))
+			if tc.get_tab_count() > 6: tc.set_tab_title(6, tr_callable.call("SETTINGS_AI_LOG"))
 	var title_label: Label = nodes.get("title_label") as Label
 	if title_label:
 		title_label.text = tr_callable.call("SETTINGS_TITLE")
