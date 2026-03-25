@@ -13,7 +13,6 @@ var reality_score: int:
 		_reality_score = clamp(value, GameConstants.Stats.MIN_REALITY_SCORE, GameConstants.Stats.MAX_REALITY_SCORE)
 		if _reality_score != old_value:
 			reality_score_changed.emit(_reality_score, old_value)
-			stats_changed.emit()
 var _positive_energy: int = GameConstants.Stats.INITIAL_POSITIVE_ENERGY
 var positive_energy: int:
 	get: return _positive_energy
@@ -22,7 +21,6 @@ var positive_energy: int:
 		_positive_energy = clamp(value, GameConstants.Stats.MIN_POSITIVE_ENERGY, GameConstants.Stats.MAX_POSITIVE_ENERGY)
 		if _positive_energy != old_value:
 			positive_energy_changed.emit(_positive_energy, old_value)
-			stats_changed.emit()
 			if _positive_energy > old_value:
 				modify_entropy((_positive_energy - old_value) * 2, "Positive energy curse")
 var _entropy_level: int = GameConstants.Stats.INITIAL_ENTROPY
@@ -33,7 +31,6 @@ var entropy_level: int:
 		_entropy_level = max(GameConstants.Stats.MIN_ENTROPY, value)
 		if _entropy_level != old_value:
 			entropy_level_changed.emit(_entropy_level, old_value)
-			stats_changed.emit()
 var skills: Dictionary = GameConstants.Skills.DEFAULT_SKILLS.duplicate()
 var cognitive_dissonance_active: bool = false
 func modify_reality_score(amount: int, reason: String = "") -> void:
