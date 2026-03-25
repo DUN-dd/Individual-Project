@@ -14,6 +14,8 @@ func _report_error(message: String, details: Dictionary = {}) -> void:
 	ErrorReporterBridge.report_error(ERROR_CONTEXT, message, -1, false, details)
 func _ready():
 	current_window_size = DisplayServer.window_get_size()
+	if current_window_size.x <= 0 or current_window_size.y <= 0:
+		current_window_size = DEFAULT_WINDOW_SIZE
 	get_tree().root.size_changed.connect(_on_viewport_size_changed)
 	call_deferred("apply_settings_from_config")
 	_report_info("Initialized. Current window size: %s" % current_window_size)

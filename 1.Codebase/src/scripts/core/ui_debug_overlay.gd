@@ -60,23 +60,75 @@ func _refresh() -> void:
 func _collect_controls(node: Node, result: Array[Control]) -> void:
 	if node is Control:
 		var ctrl := node as Control
-		if ctrl.visible and ctrl.get_global_rect().size != Vector2.ZERO:
+		if ctrl.is_visible_in_tree() and ctrl.get_global_rect().size != Vector2.ZERO:
 			result.append(ctrl)
 	for child in node.get_children():
 		_collect_controls(child, result)
 func _detect_overlaps(controls: Array[Control]) -> Array:
 	var pairs := []
+	var effective_rects: Dictionary = {}
+	for ctrl in controls:
+		var effective_rect := _get_effective_rect(ctrl)
+		if effective_rect.size.x > 0.0 and effective_rect.size.y > 0.0:
+			effective_rects[ctrl] = effective_rect
 	for i in range(controls.size()):
 		for j in range(i + 1, controls.size()):
 			var a := controls[i]
 			var b := controls[j]
+			if not effective_rects.has(a) or not effective_rects.has(b):
+				continue
+			if a.mouse_filter == Control.MOUSE_FILTER_IGNORE or b.mouse_filter == Control.MOUSE_FILTER_IGNORE:
+				continue
+			if _is_decorative_backdrop(a) or _is_decorative_backdrop(b):
+				continue
 			if _are_ancestor_related(a, b):
 				continue
-			var rect_a := a.get_global_rect()
-			var rect_b := b.get_global_rect()
+			var rect_a: Rect2 = effective_rects[a]
+			var rect_b: Rect2 = effective_rects[b]
 			if rect_a.intersects(rect_b):
 				pairs.append([a, b])
 	return pairs
+func _get_effective_rect(ctrl: Control) -> Rect2:
+	var effective_rect := ctrl.get_global_rect()
+	var ancestor := ctrl.get_parent()
+	while ancestor != null:
+		if ancestor is Control:
+			var ancestor_ctrl := ancestor as Control
+			if ancestor_ctrl.clip_contents or ancestor_ctrl is ScrollContainer or ancestor_ctrl is TabContainer:
+				effective_rect = effective_rect.intersection(ancestor_ctrl.get_global_rect())
+				if effective_rect.size.x <= 0.0 or effective_rect.size.y <= 0.0:
+					return Rect2()
+		ancestor = ancestor.get_parent()
+	return effective_rect
+func _is_decorative_backdrop(ctrl: Control) -> bool:
+	var name_lower := String(ctrl.name).to_lower()
+	var rect := ctrl.get_global_rect()
+	var viewport_rect := get_viewport().get_visible_rect()
+	var covers_viewport := rect.size.x >= viewport_rect.size.x * 0.9 and rect.size.y >= viewport_rect.size.y * 0.9
+	if _has_ancestor_name_fragment(ctrl, "screensaver") or _has_ancestor_name_fragment(ctrl, "ambientweather"):
+		return true
+	if not covers_viewport:
+		return false
+	var parent_name := String(ctrl.get_parent().name).to_lower() if ctrl.get_parent() != null else ""
+	if ctrl is ColorRect:
+		return name_lower in ["background", "backdrop", "backgroundoverlay", "colorrect", "darkoverlay", "dim", "overlay"]
+	if ctrl is TextureRect:
+		return (
+			name_lower.contains("background")
+			or name_lower.contains("backdrop")
+			or name_lower.contains("overlay")
+			or name_lower.contains("screensaver")
+			or parent_name.contains("screensaver")
+			or parent_name.contains("ambientweather")
+		)
+	return false
+func _has_ancestor_name_fragment(node: Node, fragment: String) -> bool:
+	var current := node.get_parent()
+	while current != null:
+		if String(current.name).to_lower().contains(fragment):
+			return true
+		current = current.get_parent()
+	return false
 func _are_ancestor_related(a: Node, b: Node) -> bool:
 	var node := a.get_parent()
 	while node != null:

@@ -1,6 +1,8 @@
 extends Node
+var tests_passed: int = 0
+var tests_failed: int = 0
 var prayer_system_script = load("res://1.Codebase/src/scripts/ui/prayer_system.gd")
-func test_dissonance_ui_update():
+func test_dissonance_ui_update() -> void:
 	print("[Test] Starting Cognitive Dissonance UI Bug Regression Test")
 	var game_state = GameState
 	game_state.cognitive_dissonance_active = true
@@ -22,14 +24,19 @@ func test_dissonance_ui_update():
 		prayer_input.text = sanitized_prayer
 	else:
 		print("[Test] Logic Branch: sanitized == original -> NOT UPDATING UI")
-	if prayer_input.text == "I hate this":
-		print("[Test] FAILURE: UI text remained 'I hate this' despite injection.")
-	else:
-		print("[Test] SUCCESS: UI text updated to '%s'" % prayer_input.text)
-		if "hope" in prayer_input.text or "love" in prayer_input.text:
-			print("[Test] SUCCESS: Positive words injected.")
+	_assert(prayer_input.text != original_input, "Prayer text updates after cognitive dissonance injection")
+	_assert(prayer_input.text == sanitized_prayer, "Prayer UI reflects sanitized prayer text")
+	_assert(prayer_input.text.length() > original_input.length(), "Prayer text gains injected positive wording")
 	ps.free()
 	prayer_input.free()
-func _ready():
+func _ready() -> void:
 	test_dissonance_ui_update()
-	get_tree().quit()
+	print("[PrayerDissonanceBugTest] Summary: %d passed, %d failed" % [tests_passed, tests_failed])
+	queue_free()
+func _assert(condition: bool, message: String) -> void:
+	if condition:
+		tests_passed += 1
+		print("    PASS  %s" % message)
+	else:
+		tests_failed += 1
+		print("    FAIL  %s" % message)

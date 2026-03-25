@@ -1,4 +1,6 @@
 extends Node
+var tests_passed: int = 0
+var tests_failed: int = 0
 const AIPromptBuilderScript = preload("res://1.Codebase/src/scripts/core/ai/ai_prompt_builder.gd")
 var prompt_builder: RefCounted = null
 var mock_game_state: Dictionary = { }
@@ -48,10 +50,10 @@ func _teardown() -> void:
 	mock_memory_store.clear()
 func _test_initialization() -> void:
 	print("[Test] Prompt builder initialization...")
-	assert(prompt_builder != null, "Prompt builder should be created")
-	assert(prompt_builder.has_method("setup"), "Should have setup method")
-	assert(prompt_builder.has_method("build_prompt"), "Should have build_prompt method")
-	assert(prompt_builder.has_method("set_system_persona"), "Should have set_system_persona method")
+	_assert(prompt_builder != null, "Prompt builder should be created")
+	_assert(prompt_builder.has_method("setup"), "Should have setup method")
+	_assert(prompt_builder.has_method("build_prompt"), "Should have build_prompt method")
+	_assert(prompt_builder.has_method("set_system_persona"), "Should have set_system_persona method")
 	print("[Test] Initialization PASSED")
 func _test_build_basic_prompt() -> void:
 	print("[Test] Basic prompt building...")
@@ -67,16 +69,16 @@ func _test_build_basic_prompt() -> void:
 		"entropy_level": 10,
 	}
 	var messages: Array = prompt_builder.build_prompt("Test prompt", context)
-	assert(messages is Array, "Should return an Array")
-	assert(messages.size() > 0, "Should have at least one message")
+	_assert(messages is Array, "Should return an Array")
+	_assert(messages.size() > 0, "Should have at least one message")
 	var has_user_message := false
 	for msg in messages:
 		if msg is Dictionary and msg.get("role") == "user":
 			has_user_message = true
 			var content: String = str(msg.get("content", ""))
-			assert(content.contains("Test prompt"), "Should contain the prompt text")
+			_assert(content.contains("Test prompt"), "Should contain the prompt text")
 			break
-	assert(has_user_message, "Should have a user message")
+	_assert(has_user_message, "Should have a user message")
 	print("[Test] Basic prompt building PASSED")
 func _test_language_handling() -> void:
 	print("[Test] Language handling...")
@@ -89,7 +91,7 @@ func _test_language_handling() -> void:
 	}
 	var messages_en: Array = prompt_builder.build_prompt("English test", context_en)
 	var user_content_en := _extract_user_content(messages_en)
-	assert(user_content_en.contains("English test"), "Should contain English prompt")
+	_assert(user_content_en.contains("English test"), "Should contain English prompt")
 	print("[Test] Language handling PASSED")
 func _test_metadata_lines() -> void:
 	print("[Test] Metadata lines...")
@@ -105,7 +107,7 @@ func _test_metadata_lines() -> void:
 	}
 	var messages: Array = prompt_builder.build_prompt("Test", context)
 	var user_content := _extract_user_content(messages)
-	assert(user_content.contains("Purpose:") or user_content.contains("Purpose"), "Should include purpose")
+	_assert(user_content.contains("Purpose:") or user_content.contains("Purpose"), "Should include purpose")
 	print("[Test] Metadata lines PASSED")
 func _test_stat_snapshot() -> void:
 	print("[Test] Stat snapshot...")
@@ -119,9 +121,9 @@ func _test_stat_snapshot() -> void:
 	}
 	var messages: Array = prompt_builder.build_prompt("Stats test", context)
 	var user_content := _extract_user_content(messages)
-	assert(user_content.contains("75") or user_content.contains("Reality"), "Should include reality score")
-	assert(user_content.contains("60") or user_content.contains("Positive"), "Should include positive energy")
-	assert(user_content.contains("25") or user_content.contains("Entropy"), "Should include entropy")
+	_assert(user_content.contains("75") or user_content.contains("Reality"), "Should include reality score")
+	_assert(user_content.contains("60") or user_content.contains("Positive"), "Should include positive energy")
+	_assert(user_content.contains("25") or user_content.contains("Entropy"), "Should include entropy")
 	print("[Test] Stat snapshot PASSED")
 func _test_constants() -> void:
 	print("[Test] Constants...")
@@ -129,14 +131,21 @@ func _test_constants() -> void:
 		print("[Test] SKIPPED: Prompt builder not available")
 		return
 	var builder_script = AIPromptBuilderScript
-	assert(builder_script.MAX_PRAYER_LENGTH == 320, "MAX_PRAYER_LENGTH should be 320")
-	assert(builder_script.MAX_CHOICE_TEXT_PREVIEW == 60, "MAX_CHOICE_TEXT_PREVIEW should be 60")
-	assert(builder_script.MAX_JOURNAL_ENTRIES == 3, "MAX_JOURNAL_ENTRIES should be 3")
-	assert(builder_script.REALITY_SCORE_MAX == 100, "REALITY_SCORE_MAX should be 100")
-	assert(builder_script.POSITIVE_ENERGY_MAX == 100, "POSITIVE_ENERGY_MAX should be 100")
+	_assert(builder_script.MAX_PRAYER_LENGTH == 320, "MAX_PRAYER_LENGTH should be 320")
+	_assert(builder_script.MAX_CHOICE_TEXT_PREVIEW == 60, "MAX_CHOICE_TEXT_PREVIEW should be 60")
+	_assert(builder_script.MAX_JOURNAL_ENTRIES == 3, "MAX_JOURNAL_ENTRIES should be 3")
+	_assert(builder_script.REALITY_SCORE_MAX == 100, "REALITY_SCORE_MAX should be 100")
+	_assert(builder_script.POSITIVE_ENERGY_MAX == 100, "POSITIVE_ENERGY_MAX should be 100")
 	print("[Test] Constants PASSED")
 func _extract_user_content(messages: Array) -> String:
 	for msg in messages:
 		if msg is Dictionary and msg.get("role") == "user":
 			return str(msg.get("content", ""))
 	return ""
+func _assert(condition: bool, message: String) -> void:
+	if condition:
+		tests_passed += 1
+		print("    PASS  %s" % message)
+	else:
+		tests_failed += 1
+		print("    FAIL  %s" % message)

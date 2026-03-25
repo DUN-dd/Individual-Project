@@ -18,17 +18,24 @@ func _generate_mission_summary(event_data: Dictionary) -> void:
 		return
 	var game_state: Node = _get_game_state()
 	var mission_number: int = game_state.current_mission if game_state else 0
-	var latest_story: String = game_state.get_metadata("latest_story_text") if game_state else ""
+	var latest_story := ""
+	if game_state:
+		var latest_story_value: Variant = game_state.get_latest_story_text("") if game_state.has_method("get_latest_story_text") else game_state.get_metadata("latest_story_text", "")
+		latest_story = String(latest_story_value if latest_story_value != null else "")
 	var last_choice = ""
 	if game_state and game_state.butterfly_tracker:
 		var recorded_choices = game_state.butterfly_tracker.recorded_choices
 		if not recorded_choices.is_empty():
-			last_choice = recorded_choices[-1].get("text", "")
+			var last_recorded: Variant = recorded_choices[-1]
+			if last_recorded is Dictionary:
+				var last_recorded_dict := last_recorded as Dictionary
+				last_choice = String(last_recorded_dict.get("text", last_recorded_dict.get("choice_text", last_recorded_dict.get("description", "")))).strip_edges()
+	var event_details: Dictionary = event_data.get("details", {}) if event_data.get("details", {}) is Dictionary else {}
 	var template := _tr("AI_PROMPT_MISSION_SUMMARY")
 	var summary_prompt := template % [
 		latest_story.substr(0, 200) if latest_story else _tr("UI_UNKNOWN"),
 		last_choice if last_choice else _tr("UI_UNKNOWN"),
-		event_data.get("details", { }).get("outcome", _tr("STATUS_SUCCESS")),
+		String(event_details.get("outcome", _tr("STATUS_SUCCESS"))),
 	]
 	_report_info("Generating mission summary for mission #%d" % mission_number)
 	ai_manager.request_ai(

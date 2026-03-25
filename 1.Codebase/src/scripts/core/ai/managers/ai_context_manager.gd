@@ -88,9 +88,9 @@ func _log_delta_stats(messages: Array[Dictionary]) -> void:
 	var total_chars := 0
 	for msg in messages:
 		total_chars += str(msg.get("content", "")).length()
-	var est_tokens := delta.estimate_tokens(str(total_chars))
+	var est_tokens := delta.get_current_tokens()
 	_report_info("Request: %d messages, ~%d chars, ~%d est tokens (budget: %d)" % [
-		messages.size(), total_chars, delta.get_current_tokens(), delta.token_budget])
+		messages.size(), total_chars, est_tokens, delta.token_budget])
 func _get_active_delta() -> AIContextDelta:
 	if _prompt_builder and _prompt_builder._delta:
 		return _prompt_builder._delta

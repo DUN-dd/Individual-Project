@@ -1,22 +1,66 @@
 ﻿extends RefCounted
 const ERROR_CONTEXT := "SaveLoadSystem"
 const MAX_SAVE_SLOTS: int = 5
-var _game_state: Node = null
+var _game_state = null
 var current_save_slot: int = 1
 var _migrator: SaveVersionMigrator = SaveVersionMigrator.new()
-func set_game_state(game_state: Node) -> void:
+func set_game_state(game_state) -> void:
 	_game_state = game_state
+func _to_absolute_path(path: String) -> String:
+	return ProjectSettings.globalize_path(path) if path.begins_with("user://") or path.begins_with("res://") else path
+func _ensure_parent_directory(path: String) -> bool:
+	var absolute_path := _to_absolute_path(path)
+	var parent_dir := absolute_path.get_base_dir()
+	if parent_dir.is_empty():
+		return true
+	var result := DirAccess.make_dir_recursive_absolute(parent_dir)
+	return result == OK or result == ERR_ALREADY_EXISTS
+func _open_file(path: String, mode: FileAccess.ModeFlags) -> FileAccess:
+	var absolute_path := _to_absolute_path(path)
+	if mode != FileAccess.READ and not _ensure_parent_directory(path):
+		return null
+	return FileAccess.open(absolute_path, mode)
+func _file_exists(path: String) -> bool:
+	return FileAccess.file_exists(_to_absolute_path(path))
+func _remove_file(path: String) -> bool:
+	var absolute_path := _to_absolute_path(path)
+	if not FileAccess.file_exists(absolute_path):
+		return true
+	return DirAccess.remove_absolute(absolute_path) == OK
+func _copy_save_file(source_path: String, backup_path: String) -> bool:
+	if not _file_exists(source_path):
+		return false
+	var source_file := _open_file(source_path, FileAccess.READ)
+	if not source_file:
+		return false
+	var buffer := source_file.get_buffer(source_file.get_length())
+	source_file.close()
+	var backup_file := _open_file(backup_path, FileAccess.WRITE)
+	if not backup_file:
+		ErrorReporter.report_warning(
+			ERROR_CONTEXT,
+			"Failed to create save backup",
+			{
+				"source_path": source_path,
+				"backup_path": backup_path,
+				"source_absolute": _to_absolute_path(source_path),
+				"backup_absolute": _to_absolute_path(backup_path),
+				"error_code": FileAccess.get_open_error(),
+			},
+		)
+		return false
+	backup_file.store_buffer(buffer)
+	backup_file.close()
+	return true
 func autosave() -> bool:
 	if not _game_state:
 		ErrorReporter.report_error(ERROR_CONTEXT, "Cannot autosave: GameState not set", -1)
 		return false
 	var autosave_path = "user://gda1_autosave.dat"
 	var backup_path = "user://gda1_autosave_backup.dat"
-	if FileAccess.file_exists(autosave_path):
-		var dir = DirAccess.open("user://")
-		if dir:
-			dir.copy(autosave_path, backup_path)
-	var save_file = FileAccess.open(autosave_path, FileAccess.WRITE)
+	if _file_exists(autosave_path):
+		_copy_save_file(autosave_path, backup_path)
+	var save_file = _open_file(autosave_path, FileAccess.WRITE)
 	if save_file:
 		var save_data = _game_state.get_save_data()
 		save_data["is_autosave"] = true
@@ -41,12 +85,10 @@ func save_to_slot(slot: int = -1) -> bool:
 	var save_path = "user://gda1_save_slot_%d.dat" % slot
 	var backup_path = "user://gda1_save_slot_%d_backup.dat" % slot
 	ErrorReporter.report_info(ERROR_CONTEXT, "Saving game to slot %d" % slot, { "path": save_path })
-	if FileAccess.file_exists(save_path):
-		var dir = DirAccess.open("user://")
-		if dir:
-			dir.copy(save_path, backup_path)
+	if _file_exists(save_path):
+		if _copy_save_file(save_path, backup_path):
 			ErrorReporter.report_info(ERROR_CONTEXT, "Backed up existing save", { "backup_path": backup_path })
-	var save_file = FileAccess.open(save_path, FileAccess.WRITE)
+	var save_file = _open_file(save_path, FileAccess.WRITE)
 	if save_file:
 		var save_data = _game_state.get_save_data()
 		save_data["save_slot"] = slot
@@ -82,14 +124,14 @@ func load_from_slot(slot: int = -1) -> bool:
 	var save_path = "user://gda1_save_slot_%d.dat" % slot
 	var backup_path = "user://gda1_save_slot_%d_backup.dat" % slot
 	ErrorReporter.report_info(ERROR_CONTEXT, "Loading game from slot %d" % slot)
-	if FileAccess.file_exists(save_path):
-		var save_file = FileAccess.open(save_path, FileAccess.READ)
+	if _file_exists(save_path):
+		var save_file = _open_file(save_path, FileAccess.READ)
 		if save_file:
 			var save_data = save_file.get_var()
 			save_file.close()
 			if save_data == null:
 				ErrorReporter.report_error(ERROR_CONTEXT, "Save file returned null data in slot %d" % slot, -1)
-				if FileAccess.file_exists(backup_path):
+				if _file_exists(backup_path):
 					var restored_null := _load_from_backup(slot)
 					if not restored_null:
 						ErrorReporter.report_error(
@@ -103,7 +145,7 @@ func load_from_slot(slot: int = -1) -> bool:
 				return false
 			if not save_data is Dictionary:
 				ErrorReporter.report_error(ERROR_CONTEXT, "Save data is not a Dictionary in slot %d (type: %s)" % [slot, typeof(save_data)], -1)
-				if FileAccess.file_exists(backup_path):
+				if _file_exists(backup_path):
 					var restored_type := _load_from_backup(slot)
 					if not restored_type:
 						ErrorReporter.report_error(
@@ -129,7 +171,7 @@ func load_from_slot(slot: int = -1) -> bool:
 				return true
 			else:
 				ErrorReporter.report_warning(ERROR_CONTEXT, "Corrupted save in slot %d (missing required keys), attempting backup..." % slot)
-				if FileAccess.file_exists(backup_path):
+				if _file_exists(backup_path):
 					var restored_missing := _load_from_backup(slot)
 					if not restored_missing:
 						ErrorReporter.report_error(
@@ -149,7 +191,7 @@ func load_from_slot(slot: int = -1) -> bool:
 				true,
 				{ "path": save_path },
 			)
-			if FileAccess.file_exists(backup_path):
+			if _file_exists(backup_path):
 				var restored_open := _load_from_backup(slot)
 				if not restored_open:
 					ErrorReporter.report_error(
@@ -167,10 +209,10 @@ func _load_from_backup(slot: int) -> bool:
 	if not _game_state:
 		return false
 	var backup_path = "user://gda1_save_slot_%d_backup.dat" % slot
-	if not FileAccess.file_exists(backup_path):
+	if not _file_exists(backup_path):
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Backup file missing for slot %d" % slot, { "backup_path": backup_path })
 		return false
-	var save_file = FileAccess.open(backup_path, FileAccess.READ)
+	var save_file = _open_file(backup_path, FileAccess.READ)
 	if not save_file:
 		var open_error := FileAccess.get_open_error()
 		ErrorReporter.report_error(
@@ -197,8 +239,8 @@ func _load_from_backup(slot: int) -> bool:
 func load_game() -> bool:
 	if not _game_state:
 		return false
-	if FileAccess.file_exists("user://gda1_autosave.dat"):
-		var save_file = FileAccess.open("user://gda1_autosave.dat", FileAccess.READ)
+	if _file_exists("user://gda1_autosave.dat"):
+		var save_file = _open_file("user://gda1_autosave.dat", FileAccess.READ)
 		if save_file:
 			var save_data = save_file.get_var()
 			save_file.close()
@@ -209,6 +251,30 @@ func load_game() -> bool:
 				_game_state.load_save_data(save_data)
 				return true
 	return load_from_slot(current_save_slot)
+func load_from_autosave() -> bool:
+	if not _game_state:
+		ErrorReporter.report_error(ERROR_CONTEXT, "Cannot load autosave: GameState not set", -1)
+		return false
+	var autosave_path = "user://gda1_autosave.dat"
+	if not _file_exists(autosave_path):
+		ErrorReporter.report_info(ERROR_CONTEXT, "Autosave file does not exist")
+		return false
+	var save_file = _open_file(autosave_path, FileAccess.READ)
+	if not save_file:
+		var error = FileAccess.get_open_error()
+		ErrorReporter.report_error(ERROR_CONTEXT, "Failed to open autosave file", error)
+		return false
+	var save_data = save_file.get_var()
+	save_file.close()
+	if not save_data is Dictionary or not (save_data.has("reality_score") or save_data.has("player_stats_data")):
+		ErrorReporter.report_error(ERROR_CONTEXT, "Autosave data is invalid or corrupted", -1)
+		return false
+	if _migrator.needs_migration(save_data):
+		save_data = _migrator.migrate(save_data)
+		_rewrite_save_file(autosave_path, save_data)
+	_game_state.load_save_data(save_data)
+	ErrorReporter.report_info(ERROR_CONTEXT, "Game loaded from autosave")
+	return true
 func export_slot_to_path(slot: int, destination_path: String) -> bool:
 	slot = clamp(slot, 1, MAX_SAVE_SLOTS)
 	var save_path = "user://gda1_save_slot_%d.dat" % slot
@@ -235,12 +301,12 @@ func _export_file(source_path: String, destination_path: String, details: Dictio
 	if destination_path.is_empty():
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Export destination path is empty", details)
 		return false
-	if not FileAccess.file_exists(source_path):
+	if not _file_exists(source_path):
 		var missing_details := details.duplicate()
 		missing_details["source_path"] = source_path
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Export source file does not exist", missing_details)
 		return false
-	var source_file = FileAccess.open(source_path, FileAccess.READ)
+	var source_file = _open_file(source_path, FileAccess.READ)
 	if not source_file:
 		var source_error := FileAccess.get_open_error()
 		var source_details := details.duplicate()
@@ -249,7 +315,7 @@ func _export_file(source_path: String, destination_path: String, details: Dictio
 		return false
 	var buffer = source_file.get_buffer(source_file.get_length())
 	source_file.close()
-	var destination_file = FileAccess.open(destination_path, FileAccess.WRITE)
+	var destination_file = _open_file(destination_path, FileAccess.WRITE)
 	if not destination_file:
 		var destination_error := FileAccess.get_open_error()
 		var destination_details := details.duplicate()
@@ -268,10 +334,10 @@ func _import_file(source_path: String, target_path: String, backup_path: String,
 	if source_path.is_empty():
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Import source path is empty", {})
 		return false
-	if not FileAccess.file_exists(source_path):
+	if not _file_exists(source_path):
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Import source file does not exist", { "source_path": source_path })
 		return false
-	var source_file = FileAccess.open(source_path, FileAccess.READ)
+	var source_file = _open_file(source_path, FileAccess.READ)
 	if not source_file:
 		var source_error := FileAccess.get_open_error()
 		ErrorReporter.report_error(ERROR_CONTEXT, "Failed to open import source file", source_error, false, { "source_path": source_path })
@@ -281,10 +347,8 @@ func _import_file(source_path: String, target_path: String, backup_path: String,
 	if not _is_valid_save_data(imported_data):
 		ErrorReporter.report_warning(ERROR_CONTEXT, "Imported file is not a valid save file", { "source_path": source_path })
 		return false
-	if FileAccess.file_exists(target_path):
-		var user_dir = DirAccess.open("user://")
-		if user_dir:
-			user_dir.copy(target_path, backup_path)
+	if _file_exists(target_path):
+		_copy_save_file(target_path, backup_path)
 	var normalized_data: Dictionary = imported_data.duplicate(true)
 	if _migrator.needs_migration(normalized_data):
 		normalized_data = _migrator.migrate(normalized_data)
@@ -292,7 +356,7 @@ func _import_file(source_path: String, target_path: String, backup_path: String,
 	normalized_data["is_autosave"] = is_autosave
 	if not is_autosave:
 		normalized_data["save_slot"] = slot
-	var target_file = FileAccess.open(target_path, FileAccess.WRITE)
+	var target_file = _open_file(target_path, FileAccess.WRITE)
 	if not target_file:
 		var target_error := FileAccess.get_open_error()
 		ErrorReporter.report_error(
@@ -320,7 +384,7 @@ func _import_file(source_path: String, target_path: String, backup_path: String,
 	)
 	return true
 func _rewrite_save_file(path: String, data: Dictionary) -> void:
-	var save_file = FileAccess.open(path, FileAccess.WRITE)
+	var save_file = _open_file(path, FileAccess.WRITE)
 	if save_file:
 		save_file.store_var(data)
 		save_file.close()
@@ -350,9 +414,9 @@ func _build_save_info(save_data: Dictionary, overrides: Dictionary) -> Dictionar
 	return info
 func get_autosave_info() -> Dictionary:
 	var save_path = "user://gda1_autosave.dat"
-	if not FileAccess.file_exists(save_path):
+	if not _file_exists(save_path):
 		return { "exists": false }
-	var save_file = FileAccess.open(save_path, FileAccess.READ)
+	var save_file = _open_file(save_path, FileAccess.READ)
 	if not save_file:
 		return { "exists": false }
 	var save_data = save_file.get_var()
@@ -362,9 +426,9 @@ func get_autosave_info() -> Dictionary:
 	return _build_save_info(save_data, { "save_slot": save_data.get("save_slot", 0), "is_autosave": true })
 func get_save_slot_info(slot: int) -> Dictionary:
 	var save_path = "user://gda1_save_slot_%d.dat" % slot
-	if not FileAccess.file_exists(save_path):
+	if not _file_exists(save_path):
 		return { "exists": false }
-	var save_file = FileAccess.open(save_path, FileAccess.READ)
+	var save_file = _open_file(save_path, FileAccess.READ)
 	if not save_file:
 		return { "exists": false }
 	var save_data = save_file.get_var()
@@ -373,17 +437,17 @@ func get_save_slot_info(slot: int) -> Dictionary:
 		return { "exists": false }
 	return _build_save_info(save_data, { "save_slot": slot, "is_autosave": save_data.get("is_autosave", false) })
 func get_latest_save_info() -> Dictionary:
-	var latest_timestamp: int = -1
+	var latest_timestamp: float = -1.0
 	var latest_info: Dictionary = { "exists": false }
 	var autosave_info := get_autosave_info()
 	if autosave_info.get("exists", false):
-		latest_timestamp = int(autosave_info.get("timestamp", 0))
+		latest_timestamp = float(autosave_info.get("timestamp", 0))
 		latest_info = autosave_info.duplicate()
 	for slot in range(1, MAX_SAVE_SLOTS + 1):
 		var slot_info := get_save_slot_info(slot)
 		if not slot_info.get("exists", false):
 			continue
-		var slot_timestamp := int(slot_info.get("timestamp", 0))
+		var slot_timestamp := float(slot_info.get("timestamp", 0))
 		if slot_timestamp > latest_timestamp:
 			latest_timestamp = slot_timestamp
 			latest_info = slot_info.duplicate()
@@ -394,39 +458,33 @@ func has_saved_game() -> bool:
 	return get_latest_save_info().get("exists", false)
 func delete_save_slot(slot: int) -> bool:
 	slot = clamp(slot, 1, MAX_SAVE_SLOTS)
-	var dir = DirAccess.open("user://")
-	if dir == null:
-		return false
-	var main_name = "gda1_save_slot_%d.dat" % slot
-	var backup_name = "gda1_save_slot_%d_backup.dat" % slot
+	var main_name = "user://gda1_save_slot_%d.dat" % slot
+	var backup_name = "user://gda1_save_slot_%d_backup.dat" % slot
 	var success = true
-	if dir.file_exists(main_name):
-		if dir.remove(main_name) != OK:
+	if _file_exists(main_name):
+		if not _remove_file(main_name):
 			success = false
 			ErrorReporter.report_error(ERROR_CONTEXT, "Failed to delete save slot %d" % slot, -1)
 		else:
 			ErrorReporter.report_info(ERROR_CONTEXT, "Deleted main save file " + main_name)
-	if dir.file_exists(backup_name):
-		if dir.remove(backup_name) == OK:
+	if _file_exists(backup_name):
+		if _remove_file(backup_name):
 			ErrorReporter.report_info(ERROR_CONTEXT, "Deleted backup save file " + backup_name)
 	if success:
 		ErrorReporter.report_info(ERROR_CONTEXT, "Save slot %d and its backup have been removed." % slot)
 	return success
 func delete_autosave() -> bool:
-	var dir = DirAccess.open("user://")
-	if dir == null:
-		return false
-	var main_name = "gda1_autosave.dat"
-	var backup_name = "gda1_autosave_backup.dat"
+	var main_name = "user://gda1_autosave.dat"
+	var backup_name = "user://gda1_autosave_backup.dat"
 	var success = true
-	if dir.file_exists(main_name):
-		if dir.remove(main_name) != OK:
+	if _file_exists(main_name):
+		if not _remove_file(main_name):
 			success = false
 			ErrorReporter.report_error(ERROR_CONTEXT, "Failed to delete autosave", -1)
 		else:
 			ErrorReporter.report_info(ERROR_CONTEXT, "Deleted autosave file")
-	if dir.file_exists(backup_name):
-		if dir.remove(backup_name) == OK:
+	if _file_exists(backup_name):
+		if _remove_file(backup_name):
 			ErrorReporter.report_info(ERROR_CONTEXT, "Deleted autosave backup file")
 	if success:
 		ErrorReporter.report_info(ERROR_CONTEXT, "Autosave and its backup have been removed.")

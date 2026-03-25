@@ -3,13 +3,14 @@ var SaveLoadSystemScript = preload("res://1.Codebase/src/scripts/core/save_load_
 var _save_system = null
 var _mock_game_state = null
 var _test_results = []
-class MockGameState:
+class MockGameState extends RefCounted:
 	var save_data_called = false
 	var load_data_called = false
 	var last_loaded_data = null
 	func get_save_data() -> Dictionary:
 		save_data_called = true
 		return {
+			"reality_score": 42,
 			"test_value": 42,
 			"test_string": "Hello Test",
 			"nested": { "key": "value" },
@@ -24,8 +25,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	cleanup_test_files()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Autosave Creation", test_autosave)
@@ -43,6 +43,7 @@ func run_all_tests():
 	await run_test("Slot Clamping", test_slot_clamping)
 	await run_test("Empty GameState Handling", test_empty_gamestate)
 func run_test(test_name: String, test_func: Callable):
+	cleanup_test_files()
 	_save_system = SaveLoadSystemScript.new()
 	_mock_game_state = MockGameState.new()
 	_save_system.set_game_state(_mock_game_state)
@@ -196,11 +197,13 @@ func test_backup_creation() -> bool:
 func test_backup_recovery() -> bool:
 	var success = true
 	_save_system.save_to_slot(1)
+	_save_system.save_to_slot(1)
 	var corrupt_file = FileAccess.open("user://gda1_save_slot_1.dat", FileAccess.WRITE)
 	if corrupt_file:
-		corrupt_file.store_string("CORRUPTED DATA")
+		corrupt_file.store_var("CORRUPTED DATA")
 		corrupt_file.close()
 	var result = _save_system.load_from_slot(1)
+	success = assert_true(result, "Backup recovery succeeds for malformed save data") and success
 	success = assert_true(_mock_game_state.load_data_called, "Attempted to load data") and success
 	return success
 func test_slot_clamping() -> bool:
@@ -215,12 +218,29 @@ func test_slot_clamping() -> bool:
 func test_empty_gamestate() -> bool:
 	var success = true
 	var empty_system = SaveLoadSystemScript.new()
+	var previous_console_logs := true
+	var previous_notifications := true
+	var previous_error_count := 0
+	if ErrorReporter:
+		previous_console_logs = ErrorReporter.enable_console_logs
+		previous_notifications = ErrorReporter.enable_user_notifications
+		previous_error_count = int(ErrorReporter.error_count)
+		ErrorReporter.enable_console_logs = false
+		ErrorReporter.enable_user_notifications = false
 	var result = empty_system.autosave()
 	success = assert_equal(result, false, "Autosave fails without GameState") and success
 	result = empty_system.save_to_slot(1)
 	success = assert_equal(result, false, "Save fails without GameState") and success
 	result = empty_system.load_from_slot(1)
 	success = assert_equal(result, false, "Load fails without GameState") and success
+	if ErrorReporter:
+		success = assert_equal(
+			int(ErrorReporter.error_count),
+			previous_error_count + 3,
+			"Expected GameState-not-set errors are still recorded"
+		) and success
+		ErrorReporter.enable_console_logs = previous_console_logs
+		ErrorReporter.enable_user_notifications = previous_notifications
 	return success
 func cleanup_test_files():
 	var dir = DirAccess.open("user://")

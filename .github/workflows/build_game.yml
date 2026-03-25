@@ -18,13 +18,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           lfs: true
 
       - name: Cache Godot import data
         id: cache-import
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .godot/imported
           key: godot-import-${{ runner.os }}-${{ env.GODOT_VERSION_FULL }}-v4-${{ hashFiles('1.Codebase/**/*.csv', '1.Codebase/**/*.tscn', '1.Codebase/**/*.tres', '1.Codebase/**/*.png', '1.Codebase/**/*.wav', '1.Codebase/**/*.ogg', '1.Codebase/**/*.mp3', '1.Codebase/**/*.otf', '1.Codebase/**/*.ttf', '1.Codebase/**/*.otf.import', '1.Codebase/**/*.ttf.import') }}
@@ -210,7 +210,7 @@ jobs:
           [ -f "build-artifacts/index.wasm" ] && echo "✓ index.wasm found" || echo "✗ index.wasm MISSING"
 
       - name: Upload Web Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: web-build
           path: |
@@ -232,7 +232,7 @@ jobs:
           [ -f "build-artifacts/index.audio.position.worklet.js" ] && echo "index.audio.position.worklet.js found" || (echo "index.audio.position.worklet.js missing" && exit 1)
 
       - name: Upload Windows Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-build
           path: |
@@ -240,7 +240,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Linux x86_64 Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-x64-build
           path: |
@@ -248,7 +248,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload Linux ARM64 Build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linux-arm64-build
           path: |
@@ -264,7 +264,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -286,25 +286,25 @@ jobs:
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
       - name: Download Web Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: web-build
           path: web-build/
 
       - name: Download Windows Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: windows-build
           path: windows-build/
 
       - name: Download Linux x64 Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: linux-x64-build
           path: linux-x64-build/
 
       - name: Download Linux ARM64 Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: linux-arm64-build
           path: linux-arm64-build/
@@ -364,7 +364,7 @@ jobs:
 
     steps:
       - name: Download Web Build
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: web-build
           path: web-build/
@@ -388,10 +388,18 @@ jobs:
           ls -lah web-build/
           echo "Total size: $(du -sh web-build/ | cut -f1)"
 
+      - name: Package Pages artifact
+        run: |
+          tar -cvf "$RUNNER_TEMP/github-pages.tar" -C web-build .
+          ls -lh "$RUNNER_TEMP/github-pages.tar"
+
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
-          path: web-build
+          name: github-pages
+          path: ${{ runner.temp }}/github-pages.tar
+          retention-days: 1
+          if-no-files-found: error
 
       - name: Deploy Pages artifact
         id: deployment

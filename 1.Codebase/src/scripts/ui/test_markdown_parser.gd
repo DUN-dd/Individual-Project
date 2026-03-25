@@ -1,5 +1,7 @@
 extends Node
 const MarkdownParser = preload("res://1.Codebase/src/scripts/ui/markdown_parser.gd")
+var tests_passed: int = 0
+var tests_failed: int = 0
 func _ready():
 	print("=== Markdown Parser Tests ===\n")
 	test_headers()
@@ -9,11 +11,20 @@ func _ready():
 	test_lists()
 	test_blockquotes()
 	test_code()
+	print("\n=== Summary ===")
+	print("Passed: %d" % tests_passed)
+	print("Failed: %d" % tests_failed)
 	print("\n=== All Tests Complete ===")
+	queue_free()
 func _assert_equal(actual: String, expected: String, test_name: String) -> void:
-	var message = "\n%s failed.\nExpected: %s\nActual: %s\n" % [test_name, expected, actual]
-	assert(actual == expected, message)
-	print("PASS: %s" % test_name)
+	if actual == expected:
+		tests_passed += 1
+		print("PASS: %s" % test_name)
+		return
+	tests_failed += 1
+	print("FAIL: %s" % test_name)
+	print("Expected: %s" % expected)
+	print("Actual: %s" % actual)
 func test_headers():
 	var input = "# Heading 1\n## Heading 2\n### Heading 3"
 	var output = MarkdownParser.parse_markdown(input)

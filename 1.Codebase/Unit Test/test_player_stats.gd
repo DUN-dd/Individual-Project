@@ -8,8 +8,7 @@ func _ready():
 	print("=".repeat(80) + "\n")
 	await run_all_tests()
 	print_summary()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Reality Score Modification", test_reality_score_modification)
@@ -143,7 +142,7 @@ func test_skill_checks() -> bool:
 	var successes = 0
 	var failures = 0
 	for i in range(20):
-		var result = _player_stats.skill_check("logic", 10)
+		var result = _player_stats.skill_check("logic", 12)
 		success = assert_true(result.has("success"), "Result has success field") and success
 		success = assert_true(result.has("roll"), "Result has roll field") and success
 		success = assert_true(result.has("skill_value"), "Result has skill_value field") and success
@@ -174,24 +173,21 @@ func test_cognitive_dissonance() -> bool:
 	return success
 func test_signal_emissions() -> bool:
 	var success = true
-	var reality_signal_count = 0
-	var energy_signal_count = 0
-	var entropy_signal_count = 0
-	var stats_signal_count = 0
-	_player_stats.reality_score_changed.connect(func(_new, _old): reality_signal_count += 1)
-	_player_stats.positive_energy_changed.connect(func(_new, _old): energy_signal_count += 1)
-	_player_stats.entropy_level_changed.connect(func(_new, _old): entropy_signal_count += 1)
-	_player_stats.stats_changed.connect(func(): stats_signal_count += 1)
+	var counts = {"reality": 0, "energy": 0, "entropy": 0, "stats": 0}
+	_player_stats.reality_score_changed.connect(func(_new, _old): counts["reality"] += 1)
+	_player_stats.positive_energy_changed.connect(func(_new, _old): counts["energy"] += 1)
+	_player_stats.entropy_level_changed.connect(func(_new, _old): counts["entropy"] += 1)
+	_player_stats.stats_changed.connect(func(): counts["stats"] += 1)
 	_player_stats.modify_reality_score(10)
 	await get_tree().process_frame
-	success = assert_equal(reality_signal_count, 1, "Reality signal emitted") and success
+	success = assert_equal(counts["reality"], 1, "Reality signal emitted") and success
 	_player_stats.modify_positive_energy(10)
 	await get_tree().process_frame
-	success = assert_equal(energy_signal_count, 1, "Energy signal emitted") and success
-	success = assert_equal(entropy_signal_count, 1, "Entropy signal emitted (from PE increase)") and success
+	success = assert_equal(counts["energy"], 1, "Energy signal emitted") and success
+	success = assert_equal(counts["entropy"], 1, "Entropy signal emitted (from PE increase)") and success
 	_player_stats.modify_skill("logic", 1)
 	await get_tree().process_frame
-	success = assert_equal(stats_signal_count, 1, "Stats changed signal emitted") and success
+	success = assert_equal(counts["stats"], 1, "Stats changed signal emitted") and success
 	return success
 func test_save_load() -> bool:
 	var success = true
@@ -257,20 +253,20 @@ func test_modify_skill_limits_and_signals() -> bool:
 	_player_stats.skills["logic"] = GameConstants.Skills.MIN_SKILL_VALUE + 2
 	_player_stats.modify_skill("logic", -5)
 	success = assert_equal(_player_stats.get_skill("logic"), GameConstants.Skills.MIN_SKILL_VALUE, "Skill should clamp at MIN_SKILL_VALUE") and success
-	var signal_emitted = false
-	var connector = func(): signal_emitted = true
+	var state = {"emitted": false}
+	var connector = func(): state["emitted"] = true
 	_player_stats.stats_changed.connect(connector)
 	_player_stats.skills["logic"] = 5
-	signal_emitted = false
+	state["emitted"] = false
 	_player_stats.modify_skill("logic", 1)
-	success = assert_true(signal_emitted, "stats_changed should be emitted when value changes") and success
+	success = assert_true(state["emitted"], "stats_changed should be emitted when value changes") and success
 	_player_stats.skills["logic"] = GameConstants.Skills.MAX_SKILL_VALUE
-	signal_emitted = false
+	state["emitted"] = false
 	_player_stats.modify_skill("logic", 1)
-	success = assert_true(not signal_emitted, "stats_changed should NOT be emitted when value is already at MAX") and success
-	signal_emitted = false
+	success = assert_true(not state["emitted"], "stats_changed should NOT be emitted when value is already at MAX") and success
+	state["emitted"] = false
 	_player_stats.modify_skill("imaginary_skill", 5)
-	success = assert_true(not signal_emitted, "stats_changed should NOT be emitted for non-existent skill") and success
+	success = assert_true(not state["emitted"], "stats_changed should NOT be emitted for non-existent skill") and success
 	success = assert_equal(_player_stats.get_skill("imaginary_skill"), 0, "Non-existent skill should still return 0") and success
 	_player_stats.stats_changed.disconnect(connector)
 	return success

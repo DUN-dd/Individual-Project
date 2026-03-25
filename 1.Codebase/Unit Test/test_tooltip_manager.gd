@@ -1,4 +1,6 @@
 extends Node
+var tests_passed: int = 0
+var tests_failed: int = 0
 var tooltip_manager: Node = null
 func _ready() -> void:
 	print("[TooltipManagerTest] Starting TooltipManager unit tests...")
@@ -16,7 +18,7 @@ func _setup() -> void:
 		var root := get_tree().root
 		if root:
 			tooltip_manager = root.get_node_or_null("TooltipManager")
-	assert(tooltip_manager != null, "TooltipManager should be available")
+	_assert(tooltip_manager != null, "TooltipManager should be available")
 	print("[Test Setup] TooltipManager found")
 func _teardown() -> void:
 	if tooltip_manager and tooltip_manager.has_method("hide_tooltip"):
@@ -28,10 +30,10 @@ func _test_tooltip_show_hide() -> void:
 		return
 	if tooltip_manager.has_method("show_tooltip"):
 		tooltip_manager.show_tooltip("Test tooltip", Vector2(100, 100))
-		assert(tooltip_manager.visible if "visible" in tooltip_manager else true, "Tooltip should be visible after show")
+		_assert(tooltip_manager.visible if "visible" in tooltip_manager else true, "Tooltip should be visible after show")
 		if tooltip_manager.has_method("hide_tooltip"):
 			tooltip_manager.hide_tooltip()
-			assert(not tooltip_manager.visible if "visible" in tooltip_manager else true, "Tooltip should be hidden after hide")
+			_assert(not tooltip_manager.visible if "visible" in tooltip_manager else true, "Tooltip should be hidden after hide")
 		print("[Test] Tooltip show/hide PASSED")
 	else:
 		print("[Test] Tooltip show/hide SKIPPED: methods not available")
@@ -67,3 +69,10 @@ func _test_tooltip_positioning() -> void:
 		await get_tree().process_frame
 		tooltip_manager.hide_tooltip()
 	print("[Test] Tooltip positioning PASSED")
+func _assert(condition: bool, message: String) -> void:
+	if condition:
+		tests_passed += 1
+		print("    PASS  %s" % message)
+	else:
+		tests_failed += 1
+		print("    FAIL  %s" % message)

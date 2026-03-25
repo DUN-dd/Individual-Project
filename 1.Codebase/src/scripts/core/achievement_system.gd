@@ -97,8 +97,9 @@ var _notification_system: Variant = null
 var _audio_manager: Variant = null
 var _localization_manager: Variant = null
 func _tr(key: String) -> String:
-	if LocalizationManager:
-		return LocalizationManager.get_translation(key)
+	var localization_manager: Variant = _get_localization_manager()
+	if localization_manager and localization_manager.has_method("get_translation"):
+		return localization_manager.get_translation(key)
 	return key
 func _ready():
 	_refresh_dependencies()
@@ -300,8 +301,6 @@ func get_achievement_list() -> Array:
 	var localization_manager: Variant = _get_localization_manager()
 	for achievement_id in ACHIEVEMENTS.keys():
 		var achievement: Dictionary = ACHIEVEMENTS[achievement_id].duplicate()
-		if bool(achievement.get("hidden", false)) and not is_unlocked(achievement_id):
-			continue
 		achievement["id"] = achievement_id
 		achievement["unlocked"] = is_unlocked(achievement_id)
 		if localization_manager:
@@ -323,8 +322,8 @@ func save_achievements() -> void:
 	if not game_state:
 		_report_warning("Unable to save achievements because GameState is unavailable")
 		return
-	game_state.set_metadata("achievements", unlocked_achievements)
-	game_state.set_metadata("achievement_progress", _progress_counters)
+	game_state.set_metadata("achievements", unlocked_achievements.duplicate(true))
+	game_state.set_metadata("achievement_progress", _progress_counters.duplicate(true))
 	game_state.save_game()
 func load_achievements() -> void:
 	var game_state: Variant = _get_game_state()
@@ -373,15 +372,21 @@ func load_state_snapshot(state: Dictionary) -> void:
 	if game_state:
 		game_state.set_metadata("achievements", unlocked_achievements)
 		game_state.set_metadata("achievement_progress", _progress_counters)
+func _get_service_locator() -> Node:
+	var tree: SceneTree = get_tree()
+	if tree == null or tree.root == null:
+		return null
+	return tree.root.get_node_or_null("ServiceLocator")
 func _refresh_dependencies() -> void:
-	if not ServiceLocator:
+	var service_locator: Node = _get_service_locator()
+	if service_locator == null:
 		return
-	_event_bus = ServiceLocator.get_event_bus()
-	_error_reporter = ServiceLocator.get_error_reporter()
-	_game_state = ServiceLocator.get_game_state()
-	_notification_system = ServiceLocator.get_notification_system()
-	_audio_manager = ServiceLocator.get_audio_manager()
-	_localization_manager = ServiceLocator.get_localization_manager()
+	_event_bus = service_locator.get_event_bus()
+	_error_reporter = service_locator.get_error_reporter()
+	_game_state = service_locator.get_game_state()
+	_notification_system = service_locator.get_notification_system()
+	_audio_manager = service_locator.get_audio_manager()
+	_localization_manager = service_locator.get_localization_manager()
 func _subscribe_to_events() -> void:
 	var event_bus: Variant = _get_event_bus()
 	if not event_bus:

@@ -45,7 +45,7 @@ static func _parse_bold(text: String) -> String:
 static func _parse_italic(text: String) -> String:
 	var regex_star = RegEx.create_from_string("(?<!\\*)\\*(?!\\*)([^*]+)\\*(?!\\*)")
 	var result = regex_star.sub(text, "[i]$1[/i]", true)
-	var regex_underscore = RegEx.create_from_string("(?<!_)_(?!_)([^_]+)_(?!_)")
+	var regex_underscore = RegEx.create_from_string("(?<![\\w\\]])_(?!_)([^_]+)_(?![\\w\\[])")
 	result = regex_underscore.sub(result, "[i]$1[/i]", true)
 	return result
 static func _parse_strikethrough(text: String) -> String:

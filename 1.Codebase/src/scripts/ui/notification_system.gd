@@ -51,3 +51,9 @@ func _on_notification_removed(notification: Control):
 		if is_instance_valid(notif):
 			var tween = create_tween()
 			tween.tween_property(notif, "position:y", 60 + (i * 90), 0.3)
+func clear_all():
+	for notif in active_notifications:
+		if is_instance_valid(notif):
+			notif.queue_free()
+	active_notifications.clear()
+	notification_queue.clear()

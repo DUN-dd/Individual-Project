@@ -8,8 +8,7 @@ func _ready():
 	print("=".repeat(80) + "\n")
 	await run_all_tests()
 	print_summary()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Adding Text Events", test_add_text_events)
@@ -179,19 +178,18 @@ func test_reset() -> bool:
 	return success
 func test_signal_emissions() -> bool:
 	var success = true
-	var signal_count = 0
-	var last_event = null
-	_event_system.event_logged.connect(
-		func(event):
-			signal_count += 1
-			last_event = event
-	)
+	var state = {"count": 0, "last_event": null}
+	var handler = func(event):
+		state["count"] += 1
+		state["last_event"] = event
+	_event_system.event_logged.connect(handler)
 	_event_system.record_event("test_signal", { "data": 123 })
 	await get_tree().process_frame
-	success = assert_equal(signal_count, 1, "Signal emitted once") and success
-	success = assert_true(last_event != null, "Event data received") and success
-	success = assert_equal(last_event["type"], "test_signal", "Correct event type in signal") and success
-	success = assert_equal(last_event["details"]["data"], 123, "Correct event details in signal") and success
+	success = assert_equal(state["count"], 1, "Signal emitted once") and success
+	success = assert_true(state["last_event"] != null, "Event data received") and success
+	if state["last_event"] != null:
+		success = assert_equal(state["last_event"]["type"], "test_signal", "Correct event type in signal") and success
+		success = assert_equal(state["last_event"]["details"]["data"], 123, "Correct event details in signal") and success
 	return success
 func print_summary():
 	print("\n" + "=".repeat(80))

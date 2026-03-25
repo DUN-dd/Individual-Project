@@ -1,7 +1,11 @@
 extends RefCounted
 var metadata: Dictionary = {}
+func _duplicate_variant(value: Variant) -> Variant:
+	if value is Dictionary or value is Array:
+		return value.duplicate(true)
+	return value
 func set_value(key: String, value: Variant) -> void:
-	metadata[key] = value
+	metadata[key] = _duplicate_variant(value)
 func get_value(key: String, default_value: Variant = null) -> Variant:
 	if metadata.has(key):
 		return metadata[key]
@@ -37,7 +41,7 @@ func get_journal_entries() -> Array:
 		return (stored as Array).duplicate(false)
 	return []
 func set_journal_entries(entries: Array) -> void:
-	metadata["journal_entries"] = entries
+	metadata["journal_entries"] = entries.duplicate(true)
 func append_journal_entry(entry: Dictionary) -> void:
 	var entries = get_journal_entries()
 	entries.append(entry.duplicate(true))

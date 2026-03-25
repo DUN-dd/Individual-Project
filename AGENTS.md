@@ -2,7 +2,7 @@
 
 ## Environment & Scope
 
-- This repository targets Godot 4.7-dev2; open `project.godot` from the root or use `godot4` CLI tools for editor and runtime tasks.
+- This repository targets Godot 4.7-dev3; open `project.godot` from the root or use `godot4` CLI tools for editor and runtime tasks.
 - Source contributions belong in `1.Codebase`; the numbered planning/report folders are archival and must remain unchanged.
 - Autoload singletons such as `AudioManager`, `GameState`, and `AssetRegistry` are wired in `project.godot`; update that list whenever you add a new global service.
 
@@ -82,7 +82,7 @@
 - Keep each commit focused on one concern; describe scene or autoload touch-points in the body when necessary.
 - PRs should include a problem statement, verification notes (commands run, scenes exercised), and screenshots or clips for UI-facing changes. Link issues or sprint tickets where applicable.
 
-only edit code in folder /1.Codebase and please only Use Godot 4.7 format , dont Use Godot 3 format as it will have lot of bug! Use Godot executable at "C:\Users\dunc4\Downloads\Godot_v4.7-dev2_win64_console.exe"
+only edit code in folder /1.Codebase and please only Use Godot 4.7 format , dont Use Godot 3 format as it will have lot of bug! Use Godot executable at "C:\Users\dunc4\Downloads\Godot_v4.7-dev3_win64_console.exe"
 
 ## AI Collaboration Constraints
 

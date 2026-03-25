@@ -106,6 +106,8 @@ var _pending_music_name: String = ""
 var _pending_music_loop: bool = true
 var _pending_playlist_start: bool = false
 var _is_web: bool = false
+var _audio_output_available: bool = true
+var _audio_output_warning_emitted: bool = false
 signal voice_stream_started(sample_rate: int)
 signal voice_stream_finished()
 func _ready() -> void:
@@ -136,6 +138,7 @@ func _ready() -> void:
 		sfx_players.append(player)
 	_load_sounds()
 	_load_saved_settings()
+	_refresh_audio_output_state()
 	sync_from_audio_server()
 	update_volumes()
 func _unhandled_input(event: InputEvent) -> void:
@@ -382,6 +385,23 @@ func _get_available_sfx_player() -> AudioStreamPlayer:
 	var player: AudioStreamPlayer = sfx_players[sfx_next_index % sfx_players.size()]
 	sfx_next_index = (sfx_next_index + 1) % sfx_players.size()
 	return player
+func _detect_audio_output_available() -> bool:
+	if AudioServer.has_method("get_output_device_list"):
+		var devices_variant: Variant = AudioServer.call("get_output_device_list")
+		if devices_variant is Array:
+			return not (devices_variant as Array).is_empty()
+	return true
+func _refresh_audio_output_state() -> bool:
+	_audio_output_available = _detect_audio_output_available()
+	if not _audio_output_available and not _audio_output_warning_emitted:
+		_audio_output_warning_emitted = true
+		ErrorReporterBridge.report_warning(
+			ERROR_CONTEXT,
+			"No audio output device detected. Audio playback will stay disabled for this session.",
+		)
+	return _audio_output_available
+func is_output_available() -> bool:
+	return _refresh_audio_output_state()
 func play_music(music_name: String, loop: bool = true) -> void:
 	if not sounds.has(music_name):
 		ErrorReporterBridge.report_warning(
@@ -389,6 +409,8 @@ func play_music(music_name: String, loop: bool = true) -> void:
 			"Music track not found: %s" % music_name,
 			{ "music_name": music_name },
 		)
+		return
+	if not _refresh_audio_output_state():
 		return
 	if _is_web and not _web_audio_unlocked:
 		_pending_music_name = music_name
@@ -472,6 +494,8 @@ func play_sfx(sfx_name: String, volume_multiplier: float = 1.0) -> void:
 			"Sound effect not found: %s" % sfx_name,
 			{ "sfx_name": sfx_name },
 		)
+		return
+	if not _refresh_audio_output_state():
 		return
 	if (not gloria_voice_enabled) and sfx_name.begins_with("gloria/"):
 		_log_gloria_sfx_event("disabled", sfx_name)
@@ -659,6 +683,8 @@ func apply_volume_settings(settings: Dictionary) -> void:
 	update_volumes()
 func play_voice_stream(stream: AudioStream) -> void:
 	if voice_player == null or stream == null:
+		return
+	if not _refresh_audio_output_state():
 		return
 	current_voice_stream = stream
 	if stream is AudioStreamWAV:

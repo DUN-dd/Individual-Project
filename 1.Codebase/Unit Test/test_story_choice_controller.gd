@@ -1,8 +1,10 @@
 extends Node
+var tests_passed: int = 0
+var tests_failed: int = 0
 const StoryChoiceControllerScript = preload("res://1.Codebase/src/scripts/ui/story_choice_controller.gd")
 var controller
 var mock_scene
-func _ready():
+func _ready() -> void:
 	print("Starting StoryChoiceController Tests")
 	mock_scene = Control.new()
 	var mock_script = GDScript.new()
@@ -32,34 +34,29 @@ var ui = null
 	show_btn.name = "ShowOptionsBtn"
 	choices_area.add_child(show_btn)
 	controller = StoryChoiceControllerScript.new(mock_scene)
+	_record_result(controller != null, "StoryChoiceController instantiated")
 	await _test_choice_generation()
 	await _test_choice_processing()
 	mock_scene.queue_free()
+	print("[StoryChoiceControllerTest] Summary: %d passed, %d failed" % [tests_passed, tests_failed])
 	queue_free()
-func _test_choice_generation():
+func _test_choice_generation() -> void:
 	print("Testing Choice Generation...")
 	if GameState:
 		var old_stats = GameState.player_stats
 		GameState.player_stats = {"logic": 5, "perception": 1, "composure": 1, "empathy": 1}
 		controller.generate_choices()
 		var choices = controller.current_choices
+		_record_result(choices.size() > 0, "Choices generated")
 		if choices.size() > 0:
-			print("PASS: Choices generated")
 			var types = []
-			for c in choices: types.append(c["type"])
-			if "logic" in types:
-				print("PASS: Logic skill choice generated")
-			else:
-				print("FAIL: Logic skill choice missing")
-			if "positive" in types and "complain" in types:
-				print("PASS: Default choices present")
-			else:
-				print("FAIL: Default choices missing")
-		else:
-			print("FAIL: No choices generated")
+			for c in choices:
+				types.append(c["type"])
+			_record_result("logic" in types, "Logic skill choice generated")
+			_record_result("positive" in types and "complain" in types, "Default choices present")
 		GameState.player_stats = old_stats
 	await get_tree().process_frame
-func _test_choice_processing():
+func _test_choice_processing() -> void:
 	print("Testing Choice Processing...")
 	var mock_ui = Node.new()
 	var ui_script = GDScript.new()
@@ -75,5 +72,14 @@ func display_story(txt): pass
 	if controller.current_choices.size() > 0:
 		var choice = controller.current_choices[0]
 		controller.process_choice(choice)
-		print("PASS: process_choice executed without error")
+		_record_result(true, "process_choice executed without error")
+	else:
+		_record_result(false, "process_choice executed without error")
 	await get_tree().process_frame
+func _record_result(condition: bool, message: String) -> void:
+	if condition:
+		tests_passed += 1
+		print("PASS: %s" % message)
+	else:
+		tests_failed += 1
+		print("FAIL: %s" % message)

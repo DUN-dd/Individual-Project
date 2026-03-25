@@ -21,14 +21,14 @@ runs:
   steps:
     - name: Cache Godot executable
       id: cache-godot
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: godot_executable
         key: godot-${{ inputs.godot-version }}-linux-x86_64
 
     - name: Cache Godot export templates
       id: cache-templates
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: godot_export_templates
         key: godot-templates-${{ inputs.godot-version-full }}-linux-x86_64

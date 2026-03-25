@@ -17,7 +17,7 @@ shadow_size = 4
 shadow_color = Color(0, 0, 0, 0.3)
 
 [node name="AssetCard" type="Control"]
-custom_minimum_size = Vector2(300, 140)
+custom_minimum_size = Vector2(300, 220)
 script = ExtResource("1")
 
 [node name="Panel" type="Panel" parent="."]
@@ -100,7 +100,7 @@ text = "Short description of the asset that provides context."
 autowrap = true
 autowrap_mode = 3
 clip_text = false
-max_lines_visible = -1
+max_lines_visible = 5
 
 [node name="HoverEffect" type="ColorRect" parent="Panel"]
 visible = false

@@ -1,4 +1,6 @@
 extends Node
+var tests_passed: int = 0
+var tests_failed: int = 0
 const TrolleyGeneratorScript = preload("res://1.Codebase/src/scripts/core/trolley_problem_generator.gd")
 var generator: Node
 var mock_teammate_system: MockTeammateSystem
@@ -34,9 +36,9 @@ func _teardown() -> void:
 		ServiceLocator.unregister_service("AchievementSystem")
 func _test_initialization() -> void:
 	print("[Test] Initialization...")
-	assert(generator != null, "Generator should be created")
-	assert(generator.has_signal("dilemma_generated"), "Should have signal dilemma_generated")
-	assert(generator.has_signal("dilemma_resolved"), "Should have signal dilemma_resolved")
+	_assert(generator != null, "Generator should be created")
+	_assert(generator.has_signal("dilemma_generated"), "Should have signal dilemma_generated")
+	_assert(generator.has_signal("dilemma_resolved"), "Should have signal dilemma_resolved")
 	print("[Test] Initialization PASSED")
 func _test_json_parsing_valid() -> void:
 	print("[Test] Valid JSON parsing...")
@@ -66,12 +68,12 @@ func _test_json_parsing_valid() -> void:
 	}
 	"""
 	var data = generator._parse_dilemma_json(valid_json)
-	assert(data.has("scenario"), "Should parse scenario")
-	assert(data.scenario == "Test scenario", "Scenario text match")
-	assert(data.choices.size() == 2, "Should parse 2 choices")
-	assert(data.choices[0].id == "c1", "Choice 1 ID match")
-	assert(data.choices[0].relationship_changes[0].target == "gloria", "Relationship target match")
-	assert(data.thematic_point == "Life is hard", "Theme match")
+	_assert(data.has("scenario"), "Should parse scenario")
+	_assert(data.scenario == "Test scenario", "Scenario text match")
+	_assert(data.choices.size() == 2, "Should parse 2 choices")
+	_assert(data.choices[0].id == "c1", "Choice 1 ID match")
+	_assert(data.choices[0].relationship_changes[0].target == "gloria", "Relationship target match")
+	_assert(data.thematic_point == "Life is hard", "Theme match")
 	print("[Test] Valid JSON parsing PASSED")
 func _test_json_parsing_markdown() -> void:
 	print("[Test] Markdown JSON parsing...")
@@ -104,9 +106,9 @@ func _test_json_parsing_markdown() -> void:
 	End of text.
 	"""
 	var data = generator._parse_dilemma_json(markdown_json)
-	assert(not data.is_empty(), "Should parse from markdown")
-	assert(data.scenario == "Markdown scenario", "Scenario match")
-	assert(data.choices.size() == 2, "Choices count match")
+	_assert(not data.is_empty(), "Should parse from markdown")
+	_assert(data.scenario == "Markdown scenario", "Scenario match")
+	_assert(data.choices.size() == 2, "Choices count match")
 	print("[Test] Markdown JSON parsing PASSED")
 func _test_json_parsing_invalid() -> void:
 	print("[Test] Invalid JSON parsing...")
@@ -116,12 +118,12 @@ func _test_json_parsing_invalid() -> void:
 		ErrorReporter.enable_console_logs = false
 	var invalid_json = "{ broken json }"
 	var data = generator._parse_dilemma_json(invalid_json)
-	assert(data.is_empty(), "Should return empty dict for invalid JSON")
+	_assert(data.is_empty(), "Should return empty dict for invalid JSON")
 	var empty_str = ""
 	data = generator._parse_dilemma_json(empty_str)
 	if ErrorReporter != null:
 		ErrorReporter.enable_console_logs = previous_console_logs
-	assert(data.is_empty(), "Should return empty dict for empty string")
+	_assert(data.is_empty(), "Should return empty dict for empty string")
 	print("[Test] Invalid JSON parsing PASSED")
 func _test_dilemma_resolution() -> void:
 	print("[Test] Dilemma resolution...")
@@ -147,31 +149,31 @@ func _test_dilemma_resolution() -> void:
 	var resolve_state := { "emitted": false }
 	var _on_resolved = func(id, res):
 		resolve_state["emitted"] = true
-		assert(id == "resolve_test", "Signal ID match")
+		_assert(id == "resolve_test", "Signal ID match")
 	generator.dilemma_resolved.connect(_on_resolved)
 	var result = generator.resolve_dilemma("resolve_test")
-	assert(not result.is_empty(), "Should return resolution result")
-	assert(result.choice_id == "resolve_test", "Result ID match")
-	assert(bool(resolve_state.get("emitted", false)), "Signal should be emitted")
-	assert(mock_teammate_system.last_update.source == "mock_char", "Teammate system source should be relationship target")
-	assert(mock_teammate_system.last_update.target == "player", "Teammate system target should be player")
-	assert(mock_achievement_system.dilemma_resolved_called, "Achievement system called")
+	_assert(not result.is_empty(), "Should return resolution result")
+	_assert(result.choice_id == "resolve_test", "Result ID match")
+	_assert(bool(resolve_state.get("emitted", false)), "Signal should be emitted")
+	_assert(mock_teammate_system.last_update.source == "mock_char", "Teammate system source should be relationship target")
+	_assert(mock_teammate_system.last_update.target == "player", "Teammate system target should be player")
+	_assert(mock_achievement_system.dilemma_resolved_called, "Achievement system called")
 	var history = generator.get_dilemma_history()
-	assert(history.size() > 0, "History updated")
-	assert(history[0].choice_id == "resolve_test", "History content match")
-	assert(generator.current_dilemma.is_empty(), "Current dilemma cleared")
+	_assert(history.size() > 0, "History updated")
+	_assert(history[0].choice_id == "resolve_test", "History content match")
+	_assert(generator.current_dilemma.is_empty(), "Current dilemma cleared")
 	print("[Test] Dilemma resolution PASSED")
 func _test_preset_generation() -> void:
 	print("[Test] Preset generation...")
 	var preset_state := { "generated": false }
 	var _on_generated = func(dilemma):
 		preset_state["generated"] = true
-		assert(dilemma.has("preset"), "Should be marked as preset")
+		_assert(dilemma.has("preset"), "Should be marked as preset")
 	generator.dilemma_generated.connect(_on_generated)
 	generator._generate_preset_dilemma("positive_energy_trap")
-	assert(bool(preset_state.get("generated", false)), "Should generate preset")
-	assert(not generator.current_dilemma.is_empty(), "Current dilemma populated")
-	assert(generator.current_dilemma.template_type == "positive_energy_trap", "Template type match")
+	_assert(bool(preset_state.get("generated", false)), "Should generate preset")
+	_assert(not generator.current_dilemma.is_empty(), "Current dilemma populated")
+	_assert(generator.current_dilemma.template_type == "positive_energy_trap", "Template type match")
 	print("[Test] Preset generation PASSED")
 class MockTeammateSystem extends RefCounted:
 	var last_update = {}
@@ -181,3 +183,10 @@ class MockAchievementSystem extends RefCounted:
 	var dilemma_resolved_called = false
 	func check_dilemma_resolved():
 		dilemma_resolved_called = true
+func _assert(condition: bool, message: String) -> void:
+	if condition:
+		tests_passed += 1
+		print("    PASS  %s" % message)
+	else:
+		tests_failed += 1
+		print("    FAIL  %s" % message)
