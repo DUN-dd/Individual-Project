@@ -148,7 +148,7 @@ func get_recent_choices(scene_count: int = 10) -> Array[Dictionary]:
 	var results: Array[Dictionary] = []
 	var cutoff_scene = current_scene_number - scene_count
 	for choice in recorded_choices:
-		if choice["scene_number"] >= cutoff_scene:
+		if choice["scene_number"] > cutoff_scene:
 			results.append(choice)
 	return results
 func get_choices_with_pending_consequences() -> Array[Dictionary]:
@@ -170,7 +170,7 @@ func get_context_for_ai(language: String = "en") -> String:
 	if language == "en":
 		context = "Recent player choices that may have consequences:\n"
 	else:
-		context = "The player's recent choices may have consequences:\n"
+		context = LocalizationManager.get_translation("BUTTERFLY_TRACKER_CONTEXT", language) if LocalizationManager else "The player's recent choices may have consequences:\n"
 	for choice in recent:
 		var scenes_ago = current_scene_number - choice["scene_number"]
 		var pending = 0

@@ -137,16 +137,15 @@ func _test_apply_to_rich_text() -> void:
 	print("[Test] Apply to rich text PASSED ")
 func _test_signal_emission() -> void:
 	print("[Test] Signal emission...")
-	var signal_received = false
-	var signal_scale = 0.0
+	var state = {"received": false, "scale": 0.0}
 	var signal_handler = func(scale: float):
-		signal_received = true
-		signal_scale = scale
+		state["received"] = true
+		state["scale"] = scale
 	FontManager.font_size_changed.connect(signal_handler)
 	FontManager.set_font_size(FontManager.FontSize.LARGE)
 	await get_tree().create_timer(0.05).timeout
-	assert(signal_received, "font_size_changed signal should be emitted")
-	assert(signal_scale == 1.25, "Signal should contain correct scale value")
+	assert(state["received"], "font_size_changed signal should be emitted")
+	assert(state["scale"] == 1.25, "Signal should contain correct scale value")
 	FontManager.font_size_changed.disconnect(signal_handler)
 	print("[Test] Signal emission PASSED ")
 func _test_save_load_settings() -> void:

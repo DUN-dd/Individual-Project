@@ -60,7 +60,6 @@ func set_font_size(size: int):
 		current_font_size = size
 		current_multiplier = font_size_multipliers[size]
 		font_size_changed.emit(current_multiplier)
-		save_font_settings()
 		_report_info("Font size changed to: %s (%sx)" % [get_font_size_name(), current_multiplier])
 func get_font_size() -> int:
 	return current_font_size

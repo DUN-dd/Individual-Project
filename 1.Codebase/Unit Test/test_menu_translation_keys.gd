@@ -36,7 +36,7 @@ func _ready():
 	var slot_fmt = LocalizationManager.get_translation("MENU_SLOT_FMT", "en")
 	if slot_fmt != "MENU_SLOT_FMT":
 		var formatted = slot_fmt % 3
-		print("  MENU_SLOT_FMT %% 3 = '%s'" % formatted)
+		print("  MENU_SLOT_FMT %% 3 = '" + formatted + "'")
 		print("  ✓ Slot formatting works")
 	else:
 		print("  ❌ Cannot test MENU_SLOT_FMT formatting: key not found")

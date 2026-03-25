@@ -33,6 +33,8 @@ func run_test(test_name: String, test_func: Callable):
 func setup_test_environment():
 	_game_state = get_node_or_null("/root/GameState")
 	_save_system = get_node_or_null("/root/SaveLoadSystem")
+	if not _save_system and _game_state and _game_state.has_method("get_save_load_system"):
+		_save_system = _game_state.get_save_load_system()
 	if not _game_state:
 		print("      WARNING: GameState autoload not available")
 	if not _save_system:
