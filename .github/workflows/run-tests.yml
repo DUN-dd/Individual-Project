@@ -140,10 +140,10 @@ jobs:
           fi
 
           echo "" >> $SUMMARY_FILE
-          echo "<details><summary>View Full Logs</summary>" >> $SUMMARY_FILE
+          echo "<details><summary>View Full Logs (last 200 lines)</summary>" >> $SUMMARY_FILE
           echo "" >> $SUMMARY_FILE
           echo '```' >> $SUMMARY_FILE
-          cat "$OUTPUT_FILE" >> $SUMMARY_FILE
+          tail -n 200 "$OUTPUT_FILE" >> $SUMMARY_FILE
           echo '```' >> $SUMMARY_FILE
           echo "</details>" >> $SUMMARY_FILE
 
@@ -157,13 +157,18 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const summary = fs.readFileSync('test-results/summary.md', 'utf8');
-            github.rest.issues.createComment({
+            let summary = fs.readFileSync('test-results/summary.md', 'utf8');
+            const MAX = 65000;
+            if (summary.length > MAX) {
+              const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+              summary = summary.substring(0, MAX) + `\n\n_[(truncated) — full output in Actions](${runUrl})_`;
+            }
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: summary
-            })
+            });
 
       - name: Final Status Check
         if: always()
