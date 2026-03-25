@@ -24,8 +24,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	cleanup_test_files()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Autosave Creation", test_autosave)

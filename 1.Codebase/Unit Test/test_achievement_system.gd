@@ -28,7 +28,6 @@ func _ready() -> void:
 	_restore_state()
 	print("[AchievementSystemTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _backup_state() -> void:
 	initial_achievements = AchievementSystem.unlocked_achievements.duplicate(true)
 	initial_progress = AchievementSystem._progress_counters.duplicate(true)

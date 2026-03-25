@@ -16,8 +16,7 @@ func _ready():
 	run_test("test_reset_clears_state", test_reset_clears_state())
 	run_test("test_event_history", test_event_history())
 	print_summary()
-	await get_tree().create_timer(0.5).timeout
-	get_tree().quit()
+	queue_free()
 func run_test(test_name: String, result: bool) -> void:
 	var status := " PASS" if result else " FAIL"
 	print("%s: %s" % [status, test_name])

@@ -9,8 +9,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	restore_initial_state()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func save_initial_state():
 	if GameState:
 		_initial_state = {

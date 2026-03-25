@@ -28,8 +28,7 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await _run_checks()
 	_print_summary()
-	await get_tree().create_timer(0.5).timeout
-	get_tree().quit()
+	queue_free()
 func _run_checks() -> void:
 	var overlay_script: GDScript = preload("res://1.Codebase/src/scripts/core/ui_debug_overlay.gd")
 	for scene_path in SCENES_TO_CHECK:

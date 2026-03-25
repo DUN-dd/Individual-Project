@@ -11,8 +11,7 @@ func _ready():
 	run_test("test_coordinator_initialization", test_coordinator_initialization())
 	run_test("test_story_irrelevant_ai_purposes", test_story_irrelevant_ai_purposes())
 	print_summary()
-	await get_tree().create_timer(0.5).timeout
-	get_tree().quit()
+	queue_free()
 func run_test(test_name: String, result: bool) -> void:
 	var status := " PASS" if result else " FAIL"
 	print("%s: %s" % [status, test_name])

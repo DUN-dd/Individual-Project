@@ -32,4 +32,4 @@ func test_dissonance_ui_update():
 	prayer_input.free()
 func _ready():
 	test_dissonance_ui_update()
-	get_tree().quit()
+	queue_free()
