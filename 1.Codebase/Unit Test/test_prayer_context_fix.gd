@@ -58,4 +58,4 @@ func _ready():
 	test_context_consistency()
 	print("")
 	print("===== All Tests Passed =====")
-	get_tree().quit()
+	queue_free()

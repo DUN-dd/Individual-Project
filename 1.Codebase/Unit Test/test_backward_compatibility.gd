@@ -9,8 +9,7 @@ func _ready():
 	print("=".repeat(80) + "\n")
 	await run_all_tests()
 	print_summary()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("PlayerStats: Legacy Save Format", test_player_stats_legacy)
 	await run_test("EventLogSystem: Legacy Save Format", test_event_log_legacy)

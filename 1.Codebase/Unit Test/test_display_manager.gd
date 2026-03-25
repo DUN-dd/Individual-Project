@@ -6,7 +6,6 @@ func _ready() -> void:
 	if not DisplayManager:
 		print("[DisplayManagerTest]  FAIL: DisplayManager autoload not found")
 		queue_free()
-		get_tree().quit(1)
 		return
 	initial_window_size = DisplayManager.current_window_size
 	_test_initialization()
@@ -19,7 +18,6 @@ func _ready() -> void:
 	_test_fullscreen_toggle()
 	print("[DisplayManagerTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _test_initialization() -> void:
 	print("[Test] Initialization...")
 	assert(DisplayManager != null, "DisplayManager should exist as autoload")

@@ -8,8 +8,7 @@ func _ready():
 	print("=".repeat(80) + "\n")
 	await run_all_tests()
 	print_summary()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Reality Score Modification", test_reality_score_modification)

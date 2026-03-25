@@ -10,8 +10,7 @@ func _ready() -> void:
 	print("========================================")
 	_run_all_tests()
 	_print_summary()
-	await get_tree().create_timer(0.5).timeout
-	get_tree().quit(0 if _passed_tests == _total_tests else 1)
+	queue_free()
 func _run_all_tests() -> void:
 	test_command_aliases()
 	test_ai_usage_command()

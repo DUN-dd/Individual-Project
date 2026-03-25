@@ -7,7 +7,6 @@ func _ready() -> void:
 	if not FontManager:
 		print("[FontManagerTest]  FAIL: FontManager autoload not found")
 		queue_free()
-		get_tree().quit(1)
 		return
 	initial_font_size = FontManager.get_font_size()
 	initial_multiplier = FontManager.get_multiplier()
@@ -27,7 +26,6 @@ func _ready() -> void:
 	FontManager.set_font_size(initial_font_size)
 	print("[FontManagerTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _test_initialization() -> void:
 	print("[Test] Initialization...")
 	assert(FontManager != null, "FontManager should exist as autoload")

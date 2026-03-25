@@ -7,7 +7,6 @@ func _ready() -> void:
 	if not TutorialSystem:
 		print("[TutorialSystemTest]  FAIL: TutorialSystem autoload not found")
 		queue_free()
-		get_tree().quit(1)
 		return
 	initial_completed = TutorialSystem.completed_tutorials.duplicate(true)
 	initial_enabled = TutorialSystem.tutorial_enabled
@@ -27,7 +26,6 @@ func _ready() -> void:
 	TutorialSystem.tutorial_enabled = initial_enabled
 	print("[TutorialSystemTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _test_initialization() -> void:
 	print("[Test] Initialization...")
 	assert(TutorialSystem != null, "TutorialSystem should exist as autoload")

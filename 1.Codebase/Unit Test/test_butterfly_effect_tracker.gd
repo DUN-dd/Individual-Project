@@ -35,7 +35,6 @@ func _ready() -> void:
 	tracker.queue_free()
 	print("[ButterflyEffectTrackerTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _on_choice_recorded(choice_id: String) -> void:
 	signal_choice_recorded = true
 	last_choice_id = choice_id

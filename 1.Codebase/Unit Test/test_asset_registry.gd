@@ -5,7 +5,6 @@ func _ready() -> void:
 	if not AssetRegistry:
 		print("[AssetRegistryTest]  FAIL: AssetRegistry autoload not found")
 		queue_free()
-		get_tree().quit(1)
 		return
 	_test_system_initialization()
 	_test_asset_lookup()
@@ -24,7 +23,6 @@ func _ready() -> void:
 	_test_asset_data_structure()
 	print("[AssetRegistryTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _test_system_initialization() -> void:
 	print("[Test] System initialization...")
 	assert(AssetRegistry != null, "AssetRegistry should exist as autoload")

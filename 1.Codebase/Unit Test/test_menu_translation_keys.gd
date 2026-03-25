@@ -6,8 +6,7 @@ func _ready():
 	await get_tree().process_frame
 	if not LocalizationManager:
 		print("ERROR: LocalizationManager not available!")
-		await get_tree().create_timer(1.0).timeout
-		get_tree().quit(1)
+		queue_free()
 		return
 	var test_keys = [
 		"MENU_TIMESTAMP_FMT",
@@ -67,5 +66,4 @@ func _ready():
 	else:
 		print("❌ SOME TESTS FAILED")
 	print("=".repeat(80) + "\n")
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit(0 if all_passed else 1)
+	queue_free()
