@@ -238,7 +238,7 @@ MENU_SLOT_FMT,Slot %d,槽位 %d,Steckplatz %d
 MENU_UNKNOWN_TIME,Unknown time,未知時間,Unbekannte Zeit
 MENU_TIMESTAMP_FORMAT,%04d-%02d-%02d %02d:%02d,%04d年%02d月%02d日 %02d:%02d,%04d-%02d-%02d %02d:%02d
 MENU_TIMESTAMP_FMT,%04d-%02d-%02d %02d:%02d,%04d年%02d月%02d日 %02d:%02d,%04d-%02d-%02d %02d:%02d
-MENU_LAST_SAVE_FMT,Last save: Reality %d | Missions %d | %s | %s,最近存檔:現實值 %d｜任務完成 %d｜%s｜%s,Letzte Speicherung: Reality %d | Missionen %d | %s | %S
+MENU_LAST_SAVE_FMT,Last save: Reality %d | Missions %d | %s | %s,最近存檔:現實值 %d｜任務完成 %d｜%s｜%s,Letzte Speicherung: Reality %d | Missionen %d | %s | %s
 SAVELOAD_TITLE,Save / Load,存檔 / 讀檔,Speichern / Laden
 SAVELOAD_SUBTITLE,Manage your progress,管理你的冒險進度,Verwalten Sie Ihren Fortschritt
 SAVELOAD_INFO,"Choose a slot to load, overwrite, or delete. Autosave data appears above when available.",選擇存檔槽即可載入、覆寫或刪除;自動存檔會顯示在上方。,"Wählen Sie einen Slot zum Laden, Überschreiben oder Löschen aus. Daten zur automatischen Speicherung werden oben angezeigt, sofern verfügbar."

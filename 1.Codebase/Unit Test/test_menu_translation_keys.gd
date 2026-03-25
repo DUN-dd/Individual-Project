@@ -36,7 +36,7 @@ func _ready():
 	var slot_fmt = LocalizationManager.get_translation("MENU_SLOT_FMT", "en")
 	if slot_fmt != "MENU_SLOT_FMT":
 		var formatted = slot_fmt % 3
-		print("  MENU_SLOT_FMT % 3 = '%s'" % formatted)
+		print("  MENU_SLOT_FMT %% 3 = '%s'" % formatted)
 		print("  ✓ Slot formatting works")
 	else:
 		print("  ❌ Cannot test MENU_SLOT_FMT formatting: key not found")
@@ -45,7 +45,7 @@ func _ready():
 	var timestamp_fmt = LocalizationManager.get_translation("MENU_TIMESTAMP_FMT", "en")
 	if timestamp_fmt != "MENU_TIMESTAMP_FMT":
 		var formatted = timestamp_fmt % [2026, 2, 25, 14, 30]
-		print("  MENU_TIMESTAMP_FMT % [2026, 2, 25, 14, 30] = '%s'" % formatted)
+		print("  MENU_TIMESTAMP_FMT %% [2026, 2, 25, 14, 30] = '%s'" % formatted)
 		print("  ✓ Timestamp formatting works")
 	else:
 		print("  ❌ Cannot test MENU_TIMESTAMP_FMT formatting: key not found")
@@ -54,7 +54,7 @@ func _ready():
 	var last_save_fmt = LocalizationManager.get_translation("MENU_LAST_SAVE_FMT", "en")
 	if last_save_fmt != "MENU_LAST_SAVE_FMT":
 		var formatted = last_save_fmt % [85, 12, "Slot 3", "2026-02-25 14:30"]
-		print("  MENU_LAST_SAVE_FMT % [85, 12, 'Slot 3', '2026-02-25 14:30'] = '%s'" % formatted)
+		print("  MENU_LAST_SAVE_FMT %% [85, 12, 'Slot 3', '2026-02-25 14:30'] = '%s'" % formatted)
 		print("  ✓ Last save formatting works")
 	else:
 		print("  ❌ Cannot test MENU_LAST_SAVE_FMT formatting: key not found")
