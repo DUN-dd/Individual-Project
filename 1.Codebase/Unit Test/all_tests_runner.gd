@@ -320,7 +320,8 @@ func _test_ai_system_quick() -> void:
 		(LocalizationManager.get_translation("TEST_STAT_MODIFIER", "zh") if LocalizationManager else "Test") + " ZH",
 		["test"], 2, "test",
 	)
-	assert_test(AIManager.memory_store.get_note_count() > 0, "AI note registration works")
+	var note_count: int = AIManager.memory_store.get_note_count()
+	assert_test(note_count > 0, "AI note registration works")
 	AIManager.clear_notes()
 	assert_test(AIManager.gemini_model is String, "Gemini model configured")
 	assert_test(AIManager.openrouter_model is String, "OpenRouter model configured")
