@@ -253,20 +253,20 @@ func test_modify_skill_limits_and_signals() -> bool:
 	_player_stats.skills["logic"] = GameConstants.Skills.MIN_SKILL_VALUE + 2
 	_player_stats.modify_skill("logic", -5)
 	success = assert_equal(_player_stats.get_skill("logic"), GameConstants.Skills.MIN_SKILL_VALUE, "Skill should clamp at MIN_SKILL_VALUE") and success
-	var signal_emitted = false
-	var connector = func(): signal_emitted = true
+	var state = {"emitted": false}
+	var connector = func(): state["emitted"] = true
 	_player_stats.stats_changed.connect(connector)
 	_player_stats.skills["logic"] = 5
-	signal_emitted = false
+	state["emitted"] = false
 	_player_stats.modify_skill("logic", 1)
-	success = assert_true(signal_emitted, "stats_changed should be emitted when value changes") and success
+	success = assert_true(state["emitted"], "stats_changed should be emitted when value changes") and success
 	_player_stats.skills["logic"] = GameConstants.Skills.MAX_SKILL_VALUE
-	signal_emitted = false
+	state["emitted"] = false
 	_player_stats.modify_skill("logic", 1)
-	success = assert_true(not signal_emitted, "stats_changed should NOT be emitted when value is already at MAX") and success
-	signal_emitted = false
+	success = assert_true(not state["emitted"], "stats_changed should NOT be emitted when value is already at MAX") and success
+	state["emitted"] = false
 	_player_stats.modify_skill("imaginary_skill", 5)
-	success = assert_true(not signal_emitted, "stats_changed should NOT be emitted for non-existent skill") and success
+	success = assert_true(not state["emitted"], "stats_changed should NOT be emitted for non-existent skill") and success
 	success = assert_equal(_player_stats.get_skill("imaginary_skill"), 0, "Non-existent skill should still return 0") and success
 	_player_stats.stats_changed.disconnect(connector)
 	return success

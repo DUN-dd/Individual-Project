@@ -27,6 +27,7 @@ func _ready():
 	cleanup_test_files()
 	queue_free()
 func run_all_tests():
+	cleanup_test_files()
 	await run_test("Initialization", test_initialization)
 	await run_test("Autosave Creation", test_autosave)
 	await run_test("Save to Slot", test_save_to_slot)
