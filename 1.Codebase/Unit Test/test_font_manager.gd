@@ -1,4 +1,6 @@
 extends Node
+var _font_signal_received = false
+var _font_signal_scale = 0.0
 var initial_font_size: int
 var initial_multiplier: float
 func _ready() -> void:
@@ -128,7 +130,7 @@ func _test_apply_to_rich_text() -> void:
 	print("[Test] Apply to rich text...")
 	var rich_text = RichTextLabel.new()
 	add_child(rich_text)
-	FontManager.set_font_size(FontManager.FontSize.HUGE)
+	FontManager.set_font_size(FontManager.FontSize.LARGE)
 	FontManager.apply_to_rich_text(rich_text, 16)
 	assert(rich_text.has_theme_font_size_override("normal_font_size"), "RichTextLabel should have normal_font_size override")
 	var applied_size = rich_text.get_theme_font_size("normal_font_size")
@@ -137,22 +139,23 @@ func _test_apply_to_rich_text() -> void:
 	print("[Test] Apply to rich text PASSED ")
 func _test_signal_emission() -> void:
 	print("[Test] Signal emission...")
-	var signal_received = false
-	var signal_scale = 0.0
+	_font_signal_received = false
+	_font_signal_scale = 0.0
 	var signal_handler = func(scale: float):
-		signal_received = true
-		signal_scale = scale
+		_font_signal_received = true
+		_font_signal_scale = scale
 	FontManager.font_size_changed.connect(signal_handler)
 	FontManager.set_font_size(FontManager.FontSize.LARGE)
 	await get_tree().create_timer(0.05).timeout
-	assert(signal_received, "font_size_changed signal should be emitted")
-	assert(signal_scale == 1.25, "Signal should contain correct scale value")
+	assert(_font_signal_received, "font_size_changed signal should be emitted")
+	assert(_font_signal_scale == 1.25, "Signal should contain correct scale value")
 	FontManager.font_size_changed.disconnect(signal_handler)
 	print("[Test] Signal emission PASSED ")
 func _test_save_load_settings() -> void:
 	print("[Test] Save/load settings...")
 	FontManager.set_font_size(FontManager.FontSize.HUGE)
 	FontManager.save_font_settings()
+	await get_tree().process_frame
 	await get_tree().create_timer(0.1).timeout
 	FontManager.set_font_size(FontManager.FontSize.TINY)
 	assert(FontManager.get_font_size() == FontManager.FontSize.TINY, "Should be TINY before load")

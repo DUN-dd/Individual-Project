@@ -1,6 +1,8 @@
 extends Node
 var EventLogSystemScript = preload("res://1.Codebase/src/scripts/core/event_log_system.gd")
 var _event_system = null
+var _signal_count = 0
+var _last_signal_event = null
 var _test_results = []
 func _ready():
 	print("\n" + "=".repeat(80))
@@ -178,19 +180,28 @@ func test_reset() -> bool:
 	return success
 func test_signal_emissions() -> bool:
 	var success = true
-	var signal_count = 0
-	var last_event = null
+	_signal_count = 0
+	_last_signal_event = null
+
+	var GameStateScript = load("res://1.Codebase/src/scripts/core/game_state.gd")
+	var dummy_state = get_node_or_null("/root/GameState")
+	if not dummy_state:
+		dummy_state = GameStateScript.new()
+		dummy_state.name = "GameState"
+		add_child(dummy_state)
+	_event_system.set_game_state(dummy_state)
+
 	_event_system.event_logged.connect(
 		func(event):
-			signal_count += 1
-			last_event = event
+			_signal_count += 1
+			_last_signal_event = event
 	)
 	_event_system.record_event("test_signal", { "data": 123 })
 	await get_tree().process_frame
-	success = assert_equal(signal_count, 1, "Signal emitted once") and success
-	success = assert_true(last_event != null, "Event data received") and success
-	success = assert_equal(last_event["type"], "test_signal", "Correct event type in signal") and success
-	success = assert_equal(last_event["details"]["data"], 123, "Correct event details in signal") and success
+	success = assert_equal(_signal_count, 1, "Signal emitted once") and success
+	success = assert_true(_last_signal_event != null, "Event data received") and success
+	success = assert_equal(_last_signal_event["type"], "test_signal", "Correct event type in signal") and success
+	success = assert_equal(_last_signal_event["details"]["data"], 123, "Correct event details in signal") and success
 	return success
 func print_summary():
 	print("\n" + "=".repeat(80))

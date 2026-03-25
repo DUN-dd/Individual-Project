@@ -1,4 +1,6 @@
 extends Node
+var _gamestate_signal_received = false
+var _gamestate_received_value = 0
 var _test_results = []
 var _initial_state = { }
 func _ready():
@@ -150,19 +152,17 @@ func test_debuff_integration() -> bool:
 	return success
 func test_signal_propagation() -> bool:
 	var success = true
-	if not GameState:
-		return false
-	var signal_received = false
-	var received_value = 0
-	var connection = func(new_value):
-		signal_received = true
-		received_value = new_value
+	_gamestate_signal_received = false
+	_gamestate_received_value = 0
+	var connection = func(value):
+		_gamestate_signal_received = true
+		_gamestate_received_value = value
 	GameState.reality_score_changed.connect(connection)
 	var original = GameState.reality_score
 	GameState.modify_reality_score(5, LocalizationManager.get_translation("TEST_SIGNAL", "zh") if LocalizationManager else "Signal Test")
 	await get_tree().process_frame
-	success = assert_true(signal_received, "Signal received") and success
-	success = assert_equal(received_value, original + 5, "Signal value correct") and success
+	success = assert_true(_gamestate_signal_received, "Signal received") and success
+	success = assert_equal(_gamestate_received_value, original + 5, "Signal value correct") and success
 	GameState.reality_score_changed.disconnect(connection)
 	GameState.modify_reality_score(-5)
 	return success

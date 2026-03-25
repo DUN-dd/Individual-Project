@@ -39,6 +39,9 @@ func use_cognitive_dissonance_choice() -> void:
 		if cognitive_dissonance_choices_left <= 0:
 			cognitive_dissonance_active = false
 			_report_info("Cognitive Dissonance worn off naturally.")
+			for i in range(active_debuffs.size() - 1, -1, -1):
+				if active_debuffs[i]["name"] == GameConstants.Debuffs.COGNITIVE_DISSONANCE_NAME:
+					active_debuffs.remove_at(i)
 func has_debuff(debuff_name: String) -> bool:
 	for debuff in active_debuffs:
 		if debuff["name"] == debuff_name:

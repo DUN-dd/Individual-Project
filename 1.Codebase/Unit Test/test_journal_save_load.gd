@@ -31,12 +31,21 @@ func run_test(test_name: String, test_func: Callable):
 		print("   ✗ %s FAILED" % test_name)
 	teardown_test_environment()
 func setup_test_environment():
+	var GameStateScript = load("res://1.Codebase/src/scripts/core/game_state.gd")
+	var SaveLoadSystemScript = load("res://1.Codebase/src/scripts/core/save_load_system.gd")
 	_game_state = get_node_or_null("/root/GameState")
-	_save_system = get_node_or_null("/root/SaveLoadSystem")
 	if not _game_state:
-		print("      WARNING: GameState autoload not available")
+		_game_state = GameStateScript.new()
+		_game_state.name = "GameState"
+		add_child(_game_state)
+
+	_save_system = get_node_or_null("/root/SaveLoadSystem")
 	if not _save_system:
-		print("      WARNING: SaveLoadSystem autoload not available")
+		_save_system = SaveLoadSystemScript.new()
+		_save_system.name = "SaveLoadSystem"
+		add_child(_save_system)
+
+	_save_system.set_game_state(_game_state)
 func teardown_test_environment():
 	if _game_state:
 		_game_state.set_journal_entries([])
