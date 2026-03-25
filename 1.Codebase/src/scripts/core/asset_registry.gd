@@ -327,7 +327,14 @@ func format_assets_for_prompt(asset_list: Array) -> String:
 	if asset_list.is_empty():
 		return "No symbolic assets have been defined."
 	var lines: Array = []
-	lines.append(_tr("ASSET_REG_AVAILABLE_ASSETS"))
+	if LocalizationManager:
+		var en_header = LocalizationManager.get_translation("ASSET_REG_AVAILABLE_ASSETS", "en")
+		var zh_header = LocalizationManager.get_translation("ASSET_REG_AVAILABLE_ASSETS", "zh")
+		lines.append(en_header)
+		if zh_header != en_header:
+			lines.append(zh_header)
+	else:
+		lines.append(_tr("ASSET_REG_AVAILABLE_ASSETS"))
 	lines.append(_tr("ASSET_REG_TABLE_HEADER"))
 	lines.append("")
 	for asset in asset_list:

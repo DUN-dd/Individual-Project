@@ -10,6 +10,7 @@ class MockGameState:
 	func get_save_data() -> Dictionary:
 		save_data_called = true
 		return {
+			"reality_score": 42,
 			"test_value": 42,
 			"test_string": "Hello Test",
 			"nested": { "key": "value" },
@@ -24,8 +25,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	cleanup_test_files()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Autosave Creation", test_autosave)
@@ -43,6 +43,7 @@ func run_all_tests():
 	await run_test("Slot Clamping", test_slot_clamping)
 	await run_test("Empty GameState Handling", test_empty_gamestate)
 func run_test(test_name: String, test_func: Callable):
+	cleanup_test_files()
 	_save_system = SaveLoadSystemScript.new()
 	_mock_game_state = MockGameState.new()
 	_save_system.set_game_state(_mock_game_state)
@@ -195,6 +196,7 @@ func test_backup_creation() -> bool:
 	return success
 func test_backup_recovery() -> bool:
 	var success = true
+	_save_system.save_to_slot(1)
 	_save_system.save_to_slot(1)
 	var corrupt_file = FileAccess.open("user://gda1_save_slot_1.dat", FileAccess.WRITE)
 	if corrupt_file:

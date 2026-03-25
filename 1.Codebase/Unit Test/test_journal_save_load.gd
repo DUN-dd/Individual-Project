@@ -9,8 +9,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	cleanup_test_files()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().quit()
+	queue_free()
 func run_all_tests():
 	await run_test("GameState and SaveLoadSystem initialization", test_initialization)
 	await run_test("Journal entries save to metadata", test_journal_entries_in_metadata)
@@ -34,6 +33,8 @@ func run_test(test_name: String, test_func: Callable):
 func setup_test_environment():
 	_game_state = get_node_or_null("/root/GameState")
 	_save_system = get_node_or_null("/root/SaveLoadSystem")
+	if not _save_system and _game_state and _game_state.has_method("get_save_load_system"):
+		_save_system = _game_state.get_save_load_system()
 	if not _game_state:
 		print("      WARNING: GameState autoload not available")
 	if not _save_system:

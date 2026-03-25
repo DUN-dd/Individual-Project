@@ -928,6 +928,8 @@ func save_game_to_slot(slot: int = -1) -> bool:
 	return _save_load_system.save_to_slot(slot)
 func save_game():
 	return save_game_to_slot(current_save_slot)
+func get_save_load_system() -> RefCounted:
+	return _save_load_system
 func load_game_from_slot(slot: int = -1) -> bool:
 	if not _save_load_system:
 		return false

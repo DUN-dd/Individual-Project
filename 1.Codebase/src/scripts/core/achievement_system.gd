@@ -300,8 +300,6 @@ func get_achievement_list() -> Array:
 	var localization_manager: Variant = _get_localization_manager()
 	for achievement_id in ACHIEVEMENTS.keys():
 		var achievement: Dictionary = ACHIEVEMENTS[achievement_id].duplicate()
-		if bool(achievement.get("hidden", false)) and not is_unlocked(achievement_id):
-			continue
 		achievement["id"] = achievement_id
 		achievement["unlocked"] = is_unlocked(achievement_id)
 		if localization_manager:
@@ -323,8 +321,8 @@ func save_achievements() -> void:
 	if not game_state:
 		_report_warning("Unable to save achievements because GameState is unavailable")
 		return
-	game_state.set_metadata("achievements", unlocked_achievements)
-	game_state.set_metadata("achievement_progress", _progress_counters)
+	game_state.set_metadata("achievements", unlocked_achievements.duplicate(true))
+	game_state.set_metadata("achievement_progress", _progress_counters.duplicate(true))
 	game_state.save_game()
 func load_achievements() -> void:
 	var game_state: Variant = _get_game_state()

@@ -7,7 +7,6 @@ func _ready() -> void:
 	if not TutorialSystem:
 		print("[TutorialSystemTest]  FAIL: TutorialSystem autoload not found")
 		queue_free()
-		get_tree().quit(1)
 		return
 	initial_completed = TutorialSystem.completed_tutorials.duplicate(true)
 	initial_enabled = TutorialSystem.tutorial_enabled
@@ -27,7 +26,6 @@ func _ready() -> void:
 	TutorialSystem.tutorial_enabled = initial_enabled
 	print("[TutorialSystemTest] All tests completed.")
 	queue_free()
-	get_tree().quit()
 func _test_initialization() -> void:
 	print("[Test] Initialization...")
 	assert(TutorialSystem != null, "TutorialSystem should exist as autoload")
@@ -64,6 +62,8 @@ func _test_check_tutorial_trigger() -> void:
 	print("[Test] Check tutorial trigger...")
 	TutorialSystem.reset_tutorials()
 	TutorialSystem.set_tutorial_enabled(true)
+	TutorialSystem.game_started = true
+	TutorialSystem._startup_grace_elapsed = true
 	var initial_completed_count = TutorialSystem.completed_tutorials.size()
 	TutorialSystem.check_tutorial_trigger("first_choice")
 	await get_tree().create_timer(0.1).timeout
@@ -137,6 +137,8 @@ func _test_signal_emission() -> void:
 	TutorialSystem.tutorial_triggered.connect(trigger_handler)
 	TutorialSystem.tutorial_completed.connect(complete_handler)
 	TutorialSystem.reset_tutorials()
+	TutorialSystem.game_started = true
+	TutorialSystem._startup_grace_elapsed = true
 	TutorialSystem.check_tutorial_trigger("first_prayer")
 	await get_tree().create_timer(0.1).timeout
 	assert(tutorial_triggered_received, "tutorial_triggered signal should be emitted")
