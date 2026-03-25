@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: false
-          fetch-depth: 0 # 確保能進行 Git Push
+          fetch-depth: 0
 
       - name: Cache Godot data
         id: cache-import
@@ -45,7 +45,6 @@ jobs:
           godot-version: ${{ env.GODOT_VERSION }}
           godot-version-full: ${{ env.GODOT_VERSION_FULL }}
 
-      # 強制導入資源，這會產生 .import 和 .translation 檔案
       - name: Force Import Assets (Headless)
         run: |
           echo "Importing project assets to generate .import and .translation files..."
@@ -54,7 +53,6 @@ jobs:
           ./godot_executable --headless --editor --quit --path . || true
           echo "Import complete."
 
-      # 自動檢測並提交缺失的 .import 和 .translation 檔案
       - name: Auto-Commit Missing Assets
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: |
@@ -78,7 +76,6 @@ jobs:
       - name: Create test output directory
         run: mkdir -p test-results
 
-      # 使用場景運行測試，確保 AutoLoads (全域腳本) 正常載入
       - name: Run all unit tests
         id: run-tests
         run: |

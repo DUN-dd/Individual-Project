@@ -370,7 +370,6 @@ func _rebuild_layout_into_tabs() -> void:
 	max_rounds_label  = result["max_rounds_label"]
 	max_rounds_spinbox = result["max_rounds_spinbox"]
 	gloria_voice_check = result["gloria_voice_check"]
-
 func _create_ai_log_tab_page(tab_container: TabContainer) -> VBoxContainer:
 	_ai_log_ctrl = SettingsMenuAILogControllerScript.new()
 	var result: Dictionary = SettingsMenuAILogSectionScript.build_log_page(
