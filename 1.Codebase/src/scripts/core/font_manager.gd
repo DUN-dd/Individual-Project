@@ -98,6 +98,7 @@ func save_font_settings():
 	config.set_value("display", "font_size", current_font_size)
 	config.set_value("display", "font_en", get_selected_font("en"))
 	config.set_value("display", "font_zh", get_selected_font("zh"))
+	config.set_value("display", "font_de", get_selected_font("de"))
 	config.save("user://settings.cfg")
 func load_font_settings():
 	var config = ConfigFile.new()
