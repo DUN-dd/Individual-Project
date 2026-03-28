@@ -7,9 +7,9 @@ const VALID_ARCHETYPE_IDS := ["cautious", "balanced", "reckless", "positive", "c
 const MIN_AI_CHOICES := 3
 const MAX_AI_CHOICES := 5
 const MIN_ZH_SUMMARY_CHARS := 10
-const MAX_ZH_SUMMARY_CHARS := 80
+const MAX_ZH_SUMMARY_CHARS := 20
 const MIN_NON_ZH_SUMMARY_WORDS := 10
-const MAX_NON_ZH_SUMMARY_WORDS := 35
+const MAX_NON_ZH_SUMMARY_WORDS := 20
 const ARCHETYPE_LABELS := {
 	"en": {
 		"cautious": "[Cautious]",
@@ -248,30 +248,23 @@ static func parse_mission_response(response: Dictionary, ai_manager: Variant) ->
 		var json_data: Dictionary = json_parser.data
 		if json_data.has("mission_title"):
 			result["mission_title"] = String(json_data["mission_title"]).strip_edges()
-		if json_data.has("scene"):
-			directives["scene"] = normalize_scene_directives(json_data["scene"])
-		if json_data.has("characters"):
-			directives["characters"] = normalize_character_directives(json_data["characters"])
-		if json_data.has("assets"):
-			directives["assets"] = normalize_asset_directives(json_data["assets"])
-		if json_data.has("relationships"):
-			directives["relationships"] = json_data["relationships"]
-		if json_data.has("mission_status"):
-			directives["mission_status"] = String(json_data.get("mission_status", "ongoing")).strip_edges().to_lower()
+		directives = _merge_scene_directives(directives, _extract_directives_from_json_payload(json_data))
 		if json_data.has("story_text"):
 			clean_content = String(json_data["story_text"])
+		elif json_data.has("story"):
+			clean_content = String(json_data["story"])
+		elif json_data.has("text"):
+			clean_content = String(json_data["text"])
 		if json_data.has("choices"):
 			ai_choice_payload = normalize_ai_choice_payload(json_data.get("choices", []))
 	else:
 		if ai_manager:
 			directives = ai_manager.parse_scene_directives(story_content)
-			if directives.has("scene"):
-				directives["scene"] = normalize_scene_directives(directives["scene"])
-			if directives.has("characters"):
-				directives["characters"] = normalize_character_directives(directives["characters"])
-			if directives.has("assets"):
-				directives["assets"] = normalize_asset_directives(directives["assets"])
+			directives = _normalize_directive_payload(directives)
 			clean_content = ai_manager.extract_story_content(story_content)
+	if ai_manager:
+		var marker_directives := _normalize_directive_payload(ai_manager.parse_scene_directives(story_content))
+		directives = _merge_scene_directives(directives, marker_directives)
 	if clean_content.is_empty() and ai_manager:
 		clean_content = ai_manager.extract_story_content(story_content)
 	var trimmed_content := clean_content.strip_edges()
@@ -313,6 +306,71 @@ static func parse_mission_response(response: Dictionary, ai_manager: Variant) ->
 	result["directives"] = directives
 	result["choices"] = ai_choice_payload
 	return result
+static func _extract_directives_from_json_payload(json_data: Dictionary) -> Dictionary:
+	var directives := _normalize_directive_payload(json_data)
+	if json_data.has("scene_directives") and json_data["scene_directives"] is Dictionary:
+		directives = _merge_scene_directives(directives, _normalize_directive_payload(json_data["scene_directives"]))
+	if json_data.has("sceneDirectives") and json_data["sceneDirectives"] is Dictionary:
+		directives = _merge_scene_directives(directives, _normalize_directive_payload(json_data["sceneDirectives"]))
+	if json_data.has("metadata") and json_data["metadata"] is Dictionary:
+		directives = _merge_scene_directives(directives, _normalize_directive_payload(json_data["metadata"]))
+	return directives
+static func _normalize_directive_payload(directives_variant: Variant) -> Dictionary:
+	if not (directives_variant is Dictionary):
+		return {}
+	var raw: Dictionary = directives_variant
+	var normalized: Dictionary = {}
+	if raw.has("scene"):
+		normalized["scene"] = normalize_scene_directives(raw["scene"])
+	if raw.has("characters"):
+		normalized["characters"] = normalize_character_directives(raw["characters"])
+	if raw.has("assets"):
+		normalized["assets"] = normalize_asset_directives(raw["assets"])
+	if raw.has("relationships"):
+		normalized["relationships"] = raw["relationships"]
+	if raw.has("mission_status"):
+		var mission_status := String(raw.get("mission_status", "")).strip_edges().to_lower()
+		if not mission_status.is_empty():
+			normalized["mission_status"] = mission_status
+	if raw.has("progression"):
+		var progression := String(raw.get("progression", "")).strip_edges()
+		if not progression.is_empty():
+			normalized["progression"] = progression
+	return normalized
+static func _merge_scene_directives(base: Dictionary, overlay: Dictionary) -> Dictionary:
+	if overlay.is_empty():
+		return base
+	if base.is_empty():
+		return overlay.duplicate(true)
+	var merged: Dictionary = base.duplicate(true)
+	if overlay.has("scene") and overlay["scene"] is Dictionary:
+		merged["scene"] = _merge_nested_dict(merged.get("scene", {}), overlay["scene"])
+	if overlay.has("characters") and overlay["characters"] is Dictionary:
+		merged["characters"] = _merge_nested_dict(merged.get("characters", {}), overlay["characters"])
+	if overlay.has("assets") and overlay["assets"] is Array:
+		var assets: Array = overlay["assets"]
+		if not assets.is_empty():
+			merged["assets"] = assets.duplicate(true)
+	if overlay.has("relationships"):
+		merged["relationships"] = overlay["relationships"]
+	if overlay.has("mission_status"):
+		var mission_status := String(overlay.get("mission_status", "")).strip_edges().to_lower()
+		if not mission_status.is_empty():
+			merged["mission_status"] = mission_status
+	if overlay.has("progression"):
+		var progression := String(overlay.get("progression", "")).strip_edges()
+		if not progression.is_empty():
+			merged["progression"] = progression
+	return merged
+static func _merge_nested_dict(base_variant: Variant, overlay_variant: Variant) -> Dictionary:
+	var merged: Dictionary = {}
+	if base_variant is Dictionary:
+		merged = (base_variant as Dictionary).duplicate(true)
+	if overlay_variant is Dictionary:
+		var overlay_dict: Dictionary = overlay_variant
+		for key in overlay_dict.keys():
+			merged[key] = overlay_dict[key]
+	return merged
 static func _looks_like_incomplete_json(text: String) -> bool:
 	var trimmed := text.strip_edges()
 	if trimmed.is_empty():

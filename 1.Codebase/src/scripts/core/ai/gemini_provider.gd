@@ -911,10 +911,11 @@ func parse_response(result: int, response_code: int, body: PackedByteArray) -> D
 									"sample_rate": DEFAULT_OUTPUT_SAMPLE_RATE,
 								},
 							)
+	var combined_text := "".join(ai_text_parts)
 	return {
 		"success": true,
 		"error": "",
-		"content": ai_text_parts[0] if ai_text_parts.size() > 0 else "",
+		"content": combined_text,
 		"text_parts": ai_text_parts,
 		"audio_payloads": audio_payloads,
 		"thought_signature": thought_signature,

@@ -45,6 +45,7 @@ func _run_tests() -> void:
 	var total_errors := 0
 	total_errors += test_openrouter_formatting()
 	total_errors += test_ollama_formatting()
+	total_errors += test_gemini_multipart_parsing()
 	if total_errors == 0:
 		print("\n ALL TESTS PASSED")
 		quit(0)
@@ -121,5 +122,49 @@ func test_ollama_formatting() -> int:
 		err_count += 1
 	else:
 		print(" PASS: Role 'model' -> 'assistant'")
+	provider = null
+	return err_count
+func test_gemini_multipart_parsing() -> int:
+	print("\n[TEST] Gemini Multipart Text Parsing")
+	var GeminiProvider = load("res://1.Codebase/src/scripts/core/ai/gemini_provider.gd")
+	var provider = GeminiProvider.new()
+	var mock_response_body := JSON.stringify({
+		"candidates": [
+			{
+				"content": {
+					"parts": [
+						{ "text": "{\"story_text\":\"PartA\"}" },
+						{ "text": "\n[SCENE_DIRECTIVES]\n{\"scene\":{\"background\":\"ruins\"}}\n[/SCENE_DIRECTIVES]" }
+					]
+				}
+			}
+		],
+		"usageMetadata": {
+			"promptTokenCount": 10,
+			"candidatesTokenCount": 20,
+			"totalTokenCount": 30
+		}
+	})
+	var parsed_response: Dictionary = provider.parse_response(
+		HTTPRequest.RESULT_SUCCESS,
+		200,
+		mock_response_body.to_utf8_buffer()
+	)
+	var err_count := 0
+	if not bool(parsed_response.get("success", false)):
+		print(" FAIL: Gemini parse_response returned success=false")
+		err_count += 1
+	var content := String(parsed_response.get("content", ""))
+	if content.find("[SCENE_DIRECTIVES]") == -1:
+		print(" FAIL: Multipart text was not merged into content")
+		err_count += 1
+	else:
+		print(" PASS: Multipart text merged into content")
+	var parts_variant: Variant = parsed_response.get("text_parts", [])
+	if not (parts_variant is Array) or (parts_variant as Array).size() != 2:
+		print(" FAIL: text_parts did not preserve both segments")
+		err_count += 1
+	else:
+		print(" PASS: text_parts preserved all segments")
 	provider = null
 	return err_count

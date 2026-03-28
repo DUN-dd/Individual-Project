@@ -63,7 +63,7 @@ class RequestParameters extends RefCounted:
 var _call_log: Array[Dictionary] = []
 var _prompt_guard_regex: RegEx = null
 var _config_manager: AIConfigManager = null
-var _provider_manager: AIProviderManager = null
+var _provider_manager: RefCounted = null
 var _context_manager: AIContextManager = null
 var _voice_manager: AIVoiceManager = null
 var _mock_override_enabled: bool = false
@@ -1208,7 +1208,7 @@ func _record_call_log(
 	response_time_sec: float,
 	error_msg: String = ""
 ) -> void:
-	var provider_name := _provider_manager.get_current_provider_name() if _provider_manager else "UNKNOWN"
+	var provider_name: String = str(_provider_manager.get_current_provider_name()) if _provider_manager else "UNKNOWN"
 	var model_name := _get_current_model_name()
 	var entry_purpose := ""
 	if not _active_request_payload.is_empty():
