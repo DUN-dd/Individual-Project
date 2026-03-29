@@ -49,7 +49,11 @@ static func build_consequence_prompt(choice: Dictionary, success: bool, lang: St
 		"Outcome: %s" % ("success" if success else "failure"),
 	]
 	if force_complete:
-		context_parts.append("Force mission_status to complete in scene directives.")
+		var skill_mgr := _get_skill_manager()
+		if skill_mgr and skill_mgr.is_initialized():
+			var force_content: String = skill_mgr.load_skill("force-mission-complete", lang)
+			if not force_content.is_empty():
+				context_parts.append(force_content.strip_edges())
 	return _build_prompt_with_skill("consequence-generation", lang, context_parts)
 static func build_night_cycle_prompt(last_text: String, lang: String) -> String:
 	var context_parts: Array[String] = [

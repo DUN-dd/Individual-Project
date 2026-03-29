@@ -62,7 +62,7 @@ Include at the START of your response:
 - **"ongoing"**: Story continues, more choices ahead
 - **"complete"**: This consequence ends the current mission arc
 
-**CRITICAL**: Set to "complete" ONLY when the narrative arc has concluded (catastrophic success or failure).
+**CRITICAL**: Set to "complete" only when the narrative arc has concluded naturally (catastrophic success or failure), **or when explicitly instructed to force mission completion** (turn limit reached).
 
 ---
 
