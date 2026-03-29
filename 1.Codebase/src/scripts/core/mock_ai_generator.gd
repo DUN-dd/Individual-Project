@@ -272,6 +272,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 			story_lines.append("（虛空熵值飆升。你的行動以意想不到的方式向外擴散。）")
 	var story_text = "\n".join(story_lines)
 	var expressions = ["neutral", "happy", "sad", "angry", "confused", "shocked", "thinking", "embarrassed"]
+	var choices: Array[Dictionary] = _build_choice_followup_payload(lang)
 	var response = {
 		"characters": {
 			"protagonist": { "expression": expressions[_rng.randi_range(0, expressions.size() - 1)] },
@@ -281,6 +282,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 			"one": { "expression": expressions[_rng.randi_range(0, expressions.size() - 1)] },
 		},
 		"story_text": story_text,
+		"choices": choices,
 	}
 	return JSON.stringify(response)
 static func _generate_prayer(context: Dictionary) -> String:

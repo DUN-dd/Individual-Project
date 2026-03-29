@@ -234,7 +234,7 @@ func _display_choices() -> void:
 			next_btn.visible = true
 			next_btn.modulate.a = 0.0
 			next_btn.scale = Vector2(0.9, 0.9)
-			var tween = next_btn.create_tween()
+			var tween: Tween = next_btn.create_tween()
 			tween.set_parallel(true)
 			tween.set_ease(Tween.EASE_OUT)
 			tween.set_trans(Tween.TRANS_BACK)
