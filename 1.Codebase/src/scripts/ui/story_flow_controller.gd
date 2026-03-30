@@ -13,6 +13,7 @@ var _trolley_signal_hooks_ready: bool = false
 var night_overlay_scene := preload("res://1.Codebase/src/scenes/ui/night_cycle_overlay.tscn")
 var transition_overlay_scene := preload("res://1.Codebase/src/scenes/ui/scene_transition_overlay.tscn")
 const GLORIA_POSITIVE_THRESHOLD := 30
+const TROLLEY_GENERATION_TIMEOUT_SECONDS := 30.0
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -322,6 +323,12 @@ func _schedule_trolley_problem() -> void:
 			"recent_events": recent_events,
 		},
 	)
+	# Safety timeout: reset flag if callback never fires (e.g. generator freed)
+	if story_scene and story_scene.is_inside_tree():
+		await story_scene.get_tree().create_timer(TROLLEY_GENERATION_TIMEOUT_SECONDS).timeout
+		if _trolley_generation_in_flight:
+			_log_info("Trolley generation safety timeout: resetting in-flight flag")
+			_trolley_generation_in_flight = false
 func _ensure_trolley_signal_hooks(trolley_gen: Node) -> void:
 	if _trolley_signal_hooks_ready:
 		return

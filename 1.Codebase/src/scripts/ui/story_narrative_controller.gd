@@ -471,19 +471,22 @@ func _on_consequence_generated(response: Dictionary) -> void:
 	if not response.get("success", false):
 		_report_warning("Consequence generation failed: success=false")
 		story_scene.hide_loading()
-		story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
+		if story_scene.overlay_controller:
+			story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
 		return
 	var content: String = String(response.get("content", response.get("text", "")))
 	if content.is_empty():
 		_report_warning("Consequence generation failed: content empty")
 		story_scene.hide_loading()
-		story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
+		if story_scene.overlay_controller:
+			story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
 		return
 	var ai_manager = get_ai_manager()
 	if not ai_manager:
 		_report_warning("Consequence generation failed: AI manager missing")
 		story_scene.hide_loading()
-		story_scene.overlay_controller.show_gloria_overlay(content if not content.is_empty() else "Gloria glares at you silently...")
+		if story_scene.overlay_controller:
+			story_scene.overlay_controller.show_gloria_overlay(content if not content.is_empty() else "Gloria glares at you silently...")
 		return
 	var parsed := NarrativeResponseParser.parse_mission_response(response, ai_manager)
 	var directives: Dictionary = parsed.get("directives", {})
@@ -528,7 +531,7 @@ func _on_consequence_generated(response: Dictionary) -> void:
 		story_scene.hide_loading()
 		_handle_mission_completion(sanitized)
 	else:
-		if game_state and game_state.positive_energy <= 30:
+		if game_state and game_state.positive_energy <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 			var last_turn = game_state.get_metadata("last_gloria_auto_turn", -999)
 			var current_turn = game_state.mission_turn_count
 			if current_turn - last_turn >= 3:
@@ -562,7 +565,6 @@ func _handle_mission_completion(last_text: String) -> void:
 	_cached_night_cycle_payload = {}
 	request_night_cycle_generation(last_text, true)
 	await story_scene.get_tree().create_timer(_countdown_duration).timeout
-	_night_cycle_pending = false
 	var payload: Dictionary = {}
 	if not _cached_night_cycle_payload.is_empty():
 		payload = _cached_night_cycle_payload
@@ -579,6 +581,7 @@ func _handle_mission_completion(last_text: String) -> void:
 			"honeymoon_text": "...",
 			"prayer_prompt": "Pray."
 		}
+	_night_cycle_pending = false
 	story_scene.hide_loading()
 	story_scene.flow_controller.enter_night_cycle(payload)
 func request_night_cycle_generation(last_text: String, is_background: bool = false) -> void:

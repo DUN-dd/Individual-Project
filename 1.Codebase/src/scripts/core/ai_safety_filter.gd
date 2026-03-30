@@ -17,7 +17,24 @@ const HALLUCINATION_PATTERNS := [
 	"(?i)\\bthis may not be accurate\\b",
 ]
 const BLOCK_MESSAGE := "The response was blocked because it may contain unsafe or disallowed content."
+const _MAX_REDACTION_BUFFER_SIZE := 500
 static var _redaction_buffer: Array[String] = []
+static var _compiled_sensitive_regexes: Dictionary = {}
+static var _compiled_hallucination_regexes: Array = []
+static func _get_sensitive_regexes() -> Dictionary:
+	if _compiled_sensitive_regexes.is_empty():
+		for label in SENSITIVE_PATTERNS.keys():
+			var regex := RegEx.new()
+			if regex.compile(SENSITIVE_PATTERNS[label]) == OK:
+				_compiled_sensitive_regexes[label] = regex
+	return _compiled_sensitive_regexes
+static func _get_hallucination_regexes() -> Array:
+	if _compiled_hallucination_regexes.is_empty():
+		for pattern in HALLUCINATION_PATTERNS:
+			var regex := RegEx.new()
+			if regex.compile(pattern) == OK:
+				_compiled_hallucination_regexes.append(regex)
+	return _compiled_hallucination_regexes
 static func reset_session() -> void:
 	_redaction_buffer.clear()
 static func consume_redactions() -> Array[String]:
@@ -66,15 +83,16 @@ static func review_response_content(raw_content) -> Dictionary:
 static func _scrub_sensitive_sequences(text: String, track: bool) -> Dictionary:
 	var sanitized := text
 	var redactions: Array[String] = []
-	for label in SENSITIVE_PATTERNS.keys():
-		var regex := RegEx.new()
-		if regex.compile(SENSITIVE_PATTERNS[label]) != OK:
-			continue
+	var regexes := _get_sensitive_regexes()
+	for label in regexes.keys():
+		var regex: RegEx = regexes[label]
 		if regex.search(sanitized):
 			sanitized = regex.sub(sanitized, "[REDACTED %s]" % label.to_upper(), true)
 			redactions.append(label)
 	if redactions.size() > 0 and track:
 		_redaction_buffer.append_array(redactions)
+		if _redaction_buffer.size() > _MAX_REDACTION_BUFFER_SIZE:
+			_redaction_buffer = _redaction_buffer.slice(-_MAX_REDACTION_BUFFER_SIZE)
 	return {
 		"text": sanitized,
 		"redactions": redactions,
@@ -98,10 +116,8 @@ static func _detect_harmful_content(text: String) -> Dictionary:
 		"replacement_content": BLOCK_MESSAGE,
 	}
 static func _detect_hallucination_risk(text: String) -> Dictionary:
-	for pattern in HALLUCINATION_PATTERNS:
-		var regex := RegEx.new()
-		if regex.compile(pattern) != OK:
-			continue
+	var regexes := _get_hallucination_regexes()
+	for regex in regexes:
 		if regex.search(text):
 			return {
 				"flagged": true,
