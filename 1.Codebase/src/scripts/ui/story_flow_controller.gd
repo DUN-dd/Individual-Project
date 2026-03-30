@@ -12,7 +12,6 @@ var _trolley_generation_in_flight: bool = false
 var _trolley_signal_hooks_ready: bool = false
 var night_overlay_scene := preload("res://1.Codebase/src/scenes/ui/night_cycle_overlay.tscn")
 var transition_overlay_scene := preload("res://1.Codebase/src/scenes/ui/scene_transition_overlay.tscn")
-const GLORIA_POSITIVE_THRESHOLD := 30
 const TROLLEY_GENERATION_TIMEOUT_SECONDS := 30.0
 func _tr(key: String) -> String:
 	if LocalizationManager:
@@ -262,7 +261,7 @@ func _calculate_dilemma_trigger_chance() -> float:
 	if game_state.positive_energy >= 70:
 		pe_bonus = 0.15
 	var reality_bonus: float = 0.0
-	if game_state.reality_score <= 30:
+	if game_state.reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 		reality_bonus = 0.20
 	var total: float = base_chance + entropy_bonus + pe_bonus + reality_bonus
 	return clamp(total, 0.0, 0.20)
@@ -358,7 +357,7 @@ func _select_dilemma_template() -> String:
 		return "positive_energy_trap"
 	if game_state.calculate_void_entropy() >= 0.7:
 		return "lesser_evil"
-	if game_state.reality_score <= 30:
+	if game_state.reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 		return "complicity"
 	if game_state.game_phase == GameConstants.GamePhase.CRISIS:
 		return "sacrifice"
