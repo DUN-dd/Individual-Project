@@ -1,7 +1,7 @@
 extends Control
 const ErrorReporterBridge = preload("res://1.Codebase/src/scripts/core/error_reporter_bridge.gd")
 const ERROR_CONTEXT := "LoadingScreen"
-const UIStyleManager := preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
 @onready var progress_bar: ProgressBar = $CenterContainer/VBoxContainer/ProgressBar
 @onready var loading_label: Label = $CenterContainer/VBoxContainer/LoadingLabel
 @onready var tip_label: Label = $CenterContainer/VBoxContainer/TipLabel

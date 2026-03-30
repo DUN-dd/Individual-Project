@@ -1,17 +1,5 @@
 extends RefCounted
 class_name AIContextBuilder
-const STATIC_CONTEXT_EN := """GDA1 operates in a world cursed by "Positive Energy": every forced smile feeds cosmic Void Entropy.
-Gloria leads; Donkey, ARK, One are unreliable teammates whose optimism accelerates collapse.
-The player is the lone rational agent who must surface contradictions and treat "success" as failure in disguise."""
-const NON_NEGOTIABLE_RULES_EN := """Immutable directives:
-1. Positive Energy always increases entropy, victories hide damage.
-2. Maintain dark humor and irony. Never reward blind optimism.
-3. Obey the notes register. Do not contradict recorded facts."""
-const SCENE_DIRECTIVES_INSTRUCTIONS_EN := """=== SCENE DIRECTIVES ===
-Include [SCENE_DIRECTIVES] JSON in responses for visual control.
-Format: {"scene": {"background": "id"}, "characters": {"name": {"expression": "type", "visible": true}}}
-Backgrounds: default, prayer, forest, cave, temple, ruins, laboratory, throne_room, battlefield
-Expressions: neutral, happy, sad, angry, confused, shocked, thinking, embarrassed"""
 const SHORT_TERM_WINDOW := 6
 var memory_store
 var game_state
@@ -53,10 +41,7 @@ func build_context_prompt(prompt: String, context: Dictionary) -> Array:
 func _build_user_message(prompt: String, context: Dictionary, language: String) -> String:
 	var content := ""
 	var language_instruction := ""
-	if language == "en":
-		language_instruction = "IMPORTANT: Respond in English. All narrative, dialogue, and descriptions must be in English.\n"
-	else:
-		language_instruction = _tr("AI_CTX_LANGUAGE_INSTRUCTION") + "\n"
+	language_instruction = _tr("AI_CTX_LANGUAGE_INSTRUCTION") + "\n"
 	content += "=== SESSION DATA ===\n"
 	content += language_instruction
 	content += _build_meta_context(context)
@@ -68,10 +53,10 @@ func _build_user_message(prompt: String, context: Dictionary, language: String) 
 	content += "\n=== PROMPT ===\n"
 	content += prompt.strip_edges()
 	return content
-func _get_static_context_messages(language: String) -> Array:
-	var static_text = _tr("AI_CTX_STATIC_CONTEXT") if language != "en" else STATIC_CONTEXT_EN
-	var rules_text = _tr("AI_CTX_NON_NEGOTIABLE_RULES") if language != "en" else NON_NEGOTIABLE_RULES_EN
-	var directives_text = _tr("AI_CTX_SCENE_DIRECTIVES") if language != "en" else SCENE_DIRECTIVES_INSTRUCTIONS_EN
+func _get_static_context_messages(_language: String) -> Array:
+	var static_text = _tr("AI_CTX_STATIC_CONTEXT")
+	var rules_text = _tr("AI_CTX_NON_NEGOTIABLE_RULES")
+	var directives_text = _tr("AI_CTX_SCENE_DIRECTIVES")
 	var messages := [
 		{ "role": "system", "content": static_text },
 		{ "role": "system", "content": rules_text },
@@ -81,7 +66,7 @@ func _get_static_context_messages(language: String) -> Array:
 		var backgrounds_text = background_loader.get_backgrounds_for_ai_prompt()
 		messages.append({ "role": "system", "content": backgrounds_text })
 	return messages
-func _get_entropy_modifier_message(language: String) -> Array:
+func _get_entropy_modifier_message(_language: String) -> Array:
 	if not game_state or not game_state.has_method("calculate_void_entropy"):
 		return []
 	var entropy: float = game_state.calculate_void_entropy()
@@ -90,35 +75,9 @@ func _get_entropy_modifier_message(language: String) -> Array:
 		return []
 	var modifier_text: String = ""
 	if threshold == "high":
-		if language == "en":
-			modifier_text = """[ENTROPY: CRITICAL Level %.2f]
-The world is succumbing to chaos and absurdity. The Void Entropy has reached critical levels.
-
-MANDATORY NARRATIVE DIRECTIVES:
-- Generate surreal, darkly humorous, and deeply ironic events
-- Directly subvert the player's recent positive actions with twisted consequences
-- Embrace absurdist logic and nonsensical cause-and-effect
-- Reality itself should feel unstable and dreamlike
-- Mock optimism with grotesque exaggerations
-- Create situations where "success" becomes indistinguishable from failure
-
-The higher the Positive Energy, the more reality fractures. This is the curse of forced optimism.""" % entropy
-		else:
-			modifier_text = _tr("AI_CTX_ENTROPY_HIGH") % entropy
+		modifier_text = _tr("AI_CTX_ENTROPY_HIGH") % entropy
 	elif threshold == "medium":
-		if language == "en":
-			modifier_text = """[ENTROPY: ELEVATED Level %.2f]
-The world feels slightly unreal. The boundary between normal and absurd is blurring.
-
-NARRATIVE GUIDANCE:
-- Introduce strange or unexpected elements into otherwise normal situations
-- Add subtle wrongness to familiar things
-- Layer ironic twists into positive outcomes
-- Let optimistic actions have peculiar side effects
-- Reality should feel "off" but not yet chaotic
-The Void Entropy is rising. Consequences are becoming unpredictable.""" % entropy
-		else:
-			modifier_text = _tr("AI_CTX_ENTROPY_MEDIUM") % entropy
+		modifier_text = _tr("AI_CTX_ENTROPY_MEDIUM") % entropy
 	if modifier_text.is_empty():
 		return []
 	return [{ "role": "system", "content": modifier_text }]
@@ -149,43 +108,37 @@ func _build_meta_context(context: Dictionary) -> String:
 	if meta_lines.size() > 0:
 		return "\n".join(meta_lines) + "\n"
 	return ""
-func _build_recent_events(language: String) -> String:
+func _build_recent_events(_language: String) -> String:
 	if not game_state or not game_state.has_method("get_recent_event_notes"):
 		return ""
-	var recent_event_lines = game_state.get_recent_event_notes(SHORT_TERM_WINDOW, language)
+	var recent_event_lines = game_state.get_recent_event_notes(SHORT_TERM_WINDOW, _language)
 	if recent_event_lines.size() == 0:
 		return ""
 	var content := "\n=== RECENT EVENTS ===\n"
 	for line in recent_event_lines:
 		content += "- " + line + "\n"
 	return content
-func _build_butterfly_context(language: String) -> String:
+func _build_butterfly_context(_language: String) -> String:
 	if not game_state or not game_state.has_method("get") or game_state.get("butterfly_tracker") == null:
 		return ""
 	var butterfly_tracker = game_state.get("butterfly_tracker")
 	if not butterfly_tracker or not butterfly_tracker.has_method("get_context_for_ai"):
 		return ""
-	var butterfly_context = butterfly_tracker.get_context_for_ai(language)
+	var butterfly_context = butterfly_tracker.get_context_for_ai(_language)
 	if butterfly_context.is_empty():
 		return ""
 	var content := "\n=== BUTTERFLY EFFECT: PAST CHOICES ===\n"
 	content += butterfly_context
-	if language == "en":
-		content += "Consider referencing one of these past choices in your response if narratively appropriate.\n"
-	else:
-		content += _tr("AI_CTX_BUTTERFLY_CONSIDER") + "\n"
+	content += _tr("AI_CTX_BUTTERFLY_CONSIDER") + "\n"
 	if butterfly_tracker.has_method("suggest_choice_for_callback"):
 		var suggested_choice = butterfly_tracker.suggest_choice_for_callback()
 		if not suggested_choice.is_empty():
 			var choice_id = suggested_choice.get("id", "")
 			var choice_text = suggested_choice.get("choice_text", "")
 			var scenes_ago = butterfly_tracker.current_scene_number - suggested_choice.get("scene_number", 0) if butterfly_tracker.has("current_scene_number") else 0
-			if language == "en":
-				content += "\n? SUGGESTED CALLBACK: Consider having \"%s\" (from %d scenes ago, ID: %s) affect the current situation.\n" % [choice_text.left(60), scenes_ago, choice_id]
-			else:
-				content += "\n" + (_tr("AI_CTX_BUTTERFLY_CALLBACK") % [choice_text.left(60), scenes_ago, choice_id]) + "\n"
+			content += "\n" + (_tr("AI_CTX_BUTTERFLY_CALLBACK") % [choice_text.left(60), scenes_ago, choice_id]) + "\n"
 	return content
-func _build_player_reflections(language: String) -> String:
+func _build_player_reflections(_language: String) -> String:
 	if not game_state or not game_state.has_method("get_recent_journal_entries"):
 		return ""
 	var reflections: Array = game_state.get_recent_journal_entries(3)
@@ -196,22 +149,13 @@ func _build_player_reflections(language: String) -> String:
 		var timestamp = str(entry.get("timestamp", ""))
 		var reflection_text = str(entry.get("text", "")).strip_edges()
 		var summary_text = str(entry.get("ai_summary", "")).strip_edges()
-		if language == "en":
-			var line = ""
-			if not timestamp.is_empty():
-				line += "[" + timestamp + "] "
-			line += reflection_text
-			if not summary_text.is_empty():
-				line += " | Insight: " + summary_text
-			content += "- " + line + "\n"
-		else:
-			var zh_line = ""
-			if not timestamp.is_empty():
-				zh_line += "[" + timestamp + "] "
-			zh_line += reflection_text
-			if not summary_text.is_empty():
-				zh_line += _tr("AI_CTX_INSIGHT_LABEL") + summary_text
-			content += "  " + zh_line + "\n"
+		var line = ""
+		if not timestamp.is_empty():
+			line += "[" + timestamp + "] "
+		line += reflection_text
+		if not summary_text.is_empty():
+			line += _tr("AI_CTX_INSIGHT_LABEL") + summary_text
+		content += "- " + line + "\n"
 	return content
 func _build_asset_context(context: Dictionary) -> String:
 	if not asset_registry or not asset_registry.has_method("get_assets_for_context"):
@@ -230,7 +174,7 @@ func _build_asset_context(context: Dictionary) -> String:
 	var content := "\n=== AVAILABLE ASSETS ===\n"
 	if asset_registry.has_method("format_assets_for_prompt"):
 		content += asset_registry.format_assets_for_prompt(assets_for_prompt) + "\n"
-	content += "Newest asset IDs appear last; treat them as the freshest context.\n"
+	content += _tr("AI_I18N_ASSET_FRESHEST_CONTEXT") + "\n"
 	return content
 func _build_stats_context(context: Dictionary) -> String:
 	var stat_parts: Array = []

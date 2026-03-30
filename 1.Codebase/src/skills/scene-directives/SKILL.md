@@ -128,4 +128,4 @@ Slots: 1, 2, or 3 (positions on screen)
 4. **Use atmosphere and lighting** to enhance mood
 5. **Only show visible characters** that are present in the scene
 6. **Include mission assets** with contextual names relevant to the story
-7. **Set mission_status** to "complete" only when the mission has concluded
+7. **Set mission_status** to "ongoing" to continue the story, or "complete" when the narrative arc reaches a natural conclusion

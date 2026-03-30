@@ -21,19 +21,20 @@ DEFAULT_API_ENDPOINT = os.environ.get(
 )
 DEFAULT_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-3.1-flash-image")
 DEFAULT_STYLE_PROMPT = """
-Generate a single square pixel art illustration using the provided reference image as the main guide for composition, framing, lighting, colour palette, and rendering quality.
+Generate a single square pixel art illustration using the provided reference image or images as the main guide for composition, framing, lighting, colour palette, and rendering quality.
 
-Use the reference image to keep the overall structure and art direction cohesive unless the main prompt explicitly asks for a change.
+Use the reference images together to keep the overall structure and art direction cohesive unless the main prompt explicitly asks for a change.
 - Keep the image production ready and visually consistent.
-- Match the reference image's overall style and pixel density.
+- Match the reference images' overall style and pixel density.
 - Avoid legible text, UI elements, letters, and numbers unless the main prompt explicitly asks for them.
 """.strip()
 RESAMPLING = getattr(PIL.Image, "Resampling", PIL.Image)
 PREVIEW_SIZE = (360, 360)
+SMALL_PREVIEW_SIZE = (172, 172)
 
 @dataclass
 class GenerationConfig:
-    reference_image: Path
+    reference_images: tuple[Path, ...]
     output_image: Path
     prompt: str
     style_prompt: str
@@ -59,6 +60,9 @@ def default_reference_image() -> Path:
         if candidate.is_file():
             return candidate
     return candidates[0]
+
+def default_reference_images() -> tuple[Path, ...]:
+    return (default_reference_image(),)
 
 def default_output_image() -> Path:
     return (
@@ -147,11 +151,28 @@ def build_full_prompt(style_prompt: str, prompt: str) -> str:
 def normalize_output_path(path: Path) -> Path:
     return path if path.suffix else path.with_suffix(".png")
 
+def format_reference_image_paths(paths: tuple[Path, ...]) -> str:
+    return os.pathsep.join(str(path) for path in paths)
+
+def parse_reference_image_paths(raw_value: str) -> tuple[Path, ...]:
+    paths = tuple(
+        Path(chunk.strip())
+        for chunk in raw_value.split(os.pathsep)
+        if chunk.strip()
+    )
+    if not paths:
+        raise ValueError("At least one reference image is required.")
+    return paths
+
 def generate_single_image(config: GenerationConfig) -> PIL.Image.Image:
-    reference_image = config.reference_image.expanduser().resolve()
+    reference_images = tuple(
+        reference_image.expanduser().resolve()
+        for reference_image in config.reference_images
+    )
     output_image = normalize_output_path(config.output_image.expanduser())
-    if not reference_image.is_file():
-        raise FileNotFoundError(f"Reference image not found: {reference_image}")
+    for reference_image in reference_images:
+        if not reference_image.is_file():
+            raise FileNotFoundError(f"Reference image not found: {reference_image}")
 
     client = genai.Client(
         api_key=config.api_key,
@@ -159,12 +180,14 @@ def generate_single_image(config: GenerationConfig) -> PIL.Image.Image:
     )
     full_prompt = build_full_prompt(config.style_prompt, config.prompt)
 
-    with PIL.Image.open(reference_image) as image:
-        reference_copy = image.copy()
+    contents: list[object] = [full_prompt]
+    for reference_image in reference_images:
+        with PIL.Image.open(reference_image) as image:
+            contents.append(image.copy())
 
     response = client.models.generate_content(
         model=config.model,
-        contents=[full_prompt, reference_copy],
+        contents=contents,
     )
     result = extract_generated_image(response, debug=config.debug)
     output_image.parent.mkdir(parents=True, exist_ok=True)
@@ -176,10 +199,16 @@ class AssetImageGeneratorUI:
         self.root = root
         self.args = args
         self.is_generating = False
-        self.reference_preview_image = None
-        self.output_preview_image = None
+        self._source_preview_img = None
+        self._style_preview_img = None
+        self._output_preview_img = None
 
-        self.reference_path_var = tk.StringVar(value=str(args.reference_image))
+        self.source_path_var = tk.StringVar(
+            value=str(args.source_image) if args.source_image else ""
+        )
+        self.style_path_var = tk.StringVar(
+            value=str(args.style_image) if args.style_image else ""
+        )
         self.output_path_var = tk.StringVar(value=str(args.output))
         self.model_var = tk.StringVar(value=args.model)
         self.endpoint_var = tk.StringVar(value=args.api_endpoint)
@@ -187,15 +216,14 @@ class AssetImageGeneratorUI:
         self.status_var = tk.StringVar(value="Ready.")
 
         self.root.title("Asset Image Generator")
-        self.root.minsize(1080, 720)
+        self.root.minsize(1100, 720)
         self._build_layout()
         self._set_text(self.style_prompt_text, args.style_prompt)
         self._set_text(
             self.prompt_text,
             args.prompt or "Describe the image you want to generate here.",
         )
-        self._refresh_reference_preview()
-        self._refresh_output_preview()
+        self._refresh_all_previews()
 
     def _build_layout(self) -> None:
         self.root.columnconfigure(0, weight=1)
@@ -207,115 +235,210 @@ class AssetImageGeneratorUI:
         main.columnconfigure(1, weight=2)
         main.rowconfigure(1, weight=1)
 
-        controls = ttk.Frame(main)
-        controls.grid(row=0, column=0, sticky="ew", columnspan=2, pady=(0, 12))
+        
+        controls = ttk.LabelFrame(main, text="Images & Settings", padding=8)
+        controls.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         controls.columnconfigure(1, weight=1)
 
-        self._add_path_row(
-            controls,
-            row=0,
-            label="Reference Image",
-            variable=self.reference_path_var,
-            browse_command=self._browse_reference_image,
+        self._path_row(
+            controls, row=0, label="Image to Convert",
+            var=self.source_path_var, browse=self._browse_source_image,
+            on_change=lambda _: self._refresh_source_preview(),
         )
-        self._add_path_row(
-            controls,
-            row=1,
-            label="Output Image",
-            variable=self.output_path_var,
-            browse_command=self._browse_output_image,
+        self._path_row(
+            controls, row=1, label="Style Reference",
+            var=self.style_path_var, browse=self._browse_style_image,
+            on_change=lambda _: self._refresh_style_preview(),
         )
-
-        ttk.Label(controls, text="Model").grid(row=2, column=0, sticky="w", padx=(0, 8))
-        ttk.Entry(controls, textvariable=self.model_var).grid(
-            row=2, column=1, sticky="ew", padx=(0, 8)
+        self._path_row(
+            controls, row=2, label="Output Image",
+            var=self.output_path_var, browse=self._browse_output_image,
+            on_change=lambda _: self._refresh_output_preview(),
         )
 
-        ttk.Label(controls, text="API Endpoint").grid(
-            row=3, column=0, sticky="w", padx=(0, 8), pady=(8, 0)
-        )
-        ttk.Entry(controls, textvariable=self.endpoint_var).grid(
-            row=3, column=1, sticky="ew", padx=(0, 8), pady=(8, 0)
-        )
+        settings = ttk.Frame(controls)
+        settings.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(8, 0))
+        settings.columnconfigure(1, weight=1)
+        settings.columnconfigure(3, weight=2)
+        ttk.Label(settings, text="Model").grid(row=0, column=0, sticky="w", padx=(0, 4))
+        ttk.Entry(settings, textvariable=self.model_var, width=26).grid(
+            row=0, column=1, sticky="ew", padx=(0, 16))
+        ttk.Label(settings, text="API Endpoint").grid(row=0, column=2, sticky="w", padx=(0, 4))
+        ttk.Entry(settings, textvariable=self.endpoint_var).grid(
+            row=0, column=3, sticky="ew")
 
-        self.progress = ttk.Progressbar(controls, mode="indeterminate")
-        self.progress.grid(row=2, column=2, rowspan=2, sticky="ew")
+        
+        editor = ttk.Frame(main)
+        editor.grid(row=1, column=0, sticky="nsew", padx=(0, 10))
+        editor.columnconfigure(0, weight=1)
+        editor.rowconfigure(1, weight=1)
+        editor.rowconfigure(3, weight=2)
 
-        editor_frame = ttk.Frame(main)
-        editor_frame.grid(row=1, column=0, sticky="nsew", padx=(0, 12))
-        editor_frame.columnconfigure(0, weight=1)
-        editor_frame.rowconfigure(1, weight=1)
-        editor_frame.rowconfigure(3, weight=2)
+        ttk.Label(editor, text="Style / Constraint Prompt").grid(row=0, column=0, sticky="w")
+        self.style_prompt_text = tk.Text(editor, height=7, wrap="word")
+        self.style_prompt_text.grid(row=1, column=0, sticky="nsew", pady=(4, 10))
 
-        ttk.Label(editor_frame, text="Style / Constraint Prompt").grid(
-            row=0, column=0, sticky="w"
-        )
-        self.style_prompt_text = tk.Text(editor_frame, height=8, wrap="word")
-        self.style_prompt_text.grid(row=1, column=0, sticky="nsew", pady=(4, 12))
-
-        ttk.Label(editor_frame, text="Main Prompt").grid(row=2, column=0, sticky="w")
-        self.prompt_text = tk.Text(editor_frame, height=12, wrap="word")
+        ttk.Label(editor, text="Main Prompt").grid(row=2, column=0, sticky="w")
+        self.prompt_text = tk.Text(editor, height=10, wrap="word")
         self.prompt_text.grid(row=3, column=0, sticky="nsew", pady=(4, 0))
 
-        actions = ttk.Frame(editor_frame)
-        actions.grid(row=4, column=0, sticky="ew", pady=(12, 0))
+        actions = ttk.Frame(editor)
+        actions.grid(row=4, column=0, sticky="ew", pady=(10, 0))
         actions.columnconfigure(2, weight=1)
-
         ttk.Checkbutton(actions, text="Debug", variable=self.debug_var).grid(
-            row=0, column=0, sticky="w"
-        )
-        ttk.Button(actions, text="Reload Preview", command=self._refresh_reference_preview).grid(
-            row=0, column=1, sticky="w", padx=(8, 0)
-        )
+            row=0, column=0, sticky="w")
+        ttk.Button(actions, text="Reload Previews",
+                   command=self._refresh_all_previews).grid(
+            row=0, column=1, sticky="w", padx=(8, 0))
+        self.progress = ttk.Progressbar(actions, mode="indeterminate", length=100)
+        self.progress.grid(row=0, column=2, sticky="ew", padx=(8, 8))
         self.generate_button = ttk.Button(
-            actions, text="Generate One Image", command=self._on_generate_clicked
-        )
+            actions, text="Generate Image", command=self._on_generate_clicked)
         self.generate_button.grid(row=0, column=3, sticky="e")
 
-        preview_frame = ttk.Frame(main)
-        preview_frame.grid(row=1, column=1, sticky="nsew")
-        preview_frame.columnconfigure(0, weight=1)
-        preview_frame.rowconfigure(0, weight=1)
-        preview_frame.rowconfigure(1, weight=1)
+        
+        previews = ttk.Frame(main)
+        previews.grid(row=1, column=1, sticky="nsew")
+        previews.columnconfigure(0, weight=1)
+        previews.columnconfigure(1, weight=1)
+        previews.rowconfigure(0, weight=1)
+        previews.rowconfigure(1, weight=2)
 
-        reference_group = ttk.LabelFrame(preview_frame, text="Reference Preview")
-        reference_group.grid(row=0, column=0, sticky="nsew", pady=(0, 8))
-        reference_group.columnconfigure(0, weight=1)
-        reference_group.rowconfigure(0, weight=1)
-        self.reference_preview_label = ttk.Label(
-            reference_group, text="No reference image loaded.", anchor="center"
-        )
-        self.reference_preview_label.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
+        src_grp = ttk.LabelFrame(previews, text="Image to Convert")
+        src_grp.grid(row=0, column=0, sticky="nsew", padx=(0, 4), pady=(0, 6))
+        src_grp.columnconfigure(0, weight=1)
+        src_grp.rowconfigure(0, weight=1)
+        self.source_preview_label = ttk.Label(
+            src_grp, text="No image selected.", anchor="center")
+        self.source_preview_label.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
-        output_group = ttk.LabelFrame(preview_frame, text="Generated Preview")
-        output_group.grid(row=1, column=0, sticky="nsew")
-        output_group.columnconfigure(0, weight=1)
-        output_group.rowconfigure(0, weight=1)
+        sty_grp = ttk.LabelFrame(previews, text="Style Reference")
+        sty_grp.grid(row=0, column=1, sticky="nsew", padx=(4, 0), pady=(0, 6))
+        sty_grp.columnconfigure(0, weight=1)
+        sty_grp.rowconfigure(0, weight=1)
+        self.style_preview_label = ttk.Label(
+            sty_grp, text="No reference selected.", anchor="center")
+        self.style_preview_label.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
+        out_grp = ttk.LabelFrame(previews, text="Generated Output")
+        out_grp.grid(row=1, column=0, columnspan=2, sticky="nsew")
+        out_grp.columnconfigure(0, weight=1)
+        out_grp.rowconfigure(0, weight=1)
         self.output_preview_label = ttk.Label(
-            output_group, text="No generated image yet.", anchor="center"
-        )
-        self.output_preview_label.grid(row=0, column=0, sticky="nsew", padx=8, pady=8)
+            out_grp, text="No generated image yet.", anchor="center")
+        self.output_preview_label.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
-        ttk.Label(main, textvariable=self.status_var, anchor="w").grid(
-            row=2, column=0, columnspan=2, sticky="ew", pady=(10, 0)
-        )
+        
+        ttk.Label(main, textvariable=self.status_var, anchor="w",
+                  relief="sunken", padding=(4, 2)).grid(
+            row=2, column=0, columnspan=2, sticky="ew", pady=(8, 0))
 
-    def _add_path_row(
+    def _path_row(
         self,
         parent: ttk.Frame,
         row: int,
         label: str,
-        variable: tk.StringVar,
-        browse_command,
+        var: tk.StringVar,
+        browse,
+        on_change=None,
     ) -> None:
-        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 8))
-        entry = ttk.Entry(parent, textvariable=variable)
-        entry.grid(row=row, column=1, sticky="ew", padx=(0, 8))
-        entry.bind("<Return>", self._on_path_changed)
-        entry.bind("<FocusOut>", self._on_path_changed)
-        ttk.Button(parent, text="Browse...", command=browse_command).grid(
-            row=row, column=2, sticky="ew"
+        ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=(0, 8), pady=2)
+        entry = ttk.Entry(parent, textvariable=var)
+        entry.grid(row=row, column=1, sticky="ew", padx=(0, 8), pady=2)
+        if on_change:
+            entry.bind("<Return>", on_change)
+            entry.bind("<FocusOut>", on_change)
+        ttk.Button(parent, text="Browse…", command=browse).grid(row=row, column=2, pady=2)
+
+    
+
+    def _browse_source_image(self) -> None:
+        current = Path(self.source_path_var.get()).expanduser()
+        selected = filedialog.askopenfilename(
+            title="Choose image to convert",
+            filetypes=[("Image Files", "*.png *.jpg *.jpeg *.webp *.bmp"), ("All Files", "*.*")],
+            initialdir=str(current.parent if current.parent.exists() else repo_root()),
         )
+        if selected:
+            self.source_path_var.set(selected)
+            self._refresh_source_preview()
+
+    def _browse_style_image(self) -> None:
+        current = Path(self.style_path_var.get()).expanduser()
+        selected = filedialog.askopenfilename(
+            title="Choose style reference image",
+            filetypes=[("Image Files", "*.png *.jpg *.jpeg *.webp *.bmp"), ("All Files", "*.*")],
+            initialdir=str(current.parent if current.parent.exists() else repo_root()),
+        )
+        if selected:
+            self.style_path_var.set(selected)
+            self._refresh_style_preview()
+
+    def _browse_output_image(self) -> None:
+        current = Path(self.output_path_var.get()).expanduser()
+        selected = filedialog.asksaveasfilename(
+            title="Choose where to save the generated image",
+            defaultextension=".png",
+            filetypes=[("PNG Image", "*.png"), ("All Files", "*.*")],
+            initialdir=str(current.parent if current.parent.exists() else repo_root()),
+            initialfile=current.name or "generated_image.png",
+        )
+        if selected:
+            self.output_path_var.set(selected)
+            self._refresh_output_preview()
+
+    
+
+    def _refresh_all_previews(self) -> None:
+        self._refresh_source_preview()
+        self._refresh_style_preview()
+        self._refresh_output_preview()
+
+    def _refresh_source_preview(self) -> None:
+        self._load_preview(
+            Path(self.source_path_var.get().strip()),
+            self.source_preview_label, "No image selected.",
+            "_source_preview_img", SMALL_PREVIEW_SIZE,
+        )
+
+    def _refresh_style_preview(self) -> None:
+        self._load_preview(
+            Path(self.style_path_var.get().strip()),
+            self.style_preview_label, "No reference selected.",
+            "_style_preview_img", SMALL_PREVIEW_SIZE,
+        )
+
+    def _refresh_output_preview(self) -> None:
+        self._load_preview(
+            Path(self.output_path_var.get().strip()),
+            self.output_preview_label, "No generated image yet.",
+            "_output_preview_img", PREVIEW_SIZE,
+        )
+
+    def _load_preview(
+        self,
+        path: Path,
+        label: ttk.Label,
+        missing_text: str,
+        attr: str,
+        size: tuple[int, int],
+    ) -> None:
+        try:
+            if not path.is_file():
+                label.configure(text=missing_text, image="")
+                setattr(self, attr, None)
+                return
+            with PIL.Image.open(path) as img:
+                preview = img.copy()
+            preview.thumbnail(size, RESAMPLING.LANCZOS)
+            tk_img = ImageTk.PhotoImage(preview)
+            label.configure(image=tk_img, text="")
+            setattr(self, attr, tk_img)
+        except Exception as exc:
+            label.configure(text=f"Preview failed: {exc}", image="")
+            setattr(self, attr, None)
+
+    
 
     def _set_text(self, widget: tk.Text, value: str) -> None:
         widget.delete("1.0", tk.END)
@@ -324,88 +447,26 @@ class AssetImageGeneratorUI:
     def _get_text(self, widget: tk.Text) -> str:
         return widget.get("1.0", tk.END).strip()
 
-    def _on_path_changed(self, _event=None) -> None:
-        self._refresh_reference_preview()
-        self._refresh_output_preview()
-
-    def _browse_reference_image(self) -> None:
-        current_path = Path(self.reference_path_var.get()).expanduser()
-        selected = filedialog.askopenfilename(
-            title="Choose a reference image",
-            filetypes=[
-                ("Image Files", "*.png *.jpg *.jpeg *.webp *.bmp"),
-                ("All Files", "*.*"),
-            ],
-            initialdir=str(current_path.parent if current_path.parent.exists() else repo_root()),
-        )
-        if selected:
-            self.reference_path_var.set(selected)
-            self._refresh_reference_preview()
-
-    def _browse_output_image(self) -> None:
-        current_path = Path(self.output_path_var.get()).expanduser()
-        selected = filedialog.asksaveasfilename(
-            title="Choose where to save the generated image",
-            defaultextension=".png",
-            filetypes=[("PNG Image", "*.png"), ("All Files", "*.*")],
-            initialdir=str(current_path.parent if current_path.parent.exists() else repo_root()),
-            initialfile=current_path.name or "generated_image.png",
-        )
-        if selected:
-            self.output_path_var.set(selected)
-            self._refresh_output_preview()
-
-    def _refresh_reference_preview(self) -> None:
-        self._load_preview(
-            path=Path(self.reference_path_var.get().strip()),
-            label=self.reference_preview_label,
-            missing_text="Reference image not found.",
-            attribute_name="reference_preview_image",
-        )
-
-    def _refresh_output_preview(self) -> None:
-        self._load_preview(
-            path=Path(self.output_path_var.get().strip()),
-            label=self.output_preview_label,
-            missing_text="No generated image yet.",
-            attribute_name="output_preview_image",
-        )
-
-    def _load_preview(
-        self,
-        path: Path,
-        label: ttk.Label,
-        missing_text: str,
-        attribute_name: str,
-    ) -> None:
-        try:
-            if not path.is_file():
-                label.configure(text=missing_text, image="")
-                setattr(self, attribute_name, None)
-                return
-
-            with PIL.Image.open(path) as image:
-                preview = image.copy()
-
-            preview.thumbnail(PREVIEW_SIZE, RESAMPLING.LANCZOS)
-            tk_image = ImageTk.PhotoImage(preview)
-            label.configure(image=tk_image, text="")
-            setattr(self, attribute_name, tk_image)
-        except Exception as exc:
-            label.configure(text=f"Preview failed: {exc}", image="")
-            setattr(self, attribute_name, None)
+    
 
     def _collect_config(self) -> GenerationConfig:
-        reference_image = Path(self.reference_path_var.get().strip())
+        source_path = Path(self.source_path_var.get().strip())
+        style_path = Path(self.style_path_var.get().strip())
         output_image = normalize_output_path(Path(self.output_path_var.get().strip()))
         prompt = self._get_text(self.prompt_text)
         style_prompt = self._get_text(self.style_prompt_text)
+
+        if not source_path.name:
+            raise ValueError("Please select an image to convert.")
+        if not style_path.name:
+            raise ValueError("Please select a style reference image.")
         if not prompt:
             raise ValueError("Main prompt cannot be empty.")
 
         self.output_path_var.set(str(output_image))
+        
         return GenerationConfig(
-            reference_image=reference_image,
+            reference_images=(style_path, source_path),
             output_image=output_image,
             prompt=prompt,
             style_prompt=style_prompt,
@@ -415,27 +476,23 @@ class AssetImageGeneratorUI:
             debug=self.debug_var.get(),
         )
 
+    
+
     def _on_generate_clicked(self) -> None:
         if self.is_generating:
             return
-
         try:
             config = self._collect_config()
         except Exception as exc:
             messagebox.showerror("Invalid Input", str(exc), parent=self.root)
             return
-
         self.is_generating = True
         self.generate_button.state(["disabled"])
         self.progress.start(10)
-        self.status_var.set("Generating image...")
-
-        worker = threading.Thread(
-            target=self._generate_in_background,
-            args=(config,),
-            daemon=True,
-        )
-        worker.start()
+        self.status_var.set("Generating image…")
+        threading.Thread(
+            target=self._generate_in_background, args=(config,), daemon=True
+        ).start()
 
     def _generate_in_background(self, config: GenerationConfig) -> None:
         try:
@@ -448,10 +505,9 @@ class AssetImageGeneratorUI:
         self.is_generating = False
         self.generate_button.state(["!disabled"])
         self.progress.stop()
-        self.status_var.set(f"Saved generated image to {output_image}")
+        self.status_var.set(f"Saved to {output_image}")
         self.output_path_var.set(str(output_image))
         self._show_generated_preview(image)
-        self._refresh_output_preview()
 
     def _on_generation_error(self, message: str) -> None:
         self.is_generating = False
@@ -463,15 +519,35 @@ class AssetImageGeneratorUI:
     def _show_generated_preview(self, image: PIL.Image.Image) -> None:
         preview = image.copy()
         preview.thumbnail(PREVIEW_SIZE, RESAMPLING.LANCZOS)
-        tk_image = ImageTk.PhotoImage(preview)
-        self.output_preview_label.configure(image=tk_image, text="")
-        self.output_preview_image = tk_image
+        tk_img = ImageTk.PhotoImage(preview)
+        self.output_preview_label.configure(image=tk_img, text="")
+        self._output_preview_img = tk_img
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate one reference-guided image with a simple desktop UI."
+        description="Generate one image guided by one or more reference images."
     )
-    parser.add_argument("--reference-image", type=Path, default=default_reference_image())
+    parser.add_argument(
+        "--reference-image",
+        type=Path,
+        action="append",
+        dest="reference_images",
+        help="Repeat this flag to provide multiple reference images (used by --no-ui).",
+    )
+    parser.add_argument(
+        "--source-image",
+        type=Path,
+        dest="source_image",
+        default=None,
+        help="Image to convert (pre-fills the 'Image to Convert' UI field).",
+    )
+    parser.add_argument(
+        "--style-image",
+        type=Path,
+        dest="style_image",
+        default=None,
+        help="Style reference image (pre-fills the 'Style Reference' UI field).",
+    )
     parser.add_argument("--output", type=Path, default=default_output_image())
     parser.add_argument("--prompt", default="")
     parser.add_argument("--style-prompt", default=DEFAULT_STYLE_PROMPT)
@@ -488,11 +564,21 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Run a single generation from the command line instead of opening the UI.",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if not args.reference_images:
+        args.reference_images = list(default_reference_images())
+    else:
+        args.reference_images = [path.expanduser() for path in args.reference_images]
+    
+    if args.style_image is None and args.reference_images:
+        args.style_image = args.reference_images[0]
+    if args.source_image is None and len(args.reference_images) > 1:
+        args.source_image = args.reference_images[1]
+    return args
 
 def run_cli(args: argparse.Namespace) -> int:
     config = GenerationConfig(
-        reference_image=args.reference_image,
+        reference_images=tuple(args.reference_images),
         output_image=args.output,
         prompt=args.prompt,
         style_prompt=args.style_prompt,

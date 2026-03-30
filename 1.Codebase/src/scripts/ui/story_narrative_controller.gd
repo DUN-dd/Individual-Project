@@ -281,19 +281,45 @@ func _update_story_choices(ai_choices: Array[Dictionary], story_text: String, al
 		return
 	var lang := _get_current_language()
 	var final_choices := ai_choices
+	var initial_report := NarrativeResponseParser.get_ai_choice_validation_report(final_choices, lang)
 	_debug_log("[DEBUG_NARRATIVE] Updating Story Choices. AI Payload Size: %d" % ai_choices.size())
-	_debug_log("[Narrative] Updating choices | lang=%s | ai_choices=%d" % [lang, final_choices.size()])
-	if final_choices.is_empty():
+	_debug_log("[Narrative] Updating choices | lang=%s | ai_choices=%d | valid=%s | reason=%s" % [
+		lang,
+		final_choices.size(),
+		str(initial_report.get("valid", false)),
+		str(initial_report.get("reason", "unknown")),
+	])
+	if not bool(initial_report.get("valid", false)):
+		if not final_choices.is_empty():
+			_debug_log("[Narrative] AI choices invalid; attempting story-text extraction | details=%s" % [initial_report])
 		final_choices = _extract_archetype_choices_from_text(story_text, lang)
-		_debug_log("[Narrative] Extracted choices from text | count=%d" % final_choices.size())
-	if final_choices.is_empty():
-		_debug_log("[Narrative] No AI choices, falling back to legacy generator")
+		var extracted_report := NarrativeResponseParser.get_ai_choice_validation_report(final_choices, lang)
+		_debug_log("[Narrative] Extracted choices from text | count=%d | valid=%s | reason=%s" % [
+			final_choices.size(),
+			str(extracted_report.get("valid", false)),
+			str(extracted_report.get("reason", "unknown")),
+		])
+	if not _are_ai_choices_valid(final_choices, lang):
+		print("[StoryNarrative] DEBUG: AI choices INVALID (count=%d) — entering fallback path" % final_choices.size())
+		_debug_log("[Narrative] No valid AI choices available after extraction; falling back to legacy generator")
 		if allow_followup and not _pending_choice_followup:
+			_debug_log("[Narrative] Triggering choice_followup fallback request")
 			_request_story_choice_followup(story_text, lang)
+			if not _pending_choice_followup:
+				_debug_log("[Narrative] choice_followup resolved synchronously (mock mode); skipping legacy fallback")
+				return
+		elif allow_followup:
+			_debug_log("[Narrative] choice_followup already pending for current story; skipping duplicate request")
+		else:
+			_debug_log("[Narrative] choice_followup disabled for this update path")
+		print("[StoryNarrative] DEBUG: Falling back to generate_choices() legacy path")
 		story_scene.choice_controller.generate_choices()
-	else:
-		_debug_log("[Narrative] Applying AI choices to controller")
-		story_scene.choice_controller.apply_ai_choices(final_choices, lang)
+		return
+	print("[StoryNarrative] DEBUG: AI choices VALID (count=%d) — applying directly via apply_ai_choices (FIX ACTIVE)" % final_choices.size())
+	_debug_log("[Narrative] Applying valid AI choices to controller without follow-up")
+	story_scene.choice_controller.apply_ai_choices(final_choices, lang)
+func _are_ai_choices_valid(ai_choices: Array[Dictionary], lang: String) -> bool:
+	return NarrativeResponseParser.are_ai_choices_valid(ai_choices, lang)
 func _request_story_choice_followup(story_text: String, lang: String) -> void:
 	var ai_manager = get_ai_manager()
 	var excerpt := story_text.strip_edges()
@@ -318,17 +344,26 @@ func _on_choice_followup_generated(response: Dictionary) -> void:
 	if content.is_empty():
 		return
 	var parser := JSON.new()
-	if parser.parse(content) != OK or not (parser.data is Dictionary):
-		return
+	var parse_source := content
+	if parser.parse(parse_source) != OK or not (parser.data is Dictionary):
+		var json_block := _extract_primary_json_block(content)
+		if json_block.is_empty():
+			return
+		parse_source = json_block
+		parser = JSON.new()
+		if parser.parse(parse_source) != OK or not (parser.data is Dictionary):
+			return
 	var json_data: Dictionary = parser.data
 	if not json_data.has("choices"):
 		return
 	var ai_choices := _normalize_ai_choice_payload(json_data.get("choices", []))
-	if ai_choices.is_empty():
+	var validation_report := NarrativeResponseParser.get_ai_choice_validation_report(ai_choices, _get_current_language())
+	if not bool(validation_report.get("valid", false)):
+		_debug_log("[Narrative] Follow-up choices arrived but failed validation | details=%s" % [validation_report])
 		return
 	if _choice_followup_story_id != _last_story_id:
 		return
-	_debug_log("[Narrative] Follow-up choices received: %d" % ai_choices.size())
+	_debug_log("[Narrative] Follow-up choices received and accepted: %d" % ai_choices.size())
 	_update_story_choices(ai_choices, _last_story_text, false)
 func _get_current_language() -> String:
 	var game_state = get_game_state()
@@ -430,7 +465,12 @@ func _on_consequence_generated(response: Dictionary) -> void:
 		_report_warning("Consequence generation failed: AI manager missing")
 		story_scene.overlay_controller.show_gloria_overlay(content if not content.is_empty() else "Gloria glares at you silently...")
 		return
-	var directives = ai_manager.parse_scene_directives(content)
+	var parsed := NarrativeResponseParser.parse_mission_response(response, ai_manager)
+	var directives: Dictionary = parsed.get("directives", {})
+	var ai_choice_payload: Array[Dictionary] = parsed.get("choices", [])
+	var clean_content: String = String(parsed.get("story_text", ""))
+	if clean_content.strip_edges().is_empty():
+		clean_content = ai_manager.extract_story_content(content)
 	if not directives.is_empty():
 		if directives.has("characters"):
 			directives["characters"] = _normalize_character_directives(directives.get("characters", { }))
@@ -439,7 +479,6 @@ func _on_consequence_generated(response: Dictionary) -> void:
 		story_scene.apply_scene_directives(directives)
 		if directives.has("relationships"):
 			_process_relationship_updates(directives["relationships"])
-	var clean_content = ai_manager.extract_story_content(content)
 	var sanitized: String = StoryUIHelper.sanitize_story_text(clean_content)
 	await _update_story_display(sanitized)
 	_last_story_text = sanitized
@@ -455,6 +494,11 @@ func _on_consequence_generated(response: Dictionary) -> void:
 	if game_state and game_state.debug_force_mission_complete:
 		_debug_log("[Narrative] Debug override: forcing mission completion.")
 		mission_status = "complete"
+	if game_state and mission_status != "complete":
+		var max_rounds: int = int(game_state.settings.get("max_rounds_per_mission", 0))
+		if max_rounds > 0 and game_state.mission_turn_count >= max_rounds - 1:
+			_debug_log("[Narrative] Max rounds override: turn %d >= limit %d, forcing mission completion." % [game_state.mission_turn_count, max_rounds - 1])
+			mission_status = "complete"
 	if mission_status == "complete":
 		_debug_log("[Narrative] AI signaled mission completion.")
 		_handle_mission_completion(sanitized)
@@ -470,7 +514,7 @@ func _on_consequence_generated(response: Dictionary) -> void:
 				_debug_log("[Narrative] Triggering automatic Gloria intervention (Positive Energy <= %d)" % GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD)
 				request_gloria_intervention(last_choice)
 				return
-		_update_story_choices([], sanitized)
+		_update_story_choices(ai_choice_payload, sanitized)
 		if story_scene and story_scene.flow_controller:
 			story_scene.flow_controller._try_schedule_trolley_problem()
 func _handle_mission_completion(last_text: String) -> void:
@@ -630,7 +674,7 @@ func _on_teammate_interference_generated(response: Dictionary, teammate_id: Stri
 		game_state_teammate.set_latest_story_text(combined_text)
 	_refresh_story_nav_buttons()
 	_last_story_id += 1
-	_update_story_choices([], combined_text)
+	story_scene.choice_controller.generate_choices()
 	if teammate_id == "gloria":
 		_play_random_gloria_sfx(GLORIA_MAIN_SFX_IDS, 0.88)
 func request_gloria_intervention(choice: Dictionary) -> void:

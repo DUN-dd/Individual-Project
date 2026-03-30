@@ -1,5 +1,6 @@
 extends Node2D
 const ERROR_CONTEXT := "Main"
+const ErrorReporterBridge = preload("res://1.Codebase/src/scripts/core/error_reporter_bridge.gd")
 @onready var world: Node2D = $World
 const PLAYER_SCENE: PackedScene = preload("res://1.Codebase/player.tscn")
 func _ready() -> void:

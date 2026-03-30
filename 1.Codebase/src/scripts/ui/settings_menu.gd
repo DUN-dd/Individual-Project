@@ -48,14 +48,16 @@ var selected_language: String = "en"
 var selected_font_size: int = 2
 var selected_english_font: String = ""
 var selected_chinese_font: String = ""
+var selected_german_font: String = ""
 var master_volume: float = 100.0
 var music_volume: float = 100.0
 var sfx_volume: float = 100.0
-var gloria_voice_enabled: bool = true
+var gloria_voice_enabled: bool = false
 var is_muted: bool = false
 var touch_controls_enabled: bool = false
 var text_speed: float = 1.0
 var screen_shake_enabled: bool = true
+var trolley_ai_story_enabled: bool = false
 var max_rounds_per_mission: int = 0
 var auto_advance_enabled: bool = false
 var high_contrast_mode: bool = false
@@ -90,6 +92,8 @@ var resolutions = {
 @onready var english_font_option = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/EnglishFontOption
 @onready var chinese_font_label = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/ChineseFontLabel
 @onready var chinese_font_option = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/ChineseFontOption
+@onready var german_font_label = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/GermanFontLabel
+@onready var german_font_option = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/GermanFontOption
 @onready var language_label = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/LanguageLabel
 @onready var language_option = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/LanguageOption
 @onready var master_volume_hbox = $MenuContainer/Panel/VBoxContainer/ScrollContainer/SettingsVBox/MasterVolumeHBox
@@ -128,6 +132,7 @@ var gloria_voice_check: CheckBox
 var text_speed_label: Label
 var text_speed_option: OptionButton
 var screen_shake_check: CheckBox
+var trolley_ai_story_check: CheckBox
 var max_rounds_label: Label
 var max_rounds_spinbox: SpinBox
 var force_mission_complete_check: CheckBox
@@ -347,6 +352,7 @@ func _rebuild_layout_into_tabs() -> void:
 			"font_size_label": font_size_label, "font_size_option": font_size_option,
 			"english_font_label": english_font_label, "english_font_option": english_font_option,
 			"chinese_font_label": chinese_font_label, "chinese_font_option": chinese_font_option,
+			"german_font_label": german_font_label, "german_font_option": german_font_option,
 			"mute_check_box": mute_check_box,
 			"master_volume_hbox": master_volume_hbox, "music_volume_hbox": music_volume_hbox,
 			"sfx_volume_hbox": sfx_volume_hbox,
@@ -367,6 +373,7 @@ func _rebuild_layout_into_tabs() -> void:
 	text_speed_label  = result["text_speed_label"]
 	text_speed_option = result["text_speed_option"]
 	screen_shake_check = result["screen_shake_check"]
+	trolley_ai_story_check = result["trolley_ai_story_check"]
 	max_rounds_label  = result["max_rounds_label"]
 	max_rounds_spinbox = result["max_rounds_spinbox"]
 	gloria_voice_check = result["gloria_voice_check"]
@@ -389,6 +396,10 @@ func _create_ai_log_tab_page(tab_container: TabContainer) -> VBoxContainer:
 			"export_json":           Callable(_ai_log_ctrl, "_on_ai_export_pressed"),
 			"export_csv":            Callable(_ai_log_ctrl, "_on_ai_export_csv_pressed"),
 			"clear":                 Callable(_ai_log_ctrl, "_on_ai_log_clear_pressed"),
+			"toggle_save_details":   Callable(_ai_log_ctrl, "_on_ai_log_save_details_toggled"),
+			"copy_all":              Callable(_ai_log_ctrl, "_on_ai_log_copy_all_pressed"),
+			"copy_request":          Callable(_ai_log_ctrl, "_on_ai_log_copy_request_pressed"),
+			"copy_response":         Callable(_ai_log_ctrl, "_on_ai_log_copy_response_pressed"),
 			"chart_size_changed":    Callable(_ai_log_ctrl, "_on_ai_chart_size_changed"),
 			"chart_visibility_toggled": Callable(_ai_log_ctrl, "_on_ai_chart_visibility_toggled"),
 			"tab_changed":           Callable(_ai_log_ctrl, "_on_ai_log_tab_changed"),
@@ -411,17 +422,20 @@ func _initialize_new_controls():
 		{
 			"text_speed_option": text_speed_option,
 			"screen_shake_check": screen_shake_check,
+			"trolley_ai_story_check": trolley_ai_story_check,
 			"max_rounds_spinbox": max_rounds_spinbox,
 		},
 		{
 			"text_speed": text_speed,
 			"screen_shake_enabled": screen_shake_enabled,
+			"trolley_ai_story_enabled": trolley_ai_story_enabled,
 			"max_rounds_per_mission": max_rounds_per_mission,
 		},
 		game_state,
 		{
 			"on_text_speed_selected":          _on_text_speed_selected,
 			"on_screen_shake_toggled":         _on_screen_shake_toggled,
+			"on_trolley_ai_story_toggled":     _on_trolley_ai_story_toggled,
 			"on_max_rounds_changed":           _on_max_rounds_changed,
 			"on_force_mission_complete_toggled": Callable(_dev_ctrl, "_on_force_mission_complete_toggled"),
 			"on_force_gloria_pressed":         _on_force_gloria_pressed,
@@ -527,6 +541,11 @@ func _on_text_speed_selected(index: int):
 	_play_sfx("menu_click")
 func _on_screen_shake_toggled(toggled: bool):
 	screen_shake_enabled = toggled
+func _on_trolley_ai_story_toggled(toggled: bool):
+	trolley_ai_story_enabled = toggled
+	var game_state := _get_game_state()
+	if game_state:
+		game_state.settings["trolley_ai_story_enabled"] = trolley_ai_story_enabled
 func _on_max_rounds_changed(value: float):
 	max_rounds_per_mission = int(value)
 	var game_state := _get_game_state()
@@ -608,6 +627,7 @@ func update_ui_text():
 		"text_speed_label": text_speed_label,
 		"text_speed_option": text_speed_option,
 		"screen_shake_check": screen_shake_check,
+		"trolley_ai_story_check": trolley_ai_story_check,
 		"max_rounds_label": max_rounds_label,
 		"max_rounds_spinbox": max_rounds_spinbox,
 		"touch_controls_checkbox": touch_controls_checkbox,
@@ -648,6 +668,7 @@ func update_ui_text():
 		"font_size_label": font_size_label,
 		"english_font_label": english_font_label,
 		"chinese_font_label": chinese_font_label,
+		"german_font_label": german_font_label,
 		"tab_tutorial": tab_tutorial,
 		"tutorial_enabled_toggle": tutorial_enabled_toggle,
 		"reset_tutorials_button": reset_tutorials_button,
@@ -751,7 +772,7 @@ func _connect_button_sounds() -> void:
 	var menu_click_buttons = [
 		back_button, ai_settings_button,
 		voice_preview_button, voice_capture_button,
-		screen_shake_check, touch_controls_checkbox,
+		screen_shake_check, trolley_ai_story_check, touch_controls_checkbox,
 		mute_check_box, gloria_voice_check, delete_logs_button
 	]
 	for btn in menu_click_buttons:
@@ -871,6 +892,7 @@ func _on_sfx_volume_changed(value: float):
 	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_gloria_voice_toggled(button_pressed: bool):
 	gloria_voice_enabled = button_pressed
+	print("[Godot-Cmd-Debug] Settings Menu - Gloria Voice toggled to: ", "ON" if button_pressed else "OFF")
 	SettingsMenuAudioSectionScript.apply_audio_settings(_get_audio_settings_data())
 func _on_mute_toggled(button_pressed: bool):
 	is_muted = button_pressed
@@ -882,23 +904,30 @@ func _normalize_selected_resolution(fallback_size: Vector2i) -> void:
 		selected_resolution, resolutions, fallback_size
 	)
 func _initialize_font_options() -> void:
-	if english_font_option == null or chinese_font_option == null:
+	if english_font_option == null or chinese_font_option == null or german_font_option == null:
 		return
 	var en_fonts: Array = []
 	var zh_fonts: Array = []
+	var de_fonts: Array = []
 	if FontManager and FontManager.has_method("get_available_fonts_for_language"):
 		en_fonts = FontManager.get_available_fonts_for_language("en")
 		zh_fonts = FontManager.get_available_fonts_for_language("zh")
+		de_fonts = FontManager.get_available_fonts_for_language("de")
 	if en_fonts.is_empty():
 		en_fonts.append(_get_default_font("en"))
 	if zh_fonts.is_empty():
 		zh_fonts.append(_get_default_font("zh"))
+	if de_fonts.is_empty():
+		de_fonts.append(_get_default_font("de"))
 	SettingsMenuDisplaySectionScript.populate_font_option(english_font_option, en_fonts)
 	SettingsMenuDisplaySectionScript.populate_font_option(chinese_font_option, zh_fonts)
+	SettingsMenuDisplaySectionScript.populate_font_option(german_font_option, de_fonts)
 	if selected_english_font.is_empty():
 		selected_english_font = en_fonts[0]
 	if selected_chinese_font.is_empty():
 		selected_chinese_font = zh_fonts[0]
+	if selected_german_font.is_empty():
+		selected_german_font = de_fonts[0]
 	_sync_font_option_selection()
 func _sync_font_option_selection() -> void:
 	selected_english_font = SettingsMenuDisplaySectionScript.select_option_by_metadata(
@@ -907,12 +936,16 @@ func _sync_font_option_selection() -> void:
 	selected_chinese_font = SettingsMenuDisplaySectionScript.select_option_by_metadata(
 		chinese_font_option, selected_chinese_font, _get_default_font("zh")
 	)
+	selected_german_font = SettingsMenuDisplaySectionScript.select_option_by_metadata(
+		german_font_option, selected_german_font, _get_default_font("de")
+	)
 func _apply_selected_fonts_for_current_language() -> void:
 	if not FontManager:
 		return
 	if FontManager.has_method("set_selected_font"):
 		FontManager.set_selected_font("en", selected_english_font)
 		FontManager.set_selected_font("zh", selected_chinese_font)
+		FontManager.set_selected_font("de", selected_german_font)
 	if FontManager.has_method("apply_language_font"):
 		FontManager.apply_language_font(selected_language)
 func _sync_display_options_with_state() -> void:
@@ -966,6 +999,10 @@ func _on_english_font_changed(index: int):
 func _on_chinese_font_changed(index: int):
 	selected_chinese_font = SettingsMenuDisplaySectionScript.get_option_metadata(chinese_font_option, index)
 	_report_info("Chinese font changed to: %s" % selected_chinese_font)
+	_apply_selected_fonts_for_current_language()
+func _on_german_font_changed(index: int):
+	selected_german_font = SettingsMenuDisplaySectionScript.get_option_metadata(german_font_option, index)
+	_report_info("German font changed to: %s" % selected_german_font)
 	_apply_selected_fonts_for_current_language()
 func _on_apply_button_pressed():
 	var window := get_window()
@@ -1091,10 +1128,12 @@ func save_settings():
 		"font_size": selected_font_size,
 		"font_en": selected_english_font,
 		"font_zh": selected_chinese_font,
+		"font_de": selected_german_font,
 		"high_contrast": high_contrast_mode,
 		"language": selected_language,
 		"text_speed": text_speed,
 		"screen_shake": screen_shake_enabled,
+		"trolley_ai_story_enabled": trolley_ai_story_enabled,
 		"max_rounds_per_mission": max_rounds_per_mission,
 		"master_volume": master_volume,
 		"music_volume": music_volume,
@@ -1116,6 +1155,9 @@ func load_settings():
 		"resolution": fallback_window_size,
 		"font_en": _get_default_font("en"),
 		"font_zh": _get_default_font("zh"),
+		"font_de": _get_default_font("de"),
+		"gloria_voice_enabled": false,
+		"trolley_ai_story_enabled": false,
 		"voice_enabled": false,
 		"voice_output_enabled": false,
 		"voice_input_enabled": false,
@@ -1136,10 +1178,12 @@ func load_settings():
 		selected_font_size = data["font_size"]
 		selected_english_font = data["font_en"]
 		selected_chinese_font = data["font_zh"]
+		selected_german_font = String(data.get("font_de", _get_default_font("de")))
 		high_contrast_mode = data["high_contrast"]
 		selected_language = data["language"]
 		text_speed = data["text_speed"]
 		screen_shake_enabled = data["screen_shake"]
+		trolley_ai_story_enabled = bool(data.get("trolley_ai_story_enabled", false))
 		max_rounds_per_mission = data["max_rounds_per_mission"]
 		master_volume = data["master_volume"]
 		music_volume = data["music_volume"]
@@ -1156,6 +1200,9 @@ func load_settings():
 			"voice_proactive_enabled": data["voice_proactive_enabled"],
 		}
 		touch_controls_enabled = data["touch_controls_enabled"]
+		var game_state := _get_game_state()
+		if game_state:
+			game_state.settings["trolley_ai_story_enabled"] = trolley_ai_story_enabled
 	else:
 		_normalize_selected_resolution(fallback_window_size)
 func _emit_close_requested() -> void:

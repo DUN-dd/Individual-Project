@@ -1,7 +1,7 @@
 extends Control
 const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
-const TeammateSystem = preload("res://1.Codebase/src/scripts/core/teammate_system.gd")
 const ICON_QUIT = preload("res://1.Codebase/src/assets/ui/icon_quit.svg")
+const TURNAROUND_BACKGROUND_DIR = "res://1.Codebase/src/assets/backgrounds"
 var current_language: String = "en"
 var selected_character_id: String = ""
 var character_data: Dictionary = {}
@@ -15,10 +15,16 @@ var _details_container: VBoxContainer
 var _graph_container: Control
 var _is_graph_mode: bool = false
 var _graph_nodes: Dictionary = {}
-var _reference_overlay: ColorRect
-var _reference_texture: TextureRect
-var _show_reference_btn: Button
+var _turnaround_overlay: ColorRect
+var _turnaround_background: TextureRect
+var _turnaround_texture: TextureRect
+var _show_turnaround_btn: Button
+var _turnaround_background_paths: Array[String] = []
+var _last_turnaround_background_path: String = ""
+var _turnaround_rng := RandomNumberGenerator.new()
 func _ready():
+	_turnaround_rng.randomize()
+	_load_turnaround_background_paths()
 	var game_state = ServiceLocator.get_game_state() if ServiceLocator else null
 	current_language = game_state.current_language if game_state else "en"
 	_init_character_data()
@@ -36,49 +42,48 @@ func _init_character_data():
 			"title_key": "CHAR_PROTAGONIST_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_protagonist.png",
 			"desc_key": "CHAR_PROTAGONIST_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_protagonist.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_protagonist.png"
 		},
 		"gloria": {
 			"name_key": "CHAR_GLORIA_NAME",
 			"title_key": "CHAR_GLORIA_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_gloria.png",
 			"desc_key": "CHAR_GLORIA_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_gloria.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_gloria.png"
 		},
 		"donkey": {
 			"name_key": "CHAR_DONKEY_NAME",
 			"title_key": "CHAR_DONKEY_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_donkey.png",
 			"desc_key": "CHAR_DONKEY_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_donkey.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_donkey.png"
 		},
 		"ark": {
 			"name_key": "CHAR_ARK_NAME",
 			"title_key": "CHAR_ARK_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_ark.png",
 			"desc_key": "CHAR_ARK_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_ark.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_ark.png"
 		},
 		"one": {
 			"name_key": "CHAR_ONE_NAME",
 			"title_key": "CHAR_ONE_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_one.png",
 			"desc_key": "CHAR_ONE_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_one.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_one.png"
 		},
 		"teacher_chan": {
 			"name_key": "CHAR_TEACHER_NAME",
 			"title_key": "CHAR_TEACHER_TITLE",
 			"icon_path": "res://1.Codebase/src/assets/characters/portrait_teacher_chan.png",
 			"desc_key": "CHAR_TEACHER_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_teacher_chan.png"
+			"turnaround_path": "res://1.Codebase/src/assets/characters/turnaround_teacher_chan.png"
 		},
 		"fsm": {
 			"name_key": "CHAR_FSM_NAME",
 			"title_key": "CHAR_FSM_TITLE",
-			"icon_path": "",
-			"desc_key": "CHAR_FSM_DESC",
-			"reference_path": "res://1.Codebase/src/assets/characters/reference_fsm.png"
+			"icon_path": "res://1.Codebase/src/assets/ui/praytoMonster.png",
+			"desc_key": "CHAR_FSM_DESC"
 		}
 	}
 func _rebuild_ui_layout(panel: Control):
@@ -163,40 +168,110 @@ func _rebuild_ui_layout(panel: Control):
 	_character_portrait = TextureRect.new()
 	_character_portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_character_portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_character_portrait.custom_minimum_size = Vector2(200, 200)
-	var portrait_hbox = HBoxContainer.new()
-	portrait_hbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_details_container.add_child(portrait_hbox)
-	portrait_hbox.add_child(_character_portrait)
-	_show_reference_btn = Button.new()
-	_show_reference_btn.text = _tr("CHAR_BUTTON_REFERENCE")
-	_show_reference_btn.connect("pressed", Callable(self, "_on_show_reference_pressed"))
-	UIStyleManager.apply_button_style(_show_reference_btn, "secondary", "small")
-	_show_reference_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	portrait_hbox.add_child(_show_reference_btn)
-	_reference_overlay = ColorRect.new()
-	_reference_overlay.color = Color(0, 0, 0, 0.85)
-	_reference_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_reference_overlay.visible = false
-	panel.add_child(_reference_overlay)
-	var ref_vbox = VBoxContainer.new()
-	ref_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	ref_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	_reference_overlay.add_child(ref_vbox)
-	_reference_texture = TextureRect.new()
-	_reference_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_reference_texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	_reference_texture.custom_minimum_size = Vector2(800, 600)
-	_reference_texture.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	ref_vbox.add_child(_reference_texture)
-	var close_ref_btn = Button.new()
-	close_ref_btn.text = _tr("CHAR_BUTTON_CLOSE")
-	close_ref_btn.icon = ICON_QUIT
-	close_ref_btn.expand_icon = true
-	close_ref_btn.connect("pressed", Callable(self, "_on_close_reference_pressed"))
-	UIStyleManager.apply_button_style(close_ref_btn, "primary", "medium")
-	close_ref_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	ref_vbox.add_child(close_ref_btn)
+	_character_portrait.custom_minimum_size = Vector2(320, 320)
+	_character_portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var portrait_row = HBoxContainer.new()
+	portrait_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	portrait_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	portrait_row.add_theme_constant_override("separation", 24)
+	_details_container.add_child(portrait_row)
+	portrait_row.add_child(_character_portrait)
+	var action_column = VBoxContainer.new()
+	action_column.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	action_column.add_theme_constant_override("separation", 10)
+	portrait_row.add_child(action_column)
+	_show_turnaround_btn = Button.new()
+	_show_turnaround_btn.text = _tr("CHAR_BUTTON_REFERENCE")
+	_show_turnaround_btn.custom_minimum_size = Vector2(220, 72)
+	_show_turnaround_btn.connect("pressed", Callable(self, "_on_show_turnaround_pressed"))
+	UIStyleManager.apply_button_style(_show_turnaround_btn, "accent", "large")
+	action_column.add_child(_show_turnaround_btn)
+	var turnaround_hint = Label.new()
+	turnaround_hint.text = "Front / Side / Back"
+	turnaround_hint.add_theme_font_size_override("font_size", 14)
+	turnaround_hint.add_theme_color_override("font_color", Color(0.75, 0.82, 0.92))
+	turnaround_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	action_column.add_child(turnaround_hint)
+	_turnaround_overlay = ColorRect.new()
+	_turnaround_overlay.color = Color(0, 0, 0, 0.88)
+	_turnaround_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_turnaround_overlay.visible = false
+	panel.add_child(_turnaround_overlay)
+	var overlay_margin = MarginContainer.new()
+	overlay_margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay_margin.add_theme_constant_override("margin_left", 48)
+	overlay_margin.add_theme_constant_override("margin_right", 48)
+	overlay_margin.add_theme_constant_override("margin_top", 36)
+	overlay_margin.add_theme_constant_override("margin_bottom", 36)
+	_turnaround_overlay.add_child(overlay_margin)
+	var overlay_panel = PanelContainer.new()
+	UIStyleManager.apply_panel_style(overlay_panel, 0.98, UIStyleManager.CORNER_RADIUS_LARGE)
+	overlay_margin.add_child(overlay_panel)
+	var overlay_vbox = VBoxContainer.new()
+	overlay_vbox.add_theme_constant_override("separation", 16)
+	overlay_panel.add_child(overlay_vbox)
+	var overlay_header = HBoxContainer.new()
+	overlay_header.alignment = BoxContainer.ALIGNMENT_CENTER
+	overlay_vbox.add_child(overlay_header)
+	var overlay_title = Label.new()
+	overlay_title.text = _tr("CHAR_BUTTON_REFERENCE")
+	overlay_title.add_theme_font_size_override("font_size", 26)
+	overlay_title.add_theme_color_override("font_color", Color(0.96, 0.96, 1.0))
+	overlay_header.add_child(overlay_title)
+	var turnaround_preview = Control.new()
+	turnaround_preview.custom_minimum_size = Vector2(960, 680)
+	turnaround_preview.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	turnaround_preview.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	turnaround_preview.clip_contents = true
+	overlay_vbox.add_child(turnaround_preview)
+	var turnaround_preview_frame = PanelContainer.new()
+	turnaround_preview_frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	turnaround_preview_frame.clip_contents = true
+	var turnaround_preview_style = StyleBoxFlat.new()
+	turnaround_preview_style.bg_color = Color(0.06, 0.08, 0.11, 0.96)
+	turnaround_preview_style.corner_radius_top_left = 24
+	turnaround_preview_style.corner_radius_top_right = 24
+	turnaround_preview_style.corner_radius_bottom_right = 24
+	turnaround_preview_style.corner_radius_bottom_left = 24
+	turnaround_preview_style.border_width_left = 2
+	turnaround_preview_style.border_width_top = 2
+	turnaround_preview_style.border_width_right = 2
+	turnaround_preview_style.border_width_bottom = 2
+	turnaround_preview_style.border_color = Color(1.0, 1.0, 1.0, 0.08)
+	turnaround_preview_frame.add_theme_stylebox_override("panel", turnaround_preview_style)
+	turnaround_preview.add_child(turnaround_preview_frame)
+	_turnaround_background = TextureRect.new()
+	_turnaround_background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_turnaround_background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_turnaround_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_turnaround_background.modulate = Color(1.0, 1.0, 1.0, 0.92)
+	turnaround_preview_frame.add_child(_turnaround_background)
+	var turnaround_shade = ColorRect.new()
+	turnaround_shade.color = Color(0.04, 0.05, 0.08, 0.28)
+	turnaround_shade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	turnaround_preview_frame.add_child(turnaround_shade)
+	var turnaround_margin = MarginContainer.new()
+	turnaround_margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	turnaround_margin.add_theme_constant_override("margin_left", 24)
+	turnaround_margin.add_theme_constant_override("margin_right", 24)
+	turnaround_margin.add_theme_constant_override("margin_top", 24)
+	turnaround_margin.add_theme_constant_override("margin_bottom", 24)
+	turnaround_preview_frame.add_child(turnaround_margin)
+	_turnaround_texture = TextureRect.new()
+	_turnaround_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_turnaround_texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_turnaround_texture.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_turnaround_texture.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	turnaround_margin.add_child(_turnaround_texture)
+	var close_turnaround_btn = Button.new()
+	close_turnaround_btn.text = _tr("CHAR_BUTTON_CLOSE")
+	close_turnaround_btn.icon = ICON_QUIT
+	close_turnaround_btn.expand_icon = true
+	close_turnaround_btn.custom_minimum_size = Vector2(220, 56)
+	close_turnaround_btn.connect("pressed", Callable(self, "_on_close_turnaround_pressed"))
+	UIStyleManager.apply_button_style(close_turnaround_btn, "primary", "medium")
+	close_turnaround_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	overlay_vbox.add_child(close_turnaround_btn)
 	_content_title = Label.new()
 	_content_title.text = ""
 	_content_title.add_theme_font_size_override("font_size", 32)
@@ -235,9 +310,9 @@ func _select_character(char_key: String):
 	else:
 		_character_portrait.texture = null
 		_character_portrait.visible = false
-	var ref_path = data.get("reference_path", "")
-	if _show_reference_btn:
-		_show_reference_btn.visible = (ref_path != "" and ResourceLoader.exists(ref_path))
+	var turnaround_path = data.get("turnaround_path", "")
+	if _show_turnaround_btn:
+		_show_turnaround_btn.visible = turnaround_path != "" and ResourceLoader.exists(turnaround_path)
 	_content_title.text = name_text + "\n" + title_text
 	_content_title.add_theme_font_size_override("font_size", 32)
 	var desc_text = _tr(data["desc_key"])
@@ -252,20 +327,22 @@ func _select_character(char_key: String):
 				else:
 					UIStyleManager.apply_button_style(btn, "secondary", "medium")
 			child_idx += 1
-func _on_show_reference_pressed():
+func _on_show_turnaround_pressed():
 	if selected_character_id == "" or not character_data.has(selected_character_id):
 		return
 	var data = character_data[selected_character_id]
-	var ref_path = data.get("reference_path", "")
-	if ref_path != "":
-		var tex = _load_texture_safe(ref_path)
-		if tex:
-			_reference_texture.texture = tex
-			_reference_overlay.visible = true
-			_reference_overlay.move_to_front()
-func _on_close_reference_pressed():
-	if _reference_overlay:
-		_reference_overlay.visible = false
+	var turnaround_path = data.get("turnaround_path", "")
+	if turnaround_path == "":
+		return
+	var tex = _load_texture_safe(turnaround_path)
+	if tex and _turnaround_overlay and _turnaround_texture:
+		_apply_random_turnaround_background()
+		_turnaround_texture.texture = tex
+		_turnaround_overlay.visible = true
+		_turnaround_overlay.move_to_front()
+func _on_close_turnaround_pressed():
+	if _turnaround_overlay:
+		_turnaround_overlay.visible = false
 func _on_close_pressed():
 	queue_free()
 func _input(event: InputEvent) -> void:
@@ -273,8 +350,8 @@ func _input(event: InputEvent) -> void:
 		return
 	match (event as InputEventKey).keycode:
 		KEY_ESCAPE:
-			if _reference_overlay and _reference_overlay.visible:
-				_on_close_reference_pressed()
+			if _turnaround_overlay and _turnaround_overlay.visible:
+				_on_close_turnaround_pressed()
 			else:
 				_on_close_pressed()
 			get_viewport().set_input_as_handled()
@@ -417,6 +494,43 @@ func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key, current_language)
 	return tr(key)
+func _load_turnaround_background_paths() -> void:
+	_turnaround_background_paths.clear()
+	var dir := DirAccess.open(TURNAROUND_BACKGROUND_DIR)
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir():
+			var extension := file_name.get_extension().to_lower()
+			if extension in ["png", "jpg", "jpeg", "webp"]:
+				var file_path := "%s/%s" % [TURNAROUND_BACKGROUND_DIR, file_name]
+				if ResourceLoader.exists(file_path):
+					_turnaround_background_paths.append(file_path)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	_turnaround_background_paths.sort()
+func _apply_random_turnaround_background() -> void:
+	if not _turnaround_background:
+		return
+	if _turnaround_background_paths.is_empty():
+		_turnaround_background.texture = null
+		return
+	var candidate_paths: Array[String] = []
+	for background_path in _turnaround_background_paths:
+		if background_path != _last_turnaround_background_path:
+			candidate_paths.append(background_path)
+	if candidate_paths.is_empty():
+		candidate_paths = _turnaround_background_paths.duplicate()
+	var selected_index := _turnaround_rng.randi_range(0, candidate_paths.size() - 1)
+	var selected_path := candidate_paths[selected_index]
+	var background_texture := _load_texture_safe(selected_path)
+	if background_texture:
+		_turnaround_background.texture = background_texture
+		_last_turnaround_background_path = selected_path
+	else:
+		_turnaround_background.texture = null
 func _load_texture_safe(path: String) -> Texture2D:
 	if path == "" or not ResourceLoader.exists(path):
 		return null

@@ -60,6 +60,7 @@ var memory_summary_threshold: int = 10
 var memory_full_entries: int = 5
 var custom_ai_tone_style: String = ""
 var default_ai_tone_style: String = "Maintain dark humor, ironic detachment, and satire of forced positivity."
+var save_detailed_ai_call_logs: bool = true
 var voice_config: Dictionary = { }
 const ERROR_CONTEXT := "AIConfigManager"
 func _report_info(message: String, details: Dictionary = {}) -> void:
@@ -106,6 +107,7 @@ func save_settings() -> Error:
 	config.set_value("ai", "memory_summary_threshold", memory_summary_threshold)
 	config.set_value("ai", "memory_full_entries", memory_full_entries)
 	config.set_value("ai", "custom_ai_tone_style", custom_ai_tone_style)
+	config.set_value("ai", "save_detailed_ai_call_logs", save_detailed_ai_call_logs)
 	if not voice_config.is_empty():
 		for key in voice_config:
 			config.set_value("voice", key, voice_config[key])
@@ -172,6 +174,7 @@ func load_settings() -> Error:
 	memory_summary_threshold = int(config.get_value("ai", "memory_summary_threshold", memory_summary_threshold))
 	memory_full_entries = int(config.get_value("ai", "memory_full_entries", memory_full_entries))
 	custom_ai_tone_style = config.get_value("ai", "custom_ai_tone_style", default_ai_tone_style)
+	save_detailed_ai_call_logs = bool(config.get_value("ai", "save_detailed_ai_call_logs", true))
 	voice_config.clear()
 	if config.has_section("voice"):
 		for key in config.get_section_keys("voice"):
@@ -235,7 +238,13 @@ func _normalize_gemini_model_name(value: String) -> String:
 	var lower := trimmed.to_lower()
 	if lower == "gemini-2.5-flash" or lower == "gemini-flash-latest":
 		return "gemini-3.1-flash-lite-preview"
-	if lower == "gemini-2.5-flash-native-audio-preview-09-2025" or lower == "gemini-2.5-flash-native-audio-preview-12-2025":
+	if lower in [
+		"gemini-2.5-flash-native-audio-preview-09-2025",
+		"gemini-2.5-flash-native-audio-preview-12-2025",
+		"gemini-2.5-flash-preview-native-audio-dialog",
+		"gemini-2.5-flash-exp-native-audio-thinking-dialog",
+		"gemini-2.5-flash-live-preview",
+	]:
 		return "gemini-3.1-flash-live-preview"
 	if lower == "gemini-live-2.5-flash-preview":
 		return "gemini-3.1-flash-live-preview"
@@ -276,6 +285,7 @@ func get_state_snapshot() -> Dictionary:
 		"custom_tone": custom_ai_tone_style,
 		"memory_max": memory_max_items,
 		"memory_threshold": memory_summary_threshold,
+		"save_detailed_ai_call_logs": save_detailed_ai_call_logs,
 	}
 func load_state_snapshot(state: Dictionary) -> void:
 	if state.has("provider"):
@@ -310,6 +320,8 @@ func load_state_snapshot(state: Dictionary) -> void:
 		memory_max_items = state["memory_max"]
 	if state.has("memory_threshold"):
 		memory_summary_threshold = state["memory_threshold"]
+	if state.has("save_detailed_ai_call_logs"):
+		save_detailed_ai_call_logs = bool(state["save_detailed_ai_call_logs"])
 func is_provider_configured(provider: AIProvider) -> bool:
 	match provider:
 		AIProvider.GEMINI:

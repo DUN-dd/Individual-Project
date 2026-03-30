@@ -81,11 +81,13 @@ static func rebuild_tabs(
 	var screen_shake_check := CheckBox.new()
 	var max_rounds_label  := Label.new()
 	var max_rounds_spinbox := SpinBox.new()
+	var trolley_ai_story_check := CheckBox.new()
 	gameplay_settings_box.add_child(text_speed_label)
 	gameplay_settings_box.add_child(text_speed_option)
 	gameplay_settings_box.add_child(screen_shake_check)
 	gameplay_settings_box.add_child(max_rounds_label)
 	gameplay_settings_box.add_child(max_rounds_spinbox)
+	gameplay_settings_box.add_child(trolley_ai_story_check)
 	add_separator(tab_gameplay)
 	move_control(nodes.get("touch_controls_checkbox"), tab_gameplay)
 	add_separator(tab_gameplay)
@@ -104,6 +106,8 @@ static func rebuild_tabs(
 	move_control(nodes.get("english_font_option"), tab_display)
 	move_control(nodes.get("chinese_font_label"), tab_display)
 	move_control(nodes.get("chinese_font_option"), tab_display)
+	move_control(nodes.get("german_font_label"), tab_display)
+	move_control(nodes.get("german_font_option"), tab_display)
 	move_control(nodes.get("mute_check_box"), tab_audio)
 	add_separator(tab_audio)
 	ensure_audio_label(nodes.get("master_volume_hbox"), "MasterVolumeLabel")
@@ -136,5 +140,6 @@ static func rebuild_tabs(
 		"screen_shake_check": screen_shake_check,
 		"max_rounds_label": max_rounds_label,
 		"max_rounds_spinbox": max_rounds_spinbox,
+		"trolley_ai_story_check": trolley_ai_story_check,
 		"gloria_voice_check": gloria_voice_check,
 	}

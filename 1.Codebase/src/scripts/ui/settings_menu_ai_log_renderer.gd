@@ -112,6 +112,7 @@ static func refresh_table(
 	container: VBoxContainer,
 	log_entries: Array,
 	tr_callable: Callable,
+	on_entry_selected: Callable = Callable(),
 ) -> void:
 	if not container:
 		return
@@ -197,4 +198,280 @@ static func refresh_table(
 			var err_str: String = str(entry.get("error", ""))
 			if not err_str.is_empty():
 				row_panel.tooltip_text = "Error: " + err_str
+		elif bool(entry.get("detail_available", false)):
+			row_panel.tooltip_text = tr_callable.call(
+				"SETTINGS_AI_LOG_DETAIL_OPEN_HINT",
+				"Click to inspect full request and response details.",
+			)
+		if on_entry_selected.is_valid() and bool(entry.get("detail_available", false)):
+			row_panel.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			row_panel.gui_input.connect(
+				func(event: InputEvent) -> void:
+					if event is InputEventMouseButton:
+						var mouse_event := event as InputEventMouseButton
+						if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+							on_entry_selected.call(entry)
+			)
 		container.add_child(row_panel)
+static func format_detail_text(entry: Dictionary, tr_callable: Callable) -> String:
+	var lines: PackedStringArray = []
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_REQUEST_TIME", "Request Time"))
+	lines.append(_format_timestamp(str(entry.get("request_timestamp", entry.get("timestamp", "")))))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_DURATION", "Duration"))
+	lines.append("%dms" % int(entry.get("duration_msec", int(round(float(entry.get("response_time_sec", 0.0)) * 1000.0)))))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_TOKENS", "Token Usage (In/Out)"))
+	lines.append("In: %d" % int(entry.get("input_tokens", 0)))
+	lines.append("Out: %d" % int(entry.get("output_tokens", 0)))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_PROTOCOL", "Request Protocol"))
+	lines.append(str(entry.get("protocol", "")))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_ENDPOINT", "Endpoint"))
+	lines.append(str(entry.get("request_endpoint", "-")) if not str(entry.get("request_endpoint", "")).is_empty() else "-")
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_PROVIDER", "Provider"))
+	lines.append(str(entry.get("provider", "")))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_MODEL", "Model"))
+	lines.append(str(entry.get("model", "")))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_ACCOUNT", "Account"))
+	lines.append(str(entry.get("account", "-")) if not str(entry.get("account", "")).is_empty() else "-")
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_PURPOSE", "Purpose"))
+	lines.append(str(entry.get("purpose", "")))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_PROMPT_MODULES", "Prompt Modules Breakdown"))
+	lines.append(format_prompt_modules(entry))
+	lines.append("")
+	lines.append(tr_callable.call("SETTINGS_AI_LOG_DETAIL_AI_RESPONSE_TEXT", "AI Response (plain text)"))
+	var ai_text := extract_ai_response_text(str(entry.get("response_body", "")))
+	lines.append(ai_text if not ai_text.is_empty() else "(not available)")
+	lines.append("")
+	lines.append("%s (Request)" % tr_callable.call("SETTINGS_AI_LOG_DETAIL_REQUEST", "Request"))
+	lines.append(format_request_body(entry))
+	lines.append("")
+	lines.append("%s (Response)" % tr_callable.call("SETTINGS_AI_LOG_DETAIL_RESPONSE", "Response"))
+	lines.append(format_response_body(entry))
+	return "\n".join(lines)
+static func format_request_body(entry: Dictionary) -> String:
+	var request_body := str(entry.get("request_body", ""))
+	if request_body.is_empty():
+		return "{}"
+	return _pretty_json_string(request_body)
+static func format_response_body(entry: Dictionary) -> String:
+	var response_body := str(entry.get("response_body", ""))
+	if response_body.is_empty():
+		return "{}"
+	return _pretty_json_string(response_body)
+# --- Prompt module helpers ---
+static func _extract_messages_from_body(request_body: String) -> Array:
+	if request_body.is_empty():
+		return []
+	var json := JSON.new()
+	if json.parse(request_body) != OK:
+		return []
+	var data: Variant = json.data
+	if not (data is Dictionary):
+		return []
+	var d := data as Dictionary
+	# OpenAI / Claude / Ollama format
+	if d.has("messages"):
+		var msgs: Variant = d["messages"]
+		if msgs is Array:
+			return msgs as Array
+	# Gemini format
+	if d.has("contents"):
+		var contents: Variant = d["contents"]
+		if contents is Array:
+			return contents as Array
+	return []
+static func _get_message_text(msg: Dictionary) -> String:
+	var content: Variant = msg.get("content", "")
+	if content is String and not (content as String).is_empty():
+		return content as String
+	# Gemini parts format
+	var parts: Variant = msg.get("parts", null)
+	if parts is Array:
+		var text_parts: PackedStringArray = []
+		for part_var in (parts as Array):
+			if part_var is Dictionary:
+				var part := part_var as Dictionary
+				if part.has("text"):
+					text_parts.append(str(part["text"]))
+		if text_parts.size() > 0:
+			return "\n".join(text_parts)
+	return str(content)
+static func _extract_sections_from_user_message(content: String) -> Array:
+	# Split on === SECTION === headers and return Array of {name, content} Dictionaries
+	var sections: Array = []
+	var current_name := "(preamble)"
+	var current_lines: PackedStringArray = []
+	for line in content.split("\n"):
+		var stripped := line.strip_edges()
+		if stripped.begins_with("===") and stripped.ends_with("===") and stripped.length() > 6:
+			if current_lines.size() > 0:
+				sections.append({"name": current_name, "content": "\n".join(current_lines).strip_edges()})
+				current_lines = PackedStringArray()
+			current_name = stripped.lstrip("=").rstrip("=").strip_edges()
+		else:
+			current_lines.append(line)
+	if current_lines.size() > 0:
+		sections.append({"name": current_name, "content": "\n".join(current_lines).strip_edges()})
+	return sections
+# Returns a human-readable breakdown of which prompt modules were sent
+static func format_prompt_modules(entry: Dictionary) -> String:
+	var request_body := str(entry.get("request_body", ""))
+	var messages := _extract_messages_from_body(request_body)
+	if messages.is_empty():
+		return "(no detailed request data — enable \"Save Detailed AI Call Logs\" in settings)"
+	var lines: PackedStringArray = []
+	var msg_idx := 0
+	for msg_var in messages:
+		if not (msg_var is Dictionary):
+			continue
+		var msg := msg_var as Dictionary
+		var role := str(msg.get("role", "unknown"))
+		var content := _get_message_text(msg)
+		msg_idx += 1
+		# Unchanged / summarised context markers
+		if content.begins_with("[context:"):
+			lines.append("[%d] %-12s → %s" % [msg_idx, role, content])
+			continue
+		if role == "user":
+			lines.append("[%d] %-12s → USER MESSAGE (sections):" % [msg_idx, role])
+			var sections := _extract_sections_from_user_message(content)
+			for sec_var in sections:
+				if not (sec_var is Dictionary):
+					continue
+				var sec := sec_var as Dictionary
+				var sec_name := str(sec.get("name", ""))
+				var sec_content := str(sec.get("content", ""))
+				if sec_content.is_empty():
+					lines.append("          § %s: (empty / not used)" % sec_name)
+				else:
+					var preview := sec_content
+					if preview.length() > 300:
+						preview = preview.substr(0, 300) + "…[truncated]"
+					lines.append("          § %s:" % sec_name)
+					for sub_line in preview.split("\n"):
+						lines.append("              %s" % sub_line)
+		else:
+			var preview := content
+			if preview.length() > 250:
+				preview = preview.substr(0, 250) + "…[truncated]"
+			lines.append("[%d] %-12s →" % [msg_idx, role])
+			for sub_line in preview.split("\n"):
+				lines.append("              %s" % sub_line)
+	return "\n".join(lines)
+# Extracts just the text inside === PROMPT === from the last user message in request_body
+static func extract_prompt_text(request_body: String) -> String:
+	var messages := _extract_messages_from_body(request_body)
+	var user_content := ""
+	for msg_var in messages:
+		if msg_var is Dictionary:
+			var msg := msg_var as Dictionary
+			if str(msg.get("role", "")) == "user":
+				user_content = _get_message_text(msg)
+	if user_content.is_empty():
+		return ""
+	# Look for the PROMPT section
+	var sections := _extract_sections_from_user_message(user_content)
+	for sec_var in sections:
+		if not (sec_var is Dictionary):
+			continue
+		var sec := sec_var as Dictionary
+		var sec_name := str(sec.get("name", "")).to_upper()
+		if "PROMPT" in sec_name:
+			return str(sec.get("content", ""))
+	return user_content
+# Returns comma-separated list of active (non-unchanged) module/section names
+static func extract_active_modules_summary(request_body: String) -> String:
+	var messages := _extract_messages_from_body(request_body)
+	var active: PackedStringArray = []
+	var sys_idx := 0
+	for msg_var in messages:
+		if not (msg_var is Dictionary):
+			continue
+		var msg := msg_var as Dictionary
+		var role := str(msg.get("role", ""))
+		var content := _get_message_text(msg)
+		# Skip unchanged markers
+		if content.begins_with("[context:") and " unchanged]" in content:
+			continue
+		if role == "system":
+			# Try to extract module name from summarised marker
+			if content.begins_with("[context:") and " updated," in content:
+				var start := content.find(":") + 1
+				var end := content.find(" updated,")
+				if end > start:
+					active.append(content.substr(start, end - start) + "(summarised)")
+					continue
+			sys_idx += 1
+			active.append("system_%d" % sys_idx)
+		elif role == "assistant" or role == "model":
+			active.append("acknowledgement")
+		elif role == "user":
+			var sections := _extract_sections_from_user_message(content)
+			for sec_var in sections:
+				if not (sec_var is Dictionary):
+					continue
+				var sec := sec_var as Dictionary
+				var sec_content := str(sec.get("content", ""))
+				if not sec_content.is_empty():
+					active.append(str(sec.get("name", "")))
+	return ", ".join(active)
+# Extracts the plain-text AI reply from various provider response body formats
+static func extract_ai_response_text(response_body: String) -> String:
+	if response_body.is_empty():
+		return ""
+	var json := JSON.new()
+	if json.parse(response_body) != OK:
+		return response_body
+	var data: Variant = json.data
+	if not (data is Dictionary):
+		return ""
+	var d := data as Dictionary
+	# OpenAI / OpenRouter / Claude format: choices[0].message.content
+	if d.has("choices"):
+		var choices: Variant = d["choices"]
+		if choices is Array and (choices as Array).size() > 0:
+			var first_choice: Variant = (choices as Array)[0]
+			if first_choice is Dictionary:
+				var fc := first_choice as Dictionary
+				var message: Variant = fc.get("message", null)
+				if message is Dictionary:
+					return str((message as Dictionary).get("content", ""))
+	# Gemini format: candidates[0].content.parts[0].text
+	if d.has("candidates"):
+		var candidates: Variant = d["candidates"]
+		if candidates is Array and (candidates as Array).size() > 0:
+			var first_cand: Variant = (candidates as Array)[0]
+			if first_cand is Dictionary:
+				var fc := first_cand as Dictionary
+				var cand_content: Variant = fc.get("content", null)
+				if cand_content is Dictionary:
+					var parts: Variant = (cand_content as Dictionary).get("parts", null)
+					if parts is Array and (parts as Array).size() > 0:
+						var first_part: Variant = (parts as Array)[0]
+						if first_part is Dictionary:
+							return str((first_part as Dictionary).get("text", ""))
+	# Ollama chat format: message.content
+	if d.has("message"):
+		var message: Variant = d.get("message", null)
+		if message is Dictionary:
+			return str((message as Dictionary).get("content", ""))
+	return ""
+# --- End prompt module helpers ---
+static func _pretty_json_string(raw_text: String) -> String:
+	var json := JSON.new()
+	if json.parse(raw_text) == OK:
+		return JSON.stringify(json.data, "\t")
+	return raw_text
+static func _format_timestamp(timestamp: String) -> String:
+	var formatted := timestamp
+	if formatted.length() > 19:
+		formatted = formatted.substr(0, 19)
+	return formatted.replace("T", " ")

@@ -60,9 +60,9 @@ Include at the START of your response:
 
 ### Mission Status
 - **"ongoing"**: Story continues, more choices ahead
-- **"complete"**: This consequence ends the current mission arc
+- **"complete"**: This consequence ends the current mission arc and triggers the night cycle
 
-**CRITICAL**: Set to "complete" ONLY when the narrative arc has concluded (catastrophic success or failure).
+Default to "ongoing". You may set "complete" when the narrative arc reaches a natural conclusion (e.g., catastrophic success or failure).
 
 ---
 

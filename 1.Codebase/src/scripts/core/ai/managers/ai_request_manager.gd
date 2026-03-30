@@ -45,6 +45,7 @@ var _cumulative_response_time: float = 0.0
 var _first_request_timestamp: String = ""
 const AI_USAGE_STATS_PATH := "user://ai_usage_stats.json"
 const MAX_CALL_LOG_SIZE := 200
+const CMD_DEBUG_PREFIX := "[Godot-Cmd-Debug] AI Log - "
 class ParallelRequestSlot extends RefCounted:
 	var id: int = -1
 	var prompt: String = ""
@@ -62,7 +63,7 @@ class RequestParameters extends RefCounted:
 var _call_log: Array[Dictionary] = []
 var _prompt_guard_regex: RegEx = null
 var _config_manager: AIConfigManager = null
-var _provider_manager: AIProviderManager = null
+var _provider_manager: RefCounted = null
 var _context_manager: AIContextManager = null
 var _voice_manager: AIVoiceManager = null
 var _mock_override_enabled: bool = false
@@ -173,7 +174,16 @@ func request_ai(prompt: String, callback: Callable = Callable(), context_or_call
 		"force_mock": force_mock,
 	}
 	var current_provider = _config_manager.current_provider if _config_manager else AIProvider.GEMINI
-	last_prompt_metrics["mode"] = "local" if current_provider == AIProvider.OLLAMA else "live"
+	if current_provider in [AIProvider.OLLAMA, AIProvider.LMSTUDIO, AIProvider.AI_ROUTER]:
+		last_prompt_metrics["mode"] = "local"
+	elif current_provider == AIProvider.GEMINI and _config_manager:
+		var gemini_model_lower := String(_config_manager.gemini_model).strip_edges().to_lower()
+		if gemini_model_lower.find("native-audio") != -1 or gemini_model_lower.find("flash-live") != -1:
+			last_prompt_metrics["mode"] = "live"
+		else:
+			last_prompt_metrics["mode"] = "api"
+	else:
+		last_prompt_metrics["mode"] = "api"
 	last_prompt_metrics["provider"] = current_provider
 	last_prompt_metrics["response_chars"] = 0
 	last_prompt_metrics["response_tokens_est"] = 0
@@ -347,7 +357,7 @@ func _dispatch_to_provider(full_messages: Array[Dictionary]) -> void:
 	var timeout_seconds := _request_timeout
 	if _config_manager and _config_manager.current_provider == AIProvider.GEMINI:
 		var normalized_model := String(_config_manager.gemini_model).strip_edges().to_lower()
-		if normalized_model.find("native-audio") != -1:
+		if normalized_model.find("native-audio") != -1 or normalized_model.find("flash-live") != -1:
 			timeout_seconds = max(timeout_seconds, LIVE_NATIVE_AUDIO_TIMEOUT)
 	_timeout_timer.start(timeout_seconds)
 	request_started.emit()
@@ -1207,30 +1217,110 @@ func _record_call_log(
 	response_time_sec: float,
 	error_msg: String = ""
 ) -> void:
-	var provider_name := _provider_manager.get_current_provider_name() if _provider_manager else "UNKNOWN"
+	var provider_name: String = str(_provider_manager.get_current_provider_name()) if _provider_manager else "UNKNOWN"
 	var model_name := _get_current_model_name()
 	var entry_purpose := ""
 	if not _active_request_payload.is_empty():
 		var ctx = _active_request_payload.get("context", null)
 		if ctx is Dictionary:
 			entry_purpose = _extract_purpose_from_context(ctx)
+	var request_timestamp := str(last_prompt_metrics.get("timestamp", Time.get_datetime_string_from_system()))
 	var entry := {
 		"timestamp": Time.get_datetime_string_from_system(),
+		"request_timestamp": request_timestamp,
 		"provider": provider_name,
 		"model": model_name,
 		"status_code": status_code,
 		"input_tokens": input_tokens,
 		"output_tokens": output_tokens,
 		"response_time_sec": response_time_sec,
+		"duration_msec": int(round(response_time_sec * 1000.0)),
 		"mode": mode,
 		"purpose": entry_purpose,
 		"success": success,
 		"error": error_msg,
 	}
+	var detail: Dictionary = _build_call_log_detail()
+	for key in detail.keys():
+		entry[key] = detail[key]
 	_call_log.append(entry)
+	print(
+		"%srecorded entry provider=%s purpose=%s status=%s detail=%s" %
+		[
+			CMD_DEBUG_PREFIX,
+			provider_name,
+			entry_purpose,
+			str(status_code),
+			str(bool(entry.get("detail_available", false))),
+		]
+	)
 	while _call_log.size() > MAX_CALL_LOG_SIZE:
 		_call_log.remove_at(0)
 	_save_cumulative_stats()
+func _build_call_log_detail() -> Dictionary:
+	if not _should_save_detailed_call_logs():
+		return {
+			"detail_available": false,
+		}
+	var protocol := _get_protocol_name_for_current_provider()
+	var detail := {
+		"detail_available": false,
+		"protocol": protocol,
+		"account": "",
+	}
+	var provider = _provider_manager.get_current_provider() if _provider_manager else null
+	if provider == null or not provider.has_method("get_debug_snapshot"):
+		return detail
+	var snapshot_variant: Variant = provider.get_debug_snapshot()
+	if not (snapshot_variant is Dictionary):
+		return detail
+	var snapshot: Dictionary = snapshot_variant
+	var request_info_variant: Variant = snapshot.get("request", { })
+	if request_info_variant is Dictionary:
+		var request_info: Dictionary = request_info_variant
+		detail["protocol"] = str(request_info.get("protocol", protocol))
+		detail["request_endpoint"] = str(request_info.get("endpoint", ""))
+		detail["request_body"] = str(request_info.get("body", ""))
+	var response_info_variant: Variant = snapshot.get("response", { })
+	if response_info_variant is Dictionary:
+		var response_info: Dictionary = response_info_variant
+		detail["response_body"] = str(response_info.get("body", ""))
+		if response_info.has("account"):
+			detail["account"] = str(response_info.get("account", ""))
+	var request_body := str(detail.get("request_body", ""))
+	var response_body := str(detail.get("response_body", ""))
+	detail["detail_available"] = not request_body.is_empty() or not response_body.is_empty()
+	return detail
+func _should_save_detailed_call_logs() -> bool:
+	return _config_manager == null or bool(_config_manager.save_detailed_ai_call_logs)
+func _get_protocol_name_for_current_provider() -> String:
+	if _config_manager == null:
+		return "unknown"
+	match _config_manager.current_provider:
+		AIProvider.GEMINI:
+			return "gemini"
+		AIProvider.OPENROUTER:
+			return "openrouter"
+		AIProvider.OLLAMA:
+			return "ollama"
+		AIProvider.OPENAI:
+			return "openai"
+		AIProvider.CLAUDE:
+			return "claude"
+		AIProvider.LMSTUDIO:
+			return "openai"
+		AIProvider.AI_ROUTER:
+			match int(_config_manager.ai_router_api_format):
+				1:
+					return "claude"
+				2:
+					return "gemini"
+				_:
+					return "openai"
+		AIProvider.MOCK_MODE:
+			return "mock"
+		_:
+			return "unknown"
 func _coerce_float_history(raw: Variant) -> Array[float]:
 	var out: Array[float] = []
 	if raw is Array:

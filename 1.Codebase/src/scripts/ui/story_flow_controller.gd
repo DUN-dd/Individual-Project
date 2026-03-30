@@ -7,6 +7,9 @@ var ui_controller: StoryUIController
 var choice_controller: StoryChoiceController
 var overlay_controller: StoryOverlayController
 var _debug_gloria_pending: bool = false
+var _trolley_schedule_pending: bool = false
+var _trolley_generation_in_flight: bool = false
+var _trolley_signal_hooks_ready: bool = false
 var night_overlay_scene := preload("res://1.Codebase/src/scenes/ui/night_cycle_overlay.tscn")
 var transition_overlay_scene := preload("res://1.Codebase/src/scenes/ui/scene_transition_overlay.tscn")
 const GLORIA_POSITIVE_THRESHOLD := 30
@@ -184,6 +187,16 @@ func _try_schedule_trolley_problem() -> void:
 	var trolley_gen = ServiceLocator.get_trolley_problem_generator() if ServiceLocator else null
 	if not trolley_gen:
 		return
+	_ensure_trolley_signal_hooks(trolley_gen)
+	if _trolley_schedule_pending:
+		_log_info("Trolley problem skipped: already scheduled")
+		return
+	if _trolley_generation_in_flight:
+		_log_info("Trolley problem skipped: generation already in flight")
+		return
+	if _has_active_trolley_dilemma(trolley_gen):
+		_log_info("Trolley problem skipped: active dilemma already exists")
+		return
 	var game_state = get_game_state()
 	var force_trigger = false
 	if game_state and game_state.get("debug_force_trolley_next_turn"):
@@ -243,6 +256,17 @@ func _schedule_trolley_problem() -> void:
 	var trolley_gen = ServiceLocator.get_trolley_problem_generator() if ServiceLocator else null
 	if not trolley_gen:
 		return
+	_ensure_trolley_signal_hooks(trolley_gen)
+	if _trolley_schedule_pending:
+		_log_info("Trolley problem skipped: already scheduled")
+		return
+	if _trolley_generation_in_flight:
+		_log_info("Trolley problem skipped: generation already in flight")
+		return
+	if _has_active_trolley_dilemma(trolley_gen):
+		_log_info("Trolley problem skipped: active dilemma already exists")
+		return
+	_trolley_schedule_pending = true
 	_log_info("Scheduling trolley problem")
 	var timer: Timer = Timer.new()
 	timer.one_shot = true
@@ -254,9 +278,15 @@ func _schedule_trolley_problem() -> void:
 	if is_instance_valid(timer):
 		timer.queue_free()
 	if not is_instance_valid(story_scene) or state_controller.is_in_night_cycle():
+		_trolley_schedule_pending = false
 		return
 	if narrative_controller and narrative_controller.is_generating():
-		_log_info("Trolley problem cancelled: Player already made a choice")
+		_trolley_schedule_pending = false
+		_log_info("Trolley problem cancelled: narrative generation in progress")
+		return
+	if _has_active_trolley_dilemma(trolley_gen):
+		_trolley_schedule_pending = false
+		_log_info("Trolley problem cancelled: active dilemma already exists")
 		return
 	var template_type: String = _select_dilemma_template()
 	var game_state = get_game_state()
@@ -270,6 +300,8 @@ func _schedule_trolley_problem() -> void:
 		current_story = game_state.get_latest_story_text("Unknown mission")
 		if current_story.length() > 500:
 			current_story = current_story.substr(0, 500) + "..."
+	_trolley_schedule_pending = false
+	_trolley_generation_in_flight = true
 	trolley_gen.generate_dilemma(
 		template_type,
 		{
@@ -277,6 +309,27 @@ func _schedule_trolley_problem() -> void:
 			"recent_events": recent_events,
 		},
 	)
+func _ensure_trolley_signal_hooks(trolley_gen: Node) -> void:
+	if _trolley_signal_hooks_ready:
+		return
+	if trolley_gen.has_signal("dilemma_generated"):
+		if not trolley_gen.is_connected("dilemma_generated", _on_trolley_dilemma_generated):
+			trolley_gen.connect("dilemma_generated", _on_trolley_dilemma_generated)
+	if trolley_gen.has_signal("dilemma_resolved"):
+		if not trolley_gen.is_connected("dilemma_resolved", _on_trolley_dilemma_resolved):
+			trolley_gen.connect("dilemma_resolved", _on_trolley_dilemma_resolved)
+	_trolley_signal_hooks_ready = true
+func _has_active_trolley_dilemma(trolley_gen: Node) -> bool:
+	if trolley_gen.has_method("get_current_dilemma"):
+		var active_dilemma_variant: Variant = trolley_gen.get_current_dilemma()
+		if active_dilemma_variant is Dictionary and not (active_dilemma_variant as Dictionary).is_empty():
+			return true
+	return false
+func _on_trolley_dilemma_generated(_dilemma_data: Dictionary) -> void:
+	_trolley_generation_in_flight = false
+func _on_trolley_dilemma_resolved(_choice_id: String, _resolution: Dictionary) -> void:
+	_trolley_schedule_pending = false
+	_trolley_generation_in_flight = false
 func _select_dilemma_template() -> String:
 	var game_state = get_game_state()
 	if not game_state:

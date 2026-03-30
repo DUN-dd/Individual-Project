@@ -12,6 +12,15 @@ const LONG_TERM_SUMMARY_LIMIT := 16
 const MAX_NOTES := 32
 const MAX_NOTES_PER_PROMPT := 8
 const SHORT_TERM_WINDOW := 5
+const _MEMORY_CONTENT_STRIP_PHRASES: Array[String] = [
+	"**CRITICAL**: Set to \"complete\" ONLY when the narrative arc has concluded (catastrophic success or failure).",
+	"Set to \"complete\" ONLY when the narrative arc has concluded",
+	"Set mission_status to \"complete\" only when the mission has concluded",
+	"只有在任務真正結束時，才將 mission_status 設為 complete",
+	"只有在任務真正結束時，才將 `mission_status` 設為 `complete`",
+	"Setzen Sie mission_status nur dann auf \"complete\", wenn die Mission wirklich abgeschlossen ist.",
+	"Force mission_status to complete in scene directives.",
+]
 var memory_summary_threshold: int = 24
 var memory_full_entries: int = 6
 var max_memory_items: int = 120
@@ -47,7 +56,27 @@ func get_short_term_memory() -> Array:
 		return []
 	var keep: int = max(SHORT_TERM_WINDOW, memory_full_entries * 2)
 	keep = min(keep, story_memory.size())
-	return story_memory.slice(story_memory.size() - keep, story_memory.size())
+	var entries: Array = story_memory.slice(story_memory.size() - keep, story_memory.size())
+	return _strip_conflicting_phrases(entries)
+func _strip_conflicting_phrases(entries: Array) -> Array:
+	var cleaned: Array = []
+	for entry in entries:
+		if not (entry is Dictionary):
+			cleaned.append(entry)
+			continue
+		var content: String = str(entry.get("content", ""))
+		var changed := false
+		for phrase in _MEMORY_CONTENT_STRIP_PHRASES:
+			if content.find(phrase) != -1:
+				content = content.replace(phrase, "")
+				changed = true
+		if changed:
+			var copy: Dictionary = entry.duplicate(true)
+			copy["content"] = content
+			cleaned.append(copy)
+		else:
+			cleaned.append(entry)
+	return cleaned
 func get_long_term_context(language: String) -> Array:
 	if long_term_summaries.is_empty():
 		return []
@@ -63,7 +92,7 @@ func get_long_term_context(language: String) -> Array:
 		if localized.is_empty():
 			continue
 		lines.append("- " + localized)
-	return [{ "role": "system", "content": "\n".join(lines) }]
+	return _strip_conflicting_phrases([{ "role": "system", "content": "\n".join(lines) }])
 func get_notes_context(language: String) -> Array:
 	if notes_register.is_empty():
 		return []
