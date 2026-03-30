@@ -512,7 +512,7 @@ func play_sfx(sfx_name: String, volume_multiplier: float = 1.0) -> void:
 	if not _refresh_audio_output_state():
 		return
 	if (not gloria_voice_enabled) and sfx_name.begins_with("gloria/"):
-		_log_gloria_sfx_event("disabled", sfx_name)
+		_log_gloria_sfx_event("disabled — gloria_voice_enabled=false in settings", sfx_name)
 		return
 	if _is_web and not _web_audio_unlocked:
 		ErrorReporterBridge.report_info(ERROR_CONTEXT, "Web: audio locked, dropping sfx '%s' until user gesture" % sfx_name)

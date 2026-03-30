@@ -192,12 +192,9 @@ func _on_trolley_problem_generated(data: Dictionary) -> void:
 func _on_teammate_interference(data: Dictionary) -> void:
 	_debug_log("[EventHandlers] Teammate interference")
 	EventBus.publish("hide_loading_overlay", { })
-func _on_gloria_intervention(data: Dictionary) -> void:
+func _on_gloria_intervention(_data: Dictionary) -> void:
 	_debug_log("[EventHandlers] Gloria intervention triggered")
-	var content = data.get("content", "")
-	if content.is_empty():
-		content = "Gloria glares at you..."
-	EventBus.publish("show_gloria_overlay", { "message": content })
+	EventBus.publish("hide_loading_overlay", { })
 func _on_prayer_completed(data: Dictionary) -> void:
 	var result = data.get("result", { })
 	_debug_log("[EventHandlers] Prayer completed: %s" % result)

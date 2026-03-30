@@ -10,6 +10,8 @@ signal application_closing()
 var autosave_enabled: bool = true
 var autosave_interval: float = 300.0
 var _autosave_timer: float = 0.0
+const AUTOSAVE_COOLDOWN_MS: int = 5000
+var _last_autosave_msec: int = 0
 var settings: Dictionary = {
 	"text_speed": 1.0,
 	"screen_shake_enabled": true,
@@ -23,8 +25,20 @@ func process_autosave(delta: float) -> bool:
 	_autosave_timer += delta
 	if _autosave_timer >= autosave_interval:
 		_autosave_timer = 0.0
+		_last_autosave_msec = Time.get_ticks_msec()
 		return true
 	return false
+func _emit_autosave_debounced(reason: String) -> void:
+	if not autosave_enabled:
+		return
+	var now := Time.get_ticks_msec()
+	if (now - _last_autosave_msec) < AUTOSAVE_COOLDOWN_MS:
+		_debug_log("Autosave skipped (%s): cooldown active (%d ms remaining)" % [reason, AUTOSAVE_COOLDOWN_MS - (now - _last_autosave_msec)])
+		return
+	_last_autosave_msec = now
+	_autosave_timer = 0.0
+	_debug_log("%s, requesting autosave" % reason)
+	autosave_requested.emit()
 func reset_autosave_timer() -> void:
 	_autosave_timer = 0.0
 func handle_notification(what: int) -> void:
@@ -41,22 +55,16 @@ func handle_notification(what: int) -> void:
 			on_window_focus_gained()
 func on_application_paused() -> void:
 	application_paused.emit()
-	if autosave_enabled:
-		_debug_log("Application paused, requesting autosave")
-		autosave_requested.emit()
+	_emit_autosave_debounced("Application paused")
 func on_application_resumed() -> void:
 	_debug_log("Application resumed")
 	application_resumed.emit()
 func on_application_closing() -> void:
 	application_closing.emit()
-	if autosave_enabled:
-		_debug_log("Application closing, requesting final save")
-		autosave_requested.emit()
+	_emit_autosave_debounced("Application closing")
 func on_window_focus_lost() -> void:
 	focus_lost.emit()
-	if autosave_enabled:
-		_debug_log("Window focus lost, requesting autosave")
-		autosave_requested.emit()
+	_emit_autosave_debounced("Window focus lost")
 func on_window_focus_gained() -> void:
 	_debug_log("Window focus gained, game resumed")
 	focus_gained.emit()

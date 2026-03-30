@@ -221,6 +221,8 @@ func _try_schedule_trolley_problem() -> void:
 			return
 		var last_trolley_turn: int = game_state.get_metadata("last_trolley_turn", -999)
 		var turns_since_last: int = turn_count - last_trolley_turn
+		if turns_since_last < 0:
+			turns_since_last = 999
 		if turns_since_last < 5:
 			_log_info("Trolley problem skipped: cooldown (only %d turns since last)" % turns_since_last)
 			return

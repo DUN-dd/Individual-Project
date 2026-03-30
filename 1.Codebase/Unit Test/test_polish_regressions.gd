@@ -1,5 +1,4 @@
 extends Node
-const AIContextManager = preload("res://1.Codebase/src/scripts/core/ai/managers/ai_context_manager.gd")
 var _passed: int = 0
 var _failed: int = 0
 func _ready() -> void:

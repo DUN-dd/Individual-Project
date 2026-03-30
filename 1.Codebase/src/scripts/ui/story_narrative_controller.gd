@@ -697,7 +697,7 @@ func _on_teammate_interference_generated(response: Dictionary, teammate_id: Stri
 		game_state_teammate.set_latest_story_text(combined_text)
 	_refresh_story_nav_buttons()
 	_last_story_id += 1
-	story_scene.choice_controller.generate_choices()
+	_request_story_choice_followup(combined_text, lang)
 	if teammate_id == "gloria":
 		_play_random_gloria_sfx(GLORIA_MAIN_SFX_IDS, 0.88)
 func request_gloria_intervention(choice: Dictionary) -> void:

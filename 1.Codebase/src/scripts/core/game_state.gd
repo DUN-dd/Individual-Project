@@ -460,7 +460,7 @@ func modify_positive_energy(amount: int, reason: String = ""):
 		return
 	var old_pe = positive_energy
 	_player_stats.modify_positive_energy(amount, reason)
-	_report_info("Positive Energy %d -> %d (%+d)%s" % [old_pe, positive_energy, amount, (" [%s]" % reason if not reason.is_empty() else "")])
+	_report_info("Positive Energy %d -> %d (%+d)%s" % [old_pe, positive_energy, positive_energy - old_pe, (" [%s]" % reason if not reason.is_empty() else "")])
 	var audio_manager = _get_audio_manager()
 	if audio_manager and abs(amount) >= 5:
 		if amount > 0:
@@ -490,7 +490,7 @@ func modify_entropy(amount: int, reason: String = ""):
 		return
 	var old_entropy = entropy_level
 	_player_stats.modify_entropy(amount, reason)
-	_report_info("Entropy %d -> %d (%+d)%s" % [old_entropy, entropy_level, amount, (" [%s]" % reason if not reason.is_empty() else "")])
+	_report_info("Entropy %d -> %d (%+d)%s" % [old_entropy, entropy_level, entropy_level - old_entropy, (" [%s]" % reason if not reason.is_empty() else "")])
 	if amount > 0:
 		var reason_en := _translate_reason(reason, "en")
 		var event_en := "World entropy surge: +%d" % amount

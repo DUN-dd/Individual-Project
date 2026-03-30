@@ -231,7 +231,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 	var entropy_level: int = _context_stat(context, "entropy_level", 0)
 	var offset: int = _consequence_call_count % 100
 	var story_lines: Array = []
-	var scenario_consequence := _get_scenario_consequence(success, offset)
+	var scenario_consequence := _get_scenario_consequence(success, offset, lang)
 	if not scenario_consequence.is_empty():
 		story_lines.append(scenario_consequence)
 		var teammate_label: String = _get_translation("MOCK_CONSEQUENCE_TEAMMATE_LABEL", lang)
@@ -310,7 +310,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 		"choices": choices,
 	}
 	return JSON.stringify(response)
-static func _get_scenario_consequence(success: bool, offset: int) -> String:
+static func _get_scenario_consequence(success: bool, offset: int, lang: String) -> String:
 	if _current_scenario.is_empty():
 		return ""
 	var fallback: Dictionary = _current_scenario.get("fallback", {}) as Dictionary
@@ -319,7 +319,11 @@ static func _get_scenario_consequence(success: bool, offset: int) -> String:
 	if pool.is_empty():
 		return ""
 	var idx: int = offset % pool.size()
-	return str(pool[idx])
+	var fallback_text: String = str(pool[idx])
+	var keys: Dictionary = _current_scenario.get("translation_keys", {}) as Dictionary
+	var tk_suffix: String = "success" if success else "fail"
+	var tk_key: String = String(keys.get("consequence_%s_%d" % [tk_suffix, idx + 1], ""))
+	return MissionScenarioLibrary._get_localized_text(tk_key, fallback_text, lang)
 static func _generate_prayer(context: Dictionary) -> String:
 	var lang := _resolve_language(context)
 	var prayer_text: String = str(context.get("prayer_text", "We believe in sunshine."))
@@ -355,7 +359,16 @@ static func _generate_gloria_intervention(context: Dictionary) -> String:
 	var choice_text := "your last decision"
 	var choice_variant = context.get("choice", null)
 	if choice_variant is Dictionary:
-		choice_text = String((choice_variant as Dictionary).get("text", choice_text)).strip_edges()
+		var choice_dict := choice_variant as Dictionary
+		var raw := String(choice_dict.get("summary", "")).strip_edges()
+		if raw.is_empty():
+			raw = String(choice_dict.get("text", "")).strip_edges()
+			if raw.begins_with("["):
+				var bracket_end := raw.find("] ")
+				if bracket_end != -1:
+					raw = raw.substr(bracket_end + 2).strip_edges()
+		if not raw.is_empty():
+			choice_text = raw
 	var speech: String = _get_translation("MOCK_GLORIA_INTERVENTION_SPEECH", lang) % choice_text
 	return JSON.stringify(
 		{
@@ -424,22 +437,28 @@ static func _build_choice_followup_payload(lang: String) -> Array[Dictionary]:
 		var fallback: Dictionary = _current_scenario.get("fallback", {}) as Dictionary
 		var scenario_choices: Array = fallback.get("followup_choices", []) as Array
 		if scenario_choices.size() >= 5:
+			# Validate English summaries (scenario fallback data is always English)
 			var all_valid := true
 			for entry in scenario_choices:
 				if entry is Dictionary:
 					var summary := String((entry as Dictionary).get("summary", "")).strip_edges()
-					if not _is_summary_length_valid_for_lang(summary, lang):
+					if not _is_summary_length_valid_for_lang(summary, "en"):
 						all_valid = false
 						break
 			if all_valid:
 				var result: Array[Dictionary] = []
+				var keys: Dictionary = _current_scenario.get("translation_keys", {}) as Dictionary
 				for entry in scenario_choices:
 					if entry is Dictionary:
-						result.append(entry as Dictionary)
+						var choice := (entry as Dictionary).duplicate()
+						var archetype := String(choice.get("archetype", ""))
+						var tk_key := String(keys.get("followup_%s" % archetype, ""))
+						choice["summary"] = MissionScenarioLibrary._get_localized_text(tk_key, String(choice.get("summary", "")), lang)
+						result.append(choice)
 				if result.size() >= 5:
 					return result
 			else:
-				print("[MockAIGenerator] Scenario followup choices failed summary length check for lang=%s — using generic translated fallback" % lang)
+				print("[MockAIGenerator] Scenario followup choices failed validation — using generic fallback")
 	return [
 		{ "archetype": "cautious", "summary": _get_translation("MOCK_CHOICE_CAUTIOUS", lang) },
 		{ "archetype": "balanced", "summary": _get_translation("MOCK_CHOICE_BALANCED", lang) },
@@ -457,7 +476,7 @@ static func _is_summary_length_valid_for_lang(summary: String, lang: String) -> 
 			var ch := trimmed.substr(i, 1)
 			if not ch.strip_edges().is_empty():
 				visible_chars += 1
-		return visible_chars >= 10 and visible_chars <= 25
+		return visible_chars >= 10 and visible_chars <= 100
 	var normalized := trimmed.replace("\n", " ").replace("\t", " ")
 	while normalized.find("  ") != -1:
 		normalized = normalized.replace("  ", " ")

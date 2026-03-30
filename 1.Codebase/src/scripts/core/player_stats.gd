@@ -34,20 +34,23 @@ var entropy_level: int:
 var skills: Dictionary = GameConstants.Skills.DEFAULT_SKILLS.duplicate()
 var cognitive_dissonance_active: bool = false
 func modify_reality_score(amount: int, reason: String = "") -> void:
-	var old_score = reality_score
+	var old_score: int = reality_score
 	reality_score += amount
+	var actual_delta: int = reality_score - old_score
 	var reason_str := " [%s]" % reason if not reason.is_empty() else ""
-	_report_info("Reality: %d -> %d (%+d)%s" % [old_score, reality_score, amount, reason_str])
+	_report_info("Reality: %d -> %d (%+d)%s" % [old_score, reality_score, actual_delta, reason_str])
 func modify_positive_energy(amount: int, reason: String = "") -> void:
-	var old_energy = positive_energy
+	var old_energy: int = positive_energy
 	positive_energy += amount
+	var actual_delta: int = positive_energy - old_energy
 	var reason_str := " [%s]" % reason if not reason.is_empty() else ""
-	_report_info("Positive Energy: %d -> %d (%+d)%s" % [old_energy, positive_energy, amount, reason_str])
+	_report_info("Positive Energy: %d -> %d (%+d)%s" % [old_energy, positive_energy, actual_delta, reason_str])
 func modify_entropy(amount: int, reason: String = "") -> void:
-	var old_entropy = entropy_level
+	var old_entropy: int = entropy_level
 	entropy_level += amount
+	var actual_delta: int = entropy_level - old_entropy
 	var reason_str := " [%s]" % reason if not reason.is_empty() else ""
-	_report_info("Entropy: %d -> %d (%+d)%s" % [old_entropy, entropy_level, amount, reason_str])
+	_report_info("Entropy: %d -> %d (%+d)%s" % [old_entropy, entropy_level, actual_delta, reason_str])
 func calculate_void_entropy() -> float:
 	var divisor = GameConstants.Entropy.BASE_ENTROPY_DIVISOR
 	var multiplier = GameConstants.Entropy.POSITIVE_ENERGY_MULTIPLIER
