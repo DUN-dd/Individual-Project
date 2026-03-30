@@ -189,7 +189,7 @@ Finally, this project has been a personal reminder of the importance of balance.
 
 This project investigates the integration of Large Language Models (LLMs) into interactive narrative games through the development of ``Glorious Deliverance Agency 1,'' a 2D text-based RPG built in the Godot engine. The game employs a bespoke pipeline architecture where the LLM operates within explicit developer-defined constraints to generate dynamic narrative content whilst maintaining thematic coherence.
 
-The implementation features a multi-provider AI architecture supporting Gemini, OpenRouter, Ollama, and Mock providers, enabling development flexibility and cost management. A three-layer context-management system balances narrative coherence with token efficiency, whilst the ``Reality vs. Positive Energy'' thematic framework constrains AI generation to produce satirically appropriate content.
+The implementation features a multi-provider AI architecture supporting Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers, enabling development flexibility and cost management. A three-layer context-management system balances narrative coherence with token efficiency, whilst the ``Reality vs. Positive Energy'' thematic framework constrains AI generation to produce satirically appropriate content.
 
 Key technical contributions include the Strategy pattern for provider abstraction, an EventBus for cross-module communication, and defensive multi-stage response parsing to handle non-deterministic AI outputs. The project demonstrates that bespoke pipeline approaches can successfully integrate LLM-generated content into playable games, providing practical insights for developers considering similar integrations.
 
@@ -226,7 +226,7 @@ To ensure these aims remain achievable within the project's constraints, I have 
 
 I selected the Godot 4.x engine as my development platform due to its open-source nature and scene-node architecture, which facilitates the construction of UI-heavy applications suitable for narrative-driven games. The engine's support for both C\# and GDScript provides flexibility for integrating external AI services through custom modules, while its lightweight footprint ensures rapid iteration during development.
 
-I employed Gemini-2.5-flash as my primary LLM provider, selected based on latency and cost performance, convenient API and toolchain integration, and sufficient context length to support extended interactive narrative sessions (Google, 2025). Actual available context and performance vary by model and configuration; therefore, my final evaluation criteria are based on functional test results within my project's specific scenario, including long-term narrative consistency, response time, and cost monitoring, rather than pure specification comparisons. This approach ensures my assessment reflects practical implementation requirements rather than theoretical capabilities.
+I employed Gemini 3.1 Flash Lite as my primary LLM provider, selected based on latency and cost performance, convenient API and toolchain integration, and sufficient context length to support extended interactive narrative sessions (Google, 2025). Actual available context and performance vary by model and configuration; therefore, my final evaluation criteria are based on functional test results within my project's specific scenario, including long-term narrative consistency, response time, and cost monitoring, rather than pure specification comparisons. This approach ensures my assessment reflects practical implementation requirements rather than theoretical capabilities.
 
 My narrative framework, centred on the thematic tension between ``Reality'' and ``Positive Energy,'' serves a dual purpose. First, it provides a testbed for evaluating the AI's capacity to maintain thematic coherence within a defined conceptual space. Second, the deliberately ironic and darkly satirical tone presents a challenge for the model's stylistic consistency, testing whether the system can generate content that aligns with specific tonal and thematic constraints rather than producing generic narrative outputs. I designed this approach to explore how effectively a bespoke pipeline can maintain authorial intent within AI-generated content.
 
@@ -425,7 +425,7 @@ These design boundaries enabled the development workflow described in Section 6,
 %% ============ SECTION 6: PROJECT MANAGEMENT ============
 \section{Project Management Reflection}
 
-I organised the project into five phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure~\ref{fig:gantt-chart}. The multi-provider architecture strategy, planning for Gemini, OpenRouter, Ollama, and Mock providers from the outset, proved essential as both a technical feature and a project management strategy, enabling development to continue when I encountered API rate limiting issues. This defensive planning approach was critical for working with non-deterministic AI systems where outputs cannot be fully predicted in advance.
+I organised the project into five phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure~\ref{fig:gantt-chart}. The multi-provider architecture strategy, planning for Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers from the outset, proved essential as both a technical feature and a project management strategy, enabling development to continue when I encountered API rate limiting issues. This defensive planning approach was critical for working with non-deterministic AI systems where outputs cannot be fully predicted in advance.
 I also built explicit buffer time between phases; this reserve absorbed unexpected response parsing issues during Core Development without causing a full schedule slip. In addition, I changed prompt engineering from a fixed two-week milestone into an ongoing parallel track, because output instability and rate-limit constraints required repeated template refinement across the whole implementation period.
 
 \begin{figure}[H]
@@ -454,7 +454,7 @@ I employed several established design patterns, each chosen to address specific 
 
 For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as \texttt{get\_game\_state()} and \texttt{get\_ai\_manager()}, enabling IDE autocompletion whilst maintaining loose coupling between components (see \texttt{service\_locator.gd:54--95} for implementation).
 
-For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, and Mock providers. Each provider implements the \texttt{AIProviderBase} interface, which defines \texttt{send\_request()}, \texttt{cancel\_request()}, and \texttt{is\_configured()} methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The \texttt{AIProviderManager} coordinates provider selection and synchronisation (\texttt{ai\_provider\_manager.gd:40--64}).
+For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers. Each provider implements the \texttt{AIProviderBase} interface, which defines \texttt{send\_request()}, \texttt{cancel\_request()}, and \texttt{is\_configured()} methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The \texttt{AIProviderManager} coordinates provider selection and synchronisation (\texttt{ai\_provider\_manager.gd:75--96}).
 
 For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like \texttt{reality\_score\_changed} rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (\texttt{event\_bus.gd:49--88}).
 
@@ -512,7 +512,7 @@ I implemented the \texttt{RequestRateLimiter} class to enforce configurable mini
 
 Prompt engineering required numerous iterations. Initial prompts were overly general, lacking the specific satirical tone required. The breakthrough came when I restructured prompts using explicit role definition and contextual grounding, providing detailed persona instructions establishing the game's ironic worldview.
 
-Game state must directly influence prompt parameters. The Void Entropy calculation (\texttt{player\_stats.gd:43--48}) produces a normalised value between zero and-one that modifies tonal instructions. At low-entropy, prompts request ``subtle irony''; at high entropy, ``absurdist chaos.''
+Game state must directly influence prompt parameters. The Void Entropy calculation (\texttt{player\_stats.gd:54--59}) produces a normalised value between zero and-one that modifies tonal instructions. At low-entropy, prompts request ``subtle irony''; at high entropy, ``absurdist chaos.''
 
 For the Prayer System, I implemented templated prompt construction that explicitly instructs the AI to ``interpret the prayer's intent and twist it toward an ironic disaster.'' This explicit ironic inversion instruction proved far more reliable than implicit contextual cues.
 
@@ -536,7 +536,7 @@ Implementing this system taught me about the challenges of managing temporal nar
 
 Throughout implementation, I developed a philosophy of graceful degradation for AI-dependent features. Every AI request includes a timeout (currently twenty-four seconds), and timeout handling returns the player to a stable state rather than leaving the game frozen. The \texttt{ErrorReporter} class provides centralised error tracking with severity levels, enabling me to distinguish between recoverable warnings and critical failures requiring intervention.
 
-The most significant error handling challenge involved API key configuration. Users might misconfigure their API keys in various ways: leaving them empty, pasting a URL instead of a key, or using an expired key. The \texttt{GeminiProvider} now validates key format before attempting requests (\texttt{gemini\_provider.gd:390--405}), providing specific error messages for common misconfiguration patterns rather than generic failure notifications.
+The most significant error handling challenge involved API key configuration. Users might misconfigure their API keys in various ways: leaving them empty, pasting a URL instead of a key, or using an expired key. The \texttt{GeminiProvider} now validates key format before attempting requests (\texttt{gemini\_provider.gd:425--444}), providing specific error messages for common misconfiguration patterns rather than generic failure notifications.
 
 \subsection{Key Code Examples}
 
@@ -585,13 +585,13 @@ func _append_section_incremental(section_name: String,
         out.append(_delta.build_unchanged_marker(section_name))
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Void entropy calculation driving thematic tone (from player\_stats.gd:43--48)}]
+\begin{lstlisting}[caption={Void entropy calculation driving thematic tone (from player\_stats.gd:54--59)}]
 func calculate_void_entropy() -> float:
     var divisor = GameConstants.Entropy.BASE_ENTROPY_DIVISOR
     var multiplier = GameConstants.Entropy.POSITIVE_ENERGY_MULTIPLIER
-    var pe_component = (float(positive_energy) / divisor) * multiplier
+    var pe_component = (float(positive_energy) / divisor) * (1.0 - multiplier)
     var reality_component = (1.0 - (float(reality_score) / (divisor * 2.0)))
-        * (1.0 - multiplier)
+        * multiplier
     return clamp(pe_component + reality_component, 0.0, 1.0)
 \end{lstlisting}
 
@@ -615,7 +615,7 @@ func parse_scene_directives(response_text: String) -> Dictionary:
     return _canonicalize_scene_directives(directives)
 \end{lstlisting}
 
-\begin{lstlisting}[caption={Strategy pattern for provider switching (from ai\_provider\_manager.gd:40--51)}]
+\begin{lstlisting}[caption={Strategy pattern for provider switching (from ai\_provider\_manager.gd:75--96)}]
 func get_current_provider():
     if not _config_manager:
         return null
@@ -626,6 +626,16 @@ func get_current_provider():
             return _openrouter_provider
         AIConfigManager.AIProvider.OLLAMA:
             return _ollama_provider
+        AIConfigManager.AIProvider.OPENAI:
+            return _openai_provider
+        AIConfigManager.AIProvider.CLAUDE:
+            return _claude_provider
+        AIConfigManager.AIProvider.LMSTUDIO:
+            return _lmstudio_provider
+        AIConfigManager.AIProvider.AI_ROUTER:
+            return _ai_router_provider
+        AIConfigManager.AIProvider.MOCK_MODE:
+            return null
     return null
 \end{lstlisting}
 %TC:endignore
@@ -678,7 +688,7 @@ In this section I evaluate the finished product against my stated objectives and
 
 \subsection{Technical Functionality Assessment}
 
-Regarding API response latency, the implemented system meets the target of under five seconds under normal operating conditions. During functional testing with Gemini 3.0 Flash, mean response latency averaged between two and four seconds for standard narrative generation requests. However, I observed significant variance: complex prompts requiring structured output occasionally exceeded five seconds, and during periods of high API load, latency spiked to eight seconds or more. The implementation handles these delays gracefully through timeout mechanisms, but the user experience during slow responses remains suboptimal. The local Ollama provider offers more consistent latency but with reduced output quality.
+Regarding API response latency, the implemented system meets the target of under five seconds under normal operating conditions. During functional testing with Gemini 3.1 Flash Lite, mean response latency averaged between two and four seconds for standard narrative generation requests. However, I observed significant variance: complex prompts requiring structured output occasionally exceeded five seconds, and during periods of high API load, latency spiked to eight seconds or more. The implementation handles these delays gracefully through timeout mechanisms, but the user experience during slow responses remains suboptimal. The local Ollama provider offers more consistent latency but with reduced output quality.
 
 Regarding context preservation across save/load cycles, the memory store's state serialisation and restoration functions correctly. During extended testing sessions, I verified that narrative context established before saving persisted correctly after loading, with the AI correctly referencing pre-save events in subsequent generations. The three-layer memory architecture described in Appendix C (GDD, Section 4.13) serialises completely, enabling session continuity across multiple play sessions.
 
