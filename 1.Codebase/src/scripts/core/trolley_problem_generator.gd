@@ -871,3 +871,10 @@ func get_dilemma_history() -> Array:
 	return dilemma_history.duplicate()
 func get_current_dilemma() -> Dictionary:
 	return current_dilemma.duplicate()
+func discard_current_dilemma(reason: String) -> void:
+	if current_dilemma.is_empty():
+		return
+	_report_info("Discarding current dilemma: %s (template=%s)" % [
+		reason, current_dilemma.get("template_type", "unknown")
+	])
+	current_dilemma.clear()

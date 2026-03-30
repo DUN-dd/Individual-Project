@@ -314,9 +314,29 @@ func _initialize_legacy_controllers() -> void:
 				trolley_gen.dilemma_generated.connect(_on_dilemma_generated)
 				_debug_log("[StoryScene] Trolley Problem Generator connected")
 func _on_dilemma_generated(dilemma_data: Dictionary) -> void:
-	_debug_log("[StoryScene] Dilemma generated, showing overlay")
-	if overlay_controller:
-		overlay_controller.show_trolley_problem(dilemma_data)
+	_debug_log("[StoryScene] Dilemma generated, checking if safe to show overlay")
+	if not overlay_controller:
+		return
+	if state_controller and state_controller.is_in_night_cycle():
+		_debug_log("[StoryScene] Trolley dilemma discarded: night cycle is active")
+		_discard_trolley_dilemma("night_cycle_active")
+		return
+	if _any_overlay_open():
+		_debug_log("[StoryScene] Trolley dilemma discarded: another overlay is already open")
+		_discard_trolley_dilemma("overlay_already_open")
+		return
+	if awaiting_ai_response:
+		_debug_log("[StoryScene] Trolley dilemma discarded: AI response in progress")
+		_discard_trolley_dilemma("ai_response_in_progress")
+		return
+	_debug_log("[StoryScene] Showing trolley problem overlay")
+	overlay_controller.show_trolley_problem(dilemma_data)
+func _discard_trolley_dilemma(reason: String) -> void:
+	var trolley_gen = ServiceLocator.get_trolley_problem_generator() if ServiceLocator else null
+	if trolley_gen and trolley_gen.has_method("discard_current_dilemma"):
+		trolley_gen.discard_current_dilemma(reason)
+	if flow_controller:
+		flow_controller._trolley_generation_in_flight = false
 func _create_exit_confirmation_dialog() -> void:
 	_exit_confirmation_dialog = ConfirmationDialog.new()
 	add_child(_exit_confirmation_dialog)

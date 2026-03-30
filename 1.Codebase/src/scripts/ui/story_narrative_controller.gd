@@ -210,7 +210,6 @@ func build_mission_prompt(selected_assets: Array) -> String:
 	return NarrativePromptBuilder.build_mission_prompt(game_state, selected_assets, asset_registry)
 func _on_mission_generated(response: Dictionary) -> void:
 	_is_generating = false
-	story_scene.hide_loading()
 	_debug_log("[DEBUG_NARRATIVE] Mission Generation Response Received. Success: %s" % response.get("success", false))
 	if not response.get("success", false):
 		var error_msg: String = String(response.get("error", "Unknown error"))
@@ -218,6 +217,7 @@ func _on_mission_generated(response: Dictionary) -> void:
 			"Mission generation failed: %s" % error_msg,
 			{"error": error_msg}
 		)
+		story_scene.hide_loading()
 		_update_story_display("Failed to generate mission. Please try again.")
 		emit_signal("mission_generation_complete")
 		return
@@ -226,6 +226,7 @@ func _on_mission_generated(response: Dictionary) -> void:
 	if not parsed.get("success", false):
 		var error_msg: String = String(parsed.get("error", "Unknown parse error"))
 		_report_error("Mission parse failed: %s" % error_msg, {"error": error_msg})
+		story_scene.hide_loading()
 		_update_story_display("Failed to parse mission. Please try again.")
 		emit_signal("mission_generation_complete")
 		return
@@ -235,6 +236,7 @@ func _on_mission_generated(response: Dictionary) -> void:
 			"parsed": parsed,
 			"response_keys": response.keys() if response is Dictionary else []
 		})
+		story_scene.hide_loading()
 		_update_story_display("Mission generated successfully, but the story content is empty. This may be a parsing error.")
 		emit_signal("mission_generation_complete")
 		return
@@ -265,6 +267,7 @@ func _on_mission_generated(response: Dictionary) -> void:
 		game_state.mission_turn_count = 1
 	_record_mission_start(sanitized)
 	_update_story_choices(ai_choice_payload, sanitized)
+	story_scene.hide_loading()
 	emit_signal("mission_generation_complete")
 func _extract_primary_json_block(raw_text: String) -> String:
 	return NarrativeResponseParser.extract_primary_json_block(raw_text)
@@ -450,19 +453,21 @@ func _build_consequence_prompt(choice: Dictionary, success: bool, lang: String) 
 	return NarrativePromptBuilder.build_consequence_prompt(choice, success, lang, force_complete)
 func _on_consequence_generated(response: Dictionary) -> void:
 	_is_generating = false
-	story_scene.hide_loading()
 	if not response.get("success", false):
 		_report_warning("Consequence generation failed: success=false")
+		story_scene.hide_loading()
 		story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
 		return
 	var content: String = String(response.get("content", response.get("text", "")))
 	if content.is_empty():
 		_report_warning("Consequence generation failed: content empty")
+		story_scene.hide_loading()
 		story_scene.overlay_controller.show_gloria_overlay("Gloria glares at you silently...")
 		return
 	var ai_manager = get_ai_manager()
 	if not ai_manager:
 		_report_warning("Consequence generation failed: AI manager missing")
+		story_scene.hide_loading()
 		story_scene.overlay_controller.show_gloria_overlay(content if not content.is_empty() else "Gloria glares at you silently...")
 		return
 	var parsed := NarrativeResponseParser.parse_mission_response(response, ai_manager)
@@ -501,6 +506,7 @@ func _on_consequence_generated(response: Dictionary) -> void:
 			mission_status = "complete"
 	if mission_status == "complete":
 		_debug_log("[Narrative] AI signaled mission completion.")
+		story_scene.hide_loading()
 		_handle_mission_completion(sanitized)
 	else:
 		if game_state and game_state.positive_energy <= 30:
@@ -512,9 +518,11 @@ func _on_consequence_generated(response: Dictionary) -> void:
 					last_choice = {"text": "Unknown action"}
 				game_state.set_metadata("last_gloria_auto_turn", current_turn)
 				_debug_log("[Narrative] Triggering automatic Gloria intervention (Positive Energy <= %d)" % GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD)
+				story_scene.hide_loading()
 				request_gloria_intervention(last_choice)
 				return
 		_update_story_choices(ai_choice_payload, sanitized)
+		story_scene.hide_loading()
 		if story_scene and story_scene.flow_controller:
 			story_scene.flow_controller._try_schedule_trolley_problem()
 func _handle_mission_completion(last_text: String) -> void:
