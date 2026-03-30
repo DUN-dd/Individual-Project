@@ -149,7 +149,8 @@ func _input(event: InputEvent) -> void:
 	match (event as InputEventKey).keycode:
 		KEY_ESCAPE:
 			_on_home_pressed()
-			get_viewport().set_input_as_handled()
+			if get_viewport():
+				get_viewport().set_input_as_handled()
 func _apply_modern_styling() -> void:
 	var book_panel = $JournalBook
 	if book_panel:

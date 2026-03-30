@@ -445,11 +445,17 @@ func request_consequence_generation(choice: Dictionary, success: bool) -> void:
 	if not ai_manager or not game_state:
 		return
 	var lang: String = game_state.current_language
-	var prompt: String = _build_consequence_prompt(choice, success, lang)
+	var force_complete: bool = game_state.debug_force_mission_complete
+	if not force_complete:
+		var max_rounds: int = int(game_state.settings.get("max_rounds_per_mission", 0))
+		if max_rounds > 0 and game_state.mission_turn_count >= max_rounds - 1:
+			force_complete = true
+	var prompt: String = _build_consequence_prompt(choice, success, lang, force_complete)
 	var context: Dictionary = {
 		"purpose": "consequence",
 		"choice": choice,
 		"success": success,
+		"force_complete": force_complete,
 	}
 	var choice_text: String = String(choice.get("text", "?"))
 	_report_info("Generating consequence for choice: \"%s\" (success: %s)" % [choice_text, success])
@@ -458,13 +464,7 @@ func request_consequence_generation(choice: Dictionary, success: bool) -> void:
 	var consequence_callback := Callable(self, "_on_consequence_generated")
 	_store_last_request("consequence", prompt, context, consequence_callback)
 	ai_manager.generate_story(prompt, context, consequence_callback)
-func _build_consequence_prompt(choice: Dictionary, success: bool, lang: String) -> String:
-	var game_state = get_game_state()
-	var force_complete: bool = game_state.debug_force_mission_complete if game_state else false
-	if not force_complete and game_state:
-		var max_rounds: int = int(game_state.settings.get("max_rounds_per_mission", 0))
-		if max_rounds > 0 and game_state.mission_turn_count >= max_rounds - 1:
-			force_complete = true
+func _build_consequence_prompt(choice: Dictionary, success: bool, lang: String, force_complete: bool = false) -> String:
 	return NarrativePromptBuilder.build_consequence_prompt(choice, success, lang, force_complete)
 func _on_consequence_generated(response: Dictionary) -> void:
 	_is_generating = false
@@ -513,6 +513,10 @@ func _on_consequence_generated(response: Dictionary) -> void:
 	var game_state = get_game_state()
 	if game_state and game_state.debug_force_mission_complete:
 		_debug_log("[Narrative] Debug override: forcing mission completion.")
+		mission_status = "complete"
+	var response_context: Dictionary = response.get("context", {}) as Dictionary
+	if mission_status != "complete" and bool(response_context.get("force_complete", false)):
+		_debug_log("[Narrative] Prompt required mission completion but AI omitted mission_status — forcing complete.")
 		mission_status = "complete"
 	if game_state and mission_status != "complete":
 		var max_rounds: int = int(game_state.settings.get("max_rounds_per_mission", 0))

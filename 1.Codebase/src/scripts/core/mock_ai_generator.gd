@@ -298,6 +298,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 	var story_text = "\n".join(story_lines)
 	var expressions = ["neutral", "happy", "sad", "angry", "confused", "shocked", "thinking", "embarrassed"]
 	var choices: Array[Dictionary] = _build_choice_followup_payload(lang)
+	var force_complete: bool = bool(context.get("force_complete", false))
 	var response = {
 		"characters": {
 			"protagonist": { "expression": expressions[_rng.randi_range(0, expressions.size() - 1)] },
@@ -308,6 +309,7 @@ static func _generate_consequence(context: Dictionary) -> String:
 		},
 		"story_text": story_text,
 		"choices": choices,
+		"mission_status": "complete" if force_complete else "ongoing",
 	}
 	return JSON.stringify(response)
 static func _get_scenario_consequence(success: bool, offset: int, lang: String) -> String:
@@ -476,12 +478,12 @@ static func _is_summary_length_valid_for_lang(summary: String, lang: String) -> 
 			var ch := trimmed.substr(i, 1)
 			if not ch.strip_edges().is_empty():
 				visible_chars += 1
-		return visible_chars >= 10 and visible_chars <= 100
+		return visible_chars >= 6 and visible_chars <= 100
 	var normalized := trimmed.replace("\n", " ").replace("\t", " ")
 	while normalized.find("  ") != -1:
 		normalized = normalized.replace("  ", " ")
 	var words := normalized.split(" ", false)
-	return words.size() >= 10 and words.size() <= 20
+	return words.size() >= 5 and words.size() <= 20
 static func _build_choice_preview_lines(choices: Array[Dictionary], lang: String) -> Array[String]:
 	var labels := {
 		"cautious": _get_translation("MOCK_LABEL_CAUTIOUS", lang),

@@ -146,6 +146,36 @@ func _build_ui() -> void:
 	_skip_button.anchor_left = 1.0; _skip_button.anchor_right  = 1.0
 	_skip_button.offset_left = -120; _skip_button.offset_right  = -16
 	_skip_button.offset_top  = 16;   _skip_button.offset_bottom = 58
+	_pray_button = Button.new()
+	_pray_button.text = "✦  " + (_tr("NIGHT_BUTTON_PRAY") if not _tr("NIGHT_BUTTON_PRAY").begins_with("NIGHT_") else "祈禱儀式")
+	_pray_button.visible = false
+	_pray_button.pressed.connect(_on_pray_pressed)
+	var _pn := StyleBoxFlat.new()
+	_pn.bg_color = Color(0.12, 0.04, 0.28, 0.92)
+	_pn.border_color = Color(0.88, 0.74, 0.18, 1.0)
+	_pn.border_width_left = 2; _pn.border_width_right = 2
+	_pn.border_width_top = 2; _pn.border_width_bottom = 2
+	_pn.corner_radius_top_left = 14; _pn.corner_radius_top_right = 14
+	_pn.corner_radius_bottom_left = 14; _pn.corner_radius_bottom_right = 14
+	_pn.shadow_color = Color(0.88, 0.72, 0.14, 0.50); _pn.shadow_size = 14
+	_pn.content_margin_left = 20; _pn.content_margin_right = 20
+	_pn.content_margin_top = 10; _pn.content_margin_bottom = 10
+	_pray_button.add_theme_stylebox_override("normal", _pn)
+	var _ph := _pn.duplicate() as StyleBoxFlat
+	_ph.bg_color = Color(0.20, 0.07, 0.42, 0.96); _ph.shadow_size = 20
+	_pray_button.add_theme_stylebox_override("hover", _ph)
+	var _pp := _pn.duplicate() as StyleBoxFlat
+	_pp.bg_color = Color(0.08, 0.02, 0.20, 1.0)
+	_pray_button.add_theme_stylebox_override("pressed", _pp)
+	_pray_button.add_theme_color_override("font_color", Color(0.95, 0.85, 0.30))
+	_pray_button.add_theme_color_override("font_hover_color", Color(1.0, 0.95, 0.50))
+	_pray_button.add_theme_font_size_override("font_size", 17)
+	add_child(_pray_button)
+	_pray_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_pray_button.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	_pray_button.anchor_left = 1.0; _pray_button.anchor_right = 1.0
+	_pray_button.offset_left = -190; _pray_button.offset_right = -16
+	_pray_button.offset_top = 16; _pray_button.offset_bottom = 70
 func _build_night_label(parent: VBoxContainer) -> void:
 	var bar = MarginContainer.new()
 	bar.add_theme_constant_override("margin_top",    20)
@@ -301,28 +331,17 @@ func _build_footer(parent: VBoxContainer) -> void:
 	var sep = HSeparator.new()
 	sep.modulate = Color(0.55, 0.30, 0.88, 0.45)
 	parent.add_child(sep)
-	var footer_center = CenterContainer.new()
-	footer_center.custom_minimum_size = Vector2(0, 120)
-	parent.add_child(footer_center)
-	var fvb = VBoxContainer.new()
-	fvb.alignment = BoxContainer.ALIGNMENT_CENTER
-	fvb.add_theme_constant_override("separation", 12)
-	footer_center.add_child(fvb)
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_top", 16)
+	margin.add_theme_constant_override("margin_bottom", 32)
+	parent.add_child(margin)
 	var prompt_lbl = Label.new()
 	prompt_lbl.text = _tr("NIGHT_PROMPT_DEFAULT") if not _tr("NIGHT_PROMPT_DEFAULT").begins_with("NIGHT_") \
 		else (_tr("NIGHT_CYCLE_PRAY_TO_THE_FLYING_SPAGHETTI"))
 	prompt_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	prompt_lbl.add_theme_font_size_override("font_size", 15)
-	prompt_lbl.add_theme_color_override("font_color", Color(0.68, 0.88, 1.0, 0.85))
-	fvb.add_child(prompt_lbl)
-	_pray_button = Button.new()
-	_pray_button.text = _tr("NIGHT_BUTTON_PRAY")
-	_pray_button.custom_minimum_size = Vector2(270, 64)
-	_pray_button.visible = false
-	_pray_button.pressed.connect(_on_pray_pressed)
-	if UIStyleManager:
-		UIStyleManager.apply_button_style(_pray_button, "accent", "large")
-	fvb.add_child(_pray_button)
+	prompt_lbl.add_theme_font_size_override("font_size", 14)
+	prompt_lbl.add_theme_color_override("font_color", Color(0.68, 0.88, 1.0, 0.50))
+	margin.add_child(prompt_lbl)
 func _make_card(bg: Color, border: Color, border_w: int, glow: bool) -> PanelContainer:
 	var pc = PanelContainer.new()
 	var s = StyleBoxFlat.new()
