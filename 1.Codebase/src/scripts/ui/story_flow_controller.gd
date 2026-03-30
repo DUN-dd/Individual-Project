@@ -111,7 +111,18 @@ func _on_mission_generation_ready(overlay: Node) -> void:
 	if overlay and is_instance_valid(overlay) and overlay.has_method("finish_transition"):
 		overlay.finish_transition()
 	_try_schedule_trolley_problem()
+func cancel_pending_trolley(reason: String) -> void:
+	if _trolley_schedule_pending or _trolley_generation_in_flight:
+		_log_info("Cancelling pending trolley problem: %s (scheduled=%s, in_flight=%s)" % [
+			reason, _trolley_schedule_pending, _trolley_generation_in_flight
+		])
+	_trolley_schedule_pending = false
+	_trolley_generation_in_flight = false
+	var trolley_gen = ServiceLocator.get_trolley_problem_generator() if ServiceLocator else null
+	if trolley_gen and trolley_gen.has_method("discard_current_dilemma"):
+		trolley_gen.discard_current_dilemma(reason)
 func enter_night_cycle(mission_payload: Dictionary) -> void:
+	cancel_pending_trolley("entering_night_cycle")
 	_log_info("Entering night cycle")
 	var game_state = get_game_state()
 	if game_state:
