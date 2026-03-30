@@ -286,12 +286,12 @@ static func _generate_consequence(context: Dictionary) -> String:
 		story_lines.append("%s %s" % [teammate_label, sabotage[sabotage_idx]])
 		story_lines.append(nudges[nudge_idx])
 	if lang == "en":
-		if reality_score < 30:
+		if reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 			story_lines.append("(Reality is fraying — this choice leaves deeper marks than expected.)")
 		elif entropy_level > 60:
 			story_lines.append("(The void entropy spikes. Your action ripples outward in unexpected ways.)")
 	else:
-		if reality_score < 30:
+		if reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 			story_lines.append("（現實正在崩潰——這個選擇留下了比預期更深的印記。）")
 		elif entropy_level > 60:
 			story_lines.append("（虛空熵值飆升。你的行動以意想不到的方式向外擴散。）")
