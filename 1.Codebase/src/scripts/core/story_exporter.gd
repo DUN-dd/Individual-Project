@@ -15,7 +15,7 @@ func save_to_file(html_content: String, file_path: String) -> bool:
 	return true
 func get_default_filename(game_state: Node) -> String:
 	var mission_count := 0
-	if game_state and game_state.has_method("get") or "missions_completed" in game_state:
+	if game_state and (game_state.has_method("get") or "missions_completed" in game_state):
 		mission_count = game_state.missions_completed
 	var date := Time.get_datetime_dict_from_system()
 	return "GDA_Story_%04d-%02d-%02d.html" % [date.year, date.month, date.day]
@@ -486,7 +486,7 @@ func _events_section(events: Array) -> String:
 			var parts: Array = []
 			for key in details:
 				parts.append("%s: %s" % [key, str(details[key])])
-			detail_str = parts.slice(0, 3).reduce(func(a, b): return a + " · " + b, parts[0] if not parts.is_empty() else "")
+			detail_str = " · ".join(parts.slice(0, 3))
 		items_html += '<div class="event-item"><span class="event-type">%s</span><span>%s</span></div>\n' % [
 			event_type.replace("_", " "),
 			_escape(detail_str)

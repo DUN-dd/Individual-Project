@@ -587,18 +587,18 @@ func stop_sfx(sfx_name: String) -> void:
 		if AudioServer.get_bus_index("Music") != -1:
 			music_player.volume_db = 0.0
 		else:
-			music_player.volume_db = linear_to_db(music_volume * master_volume)
+			music_player.volume_db = _safe_linear_to_db(music_volume * master_volume)
 	if voice_player:
 		if AudioServer.get_bus_index(VOICE_BUS_NAME) != -1:
 			voice_player.volume_db = 0.0
 		else:
-			voice_player.volume_db = linear_to_db(voice_volume * master_volume)
+			voice_player.volume_db = _safe_linear_to_db(voice_volume * master_volume)
 	var sfx_bus_exists = AudioServer.get_bus_index("SFX") != -1
 	for player in sfx_players:
 		if sfx_bus_exists:
 			player.volume_db = 0.0
 		else:
-			player.volume_db = linear_to_db(sfx_volume * master_volume)
+			player.volume_db = _safe_linear_to_db(sfx_volume * master_volume)
 func set_master_volume(volume: float) -> void:
 	master_volume = clamp(volume, 0.0, 1.0)
 	var master_idx = AudioServer.get_bus_index("Master")

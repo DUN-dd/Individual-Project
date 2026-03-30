@@ -524,7 +524,7 @@ func _on_consequence_generated(response: Dictionary) -> void:
 		story_scene.hide_loading()
 		_handle_mission_completion(sanitized)
 	else:
-		if game_state and game_state.positive_energy <= 30:
+		if game_state and game_state.positive_energy <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
 			var last_turn = game_state.get_metadata("last_gloria_auto_turn", -999)
 			var current_turn = game_state.mission_turn_count
 			if current_turn - last_turn >= 3:

@@ -667,7 +667,7 @@ func _on_live_api_server_message(message: Dictionary) -> void:
 	var response_text_parts := _live_accumulated_text_parts.duplicate(true)
 	if response_text_parts.is_empty() and not _live_output_transcription_text.is_empty():
 		response_text_parts = [_live_output_transcription_text]
-	var combined_text := "".join(response_text_parts)
+	var combined_text := "\n".join(response_text_parts)
 	var response := {
 		"success": true,
 		"content": combined_text,

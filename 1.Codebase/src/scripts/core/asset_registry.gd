@@ -344,19 +344,6 @@ func format_assets_for_prompt(asset_list: Array, language: String = "") -> Strin
 	lines.append(_tr_lang("ASSET_REG_PROVIDE_2", lang))
 	lines.append(_tr_lang("ASSET_REG_PROVIDE_3", lang))
 	return "\n".join(lines)
-	for asset in asset_list:
-		var id = asset.get("id", "Unknown")
-		var name = asset.get("default_name", id.capitalize())
-		var tags: Array = asset.get("tags", [])
-		var summary = asset.get("summary", "")
-		lines.append("• %s | %s | [%s]" % [id, name, ", ".join(tags)])
-		lines.append("  ↳ %s" % summary)
-	lines.append("")
-	lines.append(_tr("ASSET_REG_PROVIDE_FOR_ASSETS"))
-	lines.append(_tr("ASSET_REG_PROVIDE_1"))
-	lines.append(_tr("ASSET_REG_PROVIDE_2"))
-	lines.append(_tr("ASSET_REG_PROVIDE_3"))
-	return "\n".join(lines)
 func get_asset_icons(asset_list: Array) -> Dictionary:
 	var mapping := { }
 	for asset in asset_list:
