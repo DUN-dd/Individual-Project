@@ -246,11 +246,11 @@ I organised my codebase into three primary layers. The Core Systems Layer contai
 
 I employed several established design patterns, each chosen to address specific architectural challenges.
 
-For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as `get_game_state()` and `get_ai_manager()`, enabling IDE autocompletion whilst maintaining loose coupling between components (see `service_locator.gd:54–95` for implementation).
+For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as `get_game_state()` and `get_ai_manager()`, enabling IDE autocompletion whilst maintaining loose coupling between components (see `service_locator.gd:76–123` for implementation).
 
 For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers. Each provider implements the `AIProviderBase` interface, which defines `send_request()`, `cancel_request()`, and `is_configured()` methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The `AIProviderManager` coordinates provider selection and synchronisation (`ai_provider_manager.gd:75–96`).
 
-For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like `reality_score_changed` rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (`event_bus.gd:49–88`).
+For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like `reality_score_changed` rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (`event_bus.gd:147–195`).
 
 For simplifying AI integration, the AIManager presents a facade interface to the rest of the game, hiding the complexity of provider selection, prompt construction, context-management, and response parsing. Calling code simply invokes generation methods with context dictionaries, unaware of the underlying multi-layered prompt assembly process.
 
@@ -297,7 +297,7 @@ In this section I describe the key components I produced, focusing on the concep
 
 API connection failures emerged immediately during early development: HTTP 429 rate limiting errors and CORS restrictions. These failures occurred silently in my initial implementation, leaving the game-in an undefined state. This taught me that AI integration requires defensive programming at every layer. The multi-provider architecture became essential: the Ollama local provider enabled unlimited development testing, whilst the Mock provider enabled UI development without AI dependency.
 
-I implemented the `RequestRateLimiter` class to enforce configurable minimum intervals between API calls, proactively preventing rate limit errors rather than handling them reactively.
+I implemented the `AIRequestRateLimiter` class to enforce configurable minimum intervals between API calls, proactively preventing rate limit errors rather than handling them reactively.
 
 ## Prompt Engineering: An Iterative Learning Process
 
@@ -395,7 +395,7 @@ func calculate_void_entropy() -> float:
     return clamp(pe_component + reality_component, 0.0, 1.0)
 ```
 
-``` {caption="Multi-stage response parsing (adapted from scene\\_directives\\_parser.gd:26--62)"}
+``` {caption="Multi-stage response parsing (adapted from scene\\_directives\\_parser.gd:27--63)"}
 func parse_scene_directives(response_text: String) -> Dictionary:
     var directives: Dictionary = {}
     if _marker_regex:
@@ -403,16 +403,20 @@ func parse_scene_directives(response_text: String) -> Dictionary:
         if marker_matches:
             for m in marker_matches:
                 var block: String = String(m.get_string(1)).strip_edges()
+                if block.is_empty():
+                    continue
                 directives = _parse_json_block(block)
                 if not directives.is_empty():
                     return _canonicalize_scene_directives(directives)
     if _code_block_regex:
         var code_matches := _code_block_regex.search_all(response_text)
-        # ... fallback extraction logic
+        # ... fallback extraction with empty-check and info reporting
     var trimmed := response_text.strip_edges()
     if trimmed.begins_with("{") or trimmed.begins_with("["):
         directives = _parse_json_block(trimmed)
-    return _canonicalize_scene_directives(directives)
+        if not directives.is_empty():
+            return _canonicalize_scene_directives(directives)
+    return {}
 ```
 
 ``` {caption="Strategy pattern for provider switching (from ai\\_provider\\_manager.gd:75--96)"}
@@ -449,7 +453,7 @@ In this section I describe my approach to ensuring system correctness, encompass
 
 Testing AI-integrated systems presents unique challenges that traditional testing methodologies do not fully address. Unit tests can verify that a function correctly parses a JSON response, but they cannot verify that the AI will consistently produce parseable responses. My testing strategy therefore operates on two distinct levels: deterministic component testing using traditional unit tests, and non-deterministic behaviour testing using functional observation.
 
-I developed over thirty-five unit test scripts located in the `Unit Test/` directory, covering core systems including `test_ai_prompt_builder.gd`, `test_event_bus.gd`, `test_game_state.gd`, `test_save_load_system.gd`, and `test_butterfly_effect_tracker.gd`. These tests verify that deterministic components behave correctly given specific inputs, enabling confident refactoring without fear of introducing regressions.
+I developed over sixty unit test scripts located in the `Unit Test/` directory and additional test directories, covering core systems including `test_ai_prompt_builder.gd`, `test_event_bus.gd`, `test_game_state.gd`, `test_save_load_system.gd`, and `test_butterfly_effect_tracker.gd`. These tests verify that deterministic components behave correctly given specific inputs, enabling confident refactoring without fear of introducing regressions.
 
 ## Unit Testing Approach
 
@@ -568,7 +572,7 @@ I did not conduct formal external user testing for this project. As discussed in
 
 That said, I can report what I observed during my own extended functional testing sessions, where I deliberately tried to play the game as a fresh user would. The choice system presents meaningful dilemmas where each archetype, cautious, balanced, reckless, positive, and complain, produces noticeably different narrative consequences. The AI generates contextually appropriate responses that acknowledge previous player decisions, and the thematic framework creates a coherent sense of escalating absurdity as the Void Entropy increases across a session.
 
-The Butterfly Effect system (see Appendix C: GDD, Section 4.9) produces satisfying moments when past choices resurface with consequences, creating a sense of narrative weight that pre-scripted systems struggle to achieve. However, the system's effectiveness depends on the AI correctly incorporating callback suggestions that I inject into the prompt through the `=== BUTTERFLY EFFECT: PAST CHOICES ===` section of my `AIPromptBuilder`. Approximately one in five callback opportunities were missed because the AI did not naturally integrate the suggested reference into its narrative output. I suspect this would be more noticeable to external testers, who would lack my awareness of which callbacks were supposed to appear.
+The Butterfly Effect system (see Appendix C: GDD, Section 4.9) produces satisfying moments when past choices resurface with consequences, creating a sense of narrative weight that pre-scripted systems struggle to achieve. However, the system's effectiveness depends on the AI correctly incorporating callback suggestions that I inject into the prompt through the `=== BUTTERFLY EFFECT: PAST CHOICES ===` section of my `AIContextBuilder`. Approximately one in five callback opportunities were missed because the AI did not naturally integrate the suggested reference into its narrative output. I suspect this would be more noticeable to external testers, who would lack my awareness of which callbacks were supposed to appear.
 
 Response latency remains the most significant player experience limitation. During AI generation, the game displays loading indicators that interrupt the narrative flow. For a text-based game where reading pace is central to the experience, these interruptions are particularly noticeable. I implemented loading state animations and the `_start_connecting_animation()` cycling text feedback, but I cannot eliminate the latency inherent in API-based generation, typically two to four seconds per request under normal conditions.
 
