@@ -1183,7 +1183,7 @@ represents one of the project’s strongest achievements.
 10.3     Comparative Analysis: Bespoke Pipeline vs. World-Model
 In my project, the AI generates only text, narrative descriptions, NPC dialogue, and scene-
 setting prose. Every visual element is a pre-made asset: twenty background images, forty-eight
-character expression sprites, and twenty-eight symbolic objects. The AI returns JSON specify-
+character expression sprites, and twenty-nine symbolic objects. The AI returns JSON specify-
 ing which assets to display, and my StorySceneDirectiveApplier loads the corresponding
 files. The AI never generates pixels, only words.
 

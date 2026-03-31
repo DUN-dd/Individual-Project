@@ -1422,7 +1422,7 @@ sees on screen is a pre-made asset that I prepared in advance: twenty background
 
 
 loaded through my BackgroundLoader singleton, forty-eight character expression sprites man-
-aged by CharacterExpressionLoader, and twenty-eight symbolic objects catalogued in my
+aged by CharacterExpressionLoader, and twenty-nine symbolic objects catalogued in my
 AssetRegistry. When the AI responds, it returns a JSON block specifying which of these
 pre-authored assets to display—for example, {scene: {background: forest},
 characters: {gloria: {expression: angry}}}—and my StorySceneDirectiveApplie
