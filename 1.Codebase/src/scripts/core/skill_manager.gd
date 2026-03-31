@@ -1,5 +1,9 @@
 extends Node
-const SKILLS_BASE_PATH := "res://1.Codebase/src/skills"
+const EmbeddedSkillRegistry = preload("res://1.Codebase/generated/embedded_skill_registry.gd")
+const SKILLS_BASE_PATHS := [
+	"res://1.Codebase/src/skills",
+	"res://src/skills",
+]
 const SKILL_FILE_NAME := "SKILL.md"
 const ERROR_CONTEXT := "SkillManager"
 const VERBOSE_LOGS := GameConstants.Debug.ENABLE_VERBOSE_LOGS
@@ -11,34 +15,85 @@ func _ready() -> void:
 func _scan_skills() -> void:
 	_skills_cache.clear()
 	_purpose_map.clear()
-	if not DirAccess.dir_exists_absolute(SKILLS_BASE_PATH):
-		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Skills directory does not exist", { "path": SKILLS_BASE_PATH })
+	_initialized = false
+	var existing_paths := _get_existing_skill_paths()
+	if _scan_skills_from_paths(existing_paths):
+		_initialized = true
+		_debug_log("Initialized with %d skills from project files" % _skills_cache.size())
 		return
-	var dir := DirAccess.open(SKILLS_BASE_PATH)
-	if not dir:
-		DirAccess.make_dir_recursive_absolute(SKILLS_BASE_PATH)
-		dir = DirAccess.open(SKILLS_BASE_PATH)
-	if not dir:
-		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Cannot open skills directory", { "path": SKILLS_BASE_PATH })
+	if _load_embedded_skills():
+		var fallback_reason := "skills directories unavailable" if existing_paths.is_empty() else "skills directories contained no loadable skills"
+		ErrorReporterBridge.report_info(ERROR_CONTEXT, "Using embedded skill registry", {
+			"reason": fallback_reason,
+			"paths": existing_paths,
+		})
+		_debug_log("Initialized with %d skills from embedded registry" % _skills_cache.size())
 		return
+	if existing_paths.is_empty():
+		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Skills directory does not exist", { "paths": SKILLS_BASE_PATHS })
+	else:
+		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "No skills could be loaded", { "paths": existing_paths })
+
+func _get_existing_skill_paths() -> Array[String]:
+	var existing_paths: Array[String] = []
+	for base_path in SKILLS_BASE_PATHS:
+		if DirAccess.dir_exists_absolute(base_path):
+			existing_paths.append(base_path)
+	return existing_paths
+
+func _scan_skills_from_paths(paths: Array[String]) -> bool:
+	for base_path in paths:
+		var loaded_count := _scan_skills_from_directory(base_path)
+		if loaded_count > 0:
+			_debug_log("Loaded %d skills from %s" % [loaded_count, base_path])
+			return true
+	return false
+
+func _scan_skills_from_directory(base_path: String) -> int:
+	var dir := DirAccess.open(base_path)
+	if not dir:
+		return 0
+	var loaded_count := 0
 	dir.list_dir_begin()
 	var folder_name := dir.get_next()
 	while folder_name != "":
 		if dir.current_is_dir() and not folder_name.begins_with("."):
-			var skill_path := SKILLS_BASE_PATH + "/" + folder_name + "/" + SKILL_FILE_NAME
+			var skill_path := base_path + "/" + folder_name + "/" + SKILL_FILE_NAME
 			var metadata := _parse_skill_metadata(skill_path)
 			if not metadata.is_empty():
 				metadata["folder"] = folder_name
 				metadata["path"] = skill_path
-				_skills_cache[metadata["name"]] = metadata
-				var triggers: Array = metadata.get("purpose_triggers", [])
-				for trigger in triggers:
-					_purpose_map[trigger] = metadata["name"]
-				_debug_log("Loaded skill: %s" % metadata["name"])
+				_register_skill(str(metadata.get("name", folder_name)), metadata)
+				loaded_count += 1
 		folder_name = dir.get_next()
 	dir.list_dir_end()
+	return loaded_count
+
+func _load_embedded_skills() -> bool:
+	var embedded_skills: Dictionary = EmbeddedSkillRegistry.get_skills()
+	if embedded_skills.is_empty():
+		return false
+	for skill_name_variant in embedded_skills.keys():
+		var skill_name := str(skill_name_variant)
+		var metadata_variant: Variant = embedded_skills.get(skill_name_variant, {})
+		if metadata_variant is Dictionary and not (metadata_variant as Dictionary).is_empty():
+			_register_skill(skill_name, metadata_variant)
+	if _skills_cache.is_empty():
+		return false
 	_initialized = true
-	_debug_log("Initialized with %d skills" % _skills_cache.size())
+	return true
+
+func _register_skill(skill_name: String, metadata: Dictionary) -> void:
+	var normalized := metadata.duplicate(true)
+	normalized["name"] = skill_name
+	if str(normalized.get("folder", "")).is_empty():
+		normalized["folder"] = skill_name
+	_skills_cache[skill_name] = normalized
+	var triggers_variant: Variant = normalized.get("purpose_triggers", [])
+	if triggers_variant is Array:
+		for trigger in triggers_variant:
+			_purpose_map[str(trigger)] = skill_name
+	_debug_log("Loaded skill: %s" % skill_name)
 func _parse_skill_metadata(file_path: String) -> Dictionary:
 	if not FileAccess.file_exists(file_path):
 		return {}
@@ -104,6 +159,9 @@ func load_skill(skill_name: String, language: String = "") -> String:
 		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Skill not found", { "skill_name": skill_name })
 		return ""
 	var skill: Dictionary = _skills_cache[skill_name]
+	var embedded_content := _load_embedded_skill_content(skill, language)
+	if not embedded_content.is_empty():
+		return embedded_content
 	for file_path in _get_skill_candidate_paths(skill, language):
 		if file_path.is_empty() or not FileAccess.file_exists(file_path):
 			continue
@@ -114,6 +172,24 @@ func load_skill(skill_name: String, language: String = "") -> String:
 		"language": language,
 		"path": skill.get("path", ""),
 	})
+	return ""
+
+func _load_embedded_skill_content(skill: Dictionary, language: String) -> String:
+	var content_variant: Variant = skill.get("content", {})
+	if not content_variant is Dictionary:
+		return ""
+	var content_map := content_variant as Dictionary
+	if not language.is_empty():
+		var localized_content := str(content_map.get(language, "")).strip_edges()
+		if not localized_content.is_empty():
+			return localized_content
+	var english_content := str(content_map.get("en", "")).strip_edges()
+	if not english_content.is_empty():
+		return english_content
+	for value in content_map.values():
+		var fallback_content := str(value).strip_edges()
+		if not fallback_content.is_empty():
+			return fallback_content
 	return ""
 func _get_skill_candidate_paths(skill: Dictionary, language: String) -> Array[String]:
 	var base_path: String = skill.get("path", "")

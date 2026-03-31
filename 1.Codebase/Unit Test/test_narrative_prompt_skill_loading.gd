@@ -1,5 +1,6 @@
 extends Node
 const NarrativePromptBuilder = preload("res://1.Codebase/src/scripts/core/ai/narrative_prompt_builder.gd")
+const SkillManagerScript = preload("res://1.Codebase/src/scripts/core/skill_manager.gd")
 const TrolleyGeneratorScript = preload("res://1.Codebase/src/scripts/core/trolley_problem_generator.gd")
 var tests_passed: int = 0
 var tests_failed: int = 0
@@ -24,6 +25,7 @@ func _ready() -> void:
 		skill_mgr.reload_skills()
 		await get_tree().process_frame
 	_test_required_skills_exist(skill_mgr)
+	_test_embedded_registry_fallback_loads_skills()
 	_test_mission_prompt_uses_skill()
 	_test_consequence_prompt_uses_skill()
 	_test_interference_prompt_uses_skill_and_replaces_tokens()
@@ -52,6 +54,13 @@ func _test_required_skills_exist(skill_mgr: Node) -> void:
 	_assert("gloria-intervention" in names, "gloria-intervention skill exists")
 	_assert("choice-followup" in names, "choice-followup skill exists")
 	_assert("trolley-problem" in names, "trolley-problem skill exists")
+func _test_embedded_registry_fallback_loads_skills() -> void:
+	var embedded_manager = SkillManagerScript.new()
+	var loaded: bool = embedded_manager._load_embedded_skills()
+	_assert(loaded, "Embedded registry fallback loads skills")
+	_assert(embedded_manager.is_initialized(), "Embedded registry fallback marks SkillManager initialized")
+	var localized_skill := embedded_manager.load_skill("mission-generation", "zh")
+	_assert(not localized_skill.is_empty(), "Embedded registry returns localized skill content")
 func _test_mission_prompt_uses_skill() -> void:
 	var gs := MockGameState.new()
 	var prompt: String = NarrativePromptBuilder.build_mission_prompt(gs, [], null)
