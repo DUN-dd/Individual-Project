@@ -266,8 +266,8 @@ I implemented three distinct data structures within the `AIMemoryStore` class (`
 
 The true runtime compression occurs in `AIPromptBuilder` (`ai_prompt_builder.gd`) working with `AIContextDelta` (`ai_context_delta.gd`). Rather than naively concatenating all context, the builder operates within a token budget (default 24,000 tokens, estimated at roughly four characters per token) and performs **incremental, budget-aware prompt assembly**:
 
-1. **Token reservation**: Before assembling context sections, the builder reserves a minimum of 4,000 tokens for the user's current message, ensuring the player's prompt is never crowded out.
-2. **Section fingerprinting**: Each context section (static rules, entropy modifiers, long-term summaries, notes, short-term memory) is fingerprinted by hashing its content. `AIContextDelta` compares each section's current fingerprint against the previous request's fingerprint.
+1. **Token reservation**: Before assembling context sections, the builder estimates the minimum user-message size and reserves that many tokens from the budget, ensuring the player's prompt is never crowded out by context sections.
+2. **Section fingerprinting**: Each context section (static rules, system persona, entropy modifiers, long-term summaries, notes, short-term memory) is fingerprinted by hashing its content. `AIContextDelta` compares each section's current fingerprint against the previous request's fingerprint.
 3. **Incremental sending**: If a section is unchanged from the previous request, the builder substitutes a lightweight marker — `[context:{section_name} unchanged from previous request]` — saving the tokens that would have been spent resending identical content. Sections are forced to resend after eight consecutive unchanged cycles to guard against context drift.
 4. **Budget overflow degradation**: When a changed section exceeds the remaining budget, the builder replaces it with a compressed summary marker — `[context:{section_name} updated, {msg_count} messages, ~{total_chars} chars — truncated for budget]` — preserving awareness of the section's existence without transmitting its full content.
 5. **Short-term memory trimming**: Short-term entries are appended one by one until the budget is exhausted; any remaining entries are summarised as omitted counts.
@@ -333,46 +333,56 @@ The most significant error handling challenge involved API key configuration. Us
 
 The following code excerpts illustrate core AI integration concepts. Complete implementations are available in the source code submission.
 
-``` {caption="Budget-aware incremental prompt construction (from ai\\_prompt\\_builder.gd)"}
+``` {caption="Budget-aware incremental prompt construction (from ai\\_prompt\\_builder.gd:30--75)"}
 func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
     var messages: Array[Dictionary] = []
     var language := _get_language()
-    _pre_user_token_reserve = USER_MSG_RESERVE        # reserve 4 000 tokens for user msg
+    var minimum_user_message := _build_minimum_user_message(prompt, context, language)
+    _pre_user_token_reserve = min(_delta.token_budget,
+        _delta.estimate_tokens(minimum_user_message))
     _delta.begin_build()
     # Sections appended incrementally — unchanged sections become markers
-    _append_section_incremental("static_context",
-        _get_static_context_messages(language), messages)
-    _append_single_incremental("persona",
-        { "role": "system", "content": _system_persona }, messages)
-    _append_section_incremental("entropy",
-        _get_entropy_modifier_message(language), messages)
-    _append_section_incremental("long_term",
-        _get_long_term_context(language), messages)
-    _append_section_incremental("notes",
-        _get_notes_context(language), messages)
-    _append_short_term_memory(messages)               # one-by-one until budget exhausted
+    _append_section_incremental(messages, "static_context",
+        _get_static_context_messages(language))
+    _append_single_incremental(messages, "system_persona",
+        { "role": "system", "content": _system_persona })
+    _append_budgeted_message(messages,                # assistant acknowledgement
+        { "role": "assistant", "content": _get_acknowledgement_message(language) })
+    _append_section_incremental(messages, "entropy_modifier",
+        _get_entropy_modifier_message(language))
+    _append_section_incremental(messages, "long_term_context",
+        _get_long_term_context(language))
+    _append_section_incremental(messages, "notes_context",
+        _get_notes_context(language))
+    _append_short_term_memory(messages,               # one-by-one until budget exhausted
+        _get_short_term_memory(), language)
     # Final user message fitted into remaining budget
-    var user_msg := _build_user_message(prompt, context, language)
-    _append_budgeted_message({ "role": "user", "content": user_msg }, messages)
+    var user_message_content := _build_user_message_incremental(
+        prompt, context, language, _delta.remaining_budget())
+    messages.append({ "role": "user", "content": user_message_content })
     _delta.finish_build()
     return messages
 ```
 
-``` {caption="Section fingerprinting and budget degradation (from ai\\_prompt\\_builder.gd)"}
-func _append_section_incremental(section_name: String,
-        section_msgs: Array, out: Array) -> void:
-    var fp := _delta.fingerprint_messages(section_msgs)
-    if _delta.has_section_changed(section_name, fp):
-        if _has_budget_with_reserve(section_msgs):
+``` {caption="Section fingerprinting and budget degradation (from ai\\_prompt\\_builder.gd:89--104)"}
+func _append_section_incremental(messages: Array[Dictionary],
+        section_name: String, section_msgs: Array[Dictionary]) -> void:
+    if section_msgs.is_empty():
+        return
+    var fingerprint := _delta.fingerprint_messages(section_msgs)
+    if _delta.has_section_changed(section_name, fingerprint):
+        if _has_budget_with_reserve(fingerprint, _pre_user_token_reserve):
             for msg in section_msgs:
-                _append_budgeted_message(msg, out)
-            _delta.record_section(section_name, fp)
+                messages.append(msg)
+            _delta.record_section(section_name, fingerprint)
+            _delta.add_tokens(_delta.estimate_tokens(fingerprint))
         else:
             # Over budget — degrade to a lightweight summary marker
-            out.append(_summarize_section(section_name, section_msgs))
+            var summary := _summarize_section(section_name, section_msgs)
+            _append_budgeted_message(messages, { "role": "system", "content": summary })
     else:
         # Unchanged — single-line marker instead of full content
-        out.append(_delta.build_unchanged_marker(section_name))
+        _append_budgeted_message(messages, _delta.build_unchanged_marker(section_name))
 ```
 
 ``` {caption="Void entropy calculation driving thematic tone (from player\\_stats.gd:54--59)"}
