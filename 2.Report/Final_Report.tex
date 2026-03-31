@@ -547,6 +547,8 @@ The following code excerpts illustrate core AI integration concepts. Complete im
 func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
     var messages: Array[Dictionary] = []
     var language := _get_language()
+    if not _delta:
+        _delta = AIContextDeltaScript.new()
     var minimum_user_message := _build_minimum_user_message(prompt, context, language)
     _pre_user_token_reserve = min(_delta.token_budget,
         _delta.estimate_tokens(minimum_user_message))
@@ -557,7 +559,8 @@ func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
     _append_single_incremental(messages, "system_persona",
         { "role": "system", "content": _system_persona })
     _append_budgeted_message(messages,                # assistant acknowledgement
-        { "role": "assistant", "content": _get_acknowledgement_message(language) })
+        { "role": "assistant", "content": _get_acknowledgement_message(language) },
+        _pre_user_token_reserve)
     _append_section_incremental(messages, "entropy_modifier",
         _get_entropy_modifier_message(language))
     _append_section_incremental(messages, "long_term_context",
@@ -566,10 +569,19 @@ func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
         _get_notes_context(language))
     _append_short_term_memory(messages,               # one-by-one until budget exhausted
         _get_short_term_memory(), language)
-    # Final user message fitted into remaining budget
+    # Final user message -- overflow check, truncation, voice-inline attachment
+    var user_available_tokens := _delta.remaining_budget()
     var user_message_content := _build_user_message_incremental(
-        prompt, context, language, _delta.remaining_budget())
-    messages.append({ "role": "user", "content": user_message_content })
+        prompt, context, language, user_available_tokens)
+    if _delta.estimate_tokens(user_message_content) > user_available_tokens:
+        user_message_content = _truncate_text_to_budget(
+            _build_minimum_user_message(prompt, context, language),
+            user_available_tokens)
+    var user_message := { "role": "user", "content": user_message_content }
+    # ... voice inline part attached when a voice session is active
+    messages.append(user_message)
+    _delta.add_tokens(_delta.estimate_tokens(user_message_content))
+    _pre_user_token_reserve = 0
     _delta.finish_build()
     return messages
 \end{lstlisting}
@@ -589,10 +601,12 @@ func _append_section_incremental(messages: Array[Dictionary],
         else:
             # Over budget -- degrade to a lightweight summary marker
             var summary := _summarize_section(section_name, section_msgs)
-            _append_budgeted_message(messages, { "role": "system", "content": summary })
+            if _append_budgeted_message(messages, { "role": "system", "content": summary }):
+                _delta.record_section(section_name, summary)
     else:
         # Unchanged -- single-line marker instead of full content
-        _append_budgeted_message(messages, _delta.build_unchanged_marker(section_name))
+        _append_budgeted_message(messages,
+            _delta.build_unchanged_marker(section_name), _pre_user_token_reserve)
 \end{lstlisting}
 
 \begin{lstlisting}[caption={Void entropy calculation driving thematic tone (from player\_stats.gd:54--59)}]
@@ -632,6 +646,7 @@ func parse_scene_directives(response_text: String) -> Dictionary:
 \begin{lstlisting}[caption={Strategy pattern for provider switching (from ai\_provider\_manager.gd:75--96)}]
 func get_current_provider():
     if not _config_manager:
+        ErrorReporterBridge.report_error(ERROR_CONTEXT, "Config manager not set")
         return null
     match _config_manager.current_provider:
         AIConfigManager.AIProvider.GEMINI:
