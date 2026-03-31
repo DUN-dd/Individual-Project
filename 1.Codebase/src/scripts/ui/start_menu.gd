@@ -1264,6 +1264,15 @@ func _show_cant_touch_easter_egg() -> void:
 	body_lbl.add_theme_font_size_override("normal_font_size", 16)
 	body_lbl.add_theme_color_override("default_color", Color(0.9, 0.88, 0.95))
 	scroll.add_child(body_lbl)
+	var secret_btn := Button.new()
+	secret_btn.text = _tr("EASTER_EGG_SUPER_GIRLS_BTN")
+	secret_btn.custom_minimum_size = Vector2(50, 36)
+	secret_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	secret_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	secret_btn.add_theme_font_size_override("font_size", 18)
+	secret_btn.add_theme_color_override("font_color", Color(0.8, 0.55, 0.95, 0.75))
+	secret_btn.pressed.connect(_show_super_girls_easter_egg)
+	vbox.add_child(secret_btn)
 	var close_btn := Button.new()
 	close_btn.text = _tr("EASTER_EGG_CLOSE")
 	close_btn.custom_minimum_size = Vector2(160, 44)
@@ -1277,3 +1286,103 @@ func _show_cant_touch_easter_egg() -> void:
 	UIStyleManager.fade_in(overlay, 0.35)
 	add_child(overlay)
 	_debug_log("[StartMenu] Easter egg triggered: Can't Touch This")
+
+func _show_super_girls_easter_egg() -> void:
+	const SUPER_GIRLS_URL := "https://youtube.com/@supergirlsgroup"
+	const CLICKS_NEEDED := 5
+	var click_count := 0
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.85)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(400, 260)
+	panel.pivot_offset = Vector2(200, 130)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.10, 0.05, 0.18, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 2
+	sb.border_width_right = 2
+	sb.border_width_top = 2
+	sb.border_width_bottom = 2
+	sb.border_color = Color(0.95, 0.55, 0.85, 0.85)
+	sb.shadow_size = 20
+	sb.shadow_color = Color(0.6, 0.0, 0.5, 0.45)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.mouse_filter = Control.MOUSE_FILTER_PASS
+	margin.add_theme_constant_override("margin_left", 36)
+	margin.add_theme_constant_override("margin_right", 36)
+	margin.add_theme_constant_override("margin_top", 28)
+	margin.add_theme_constant_override("margin_bottom", 24)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_theme_constant_override("separation", 14)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_SUPER_GIRLS_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 20)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.7, 0.9))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.85, 0.45, 0.75, 0.5)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(sep)
+	var hint_lbl := Label.new()
+	hint_lbl.text = _tr("EASTER_EGG_SUPER_GIRLS_HINT").format({"remaining": CLICKS_NEEDED})
+	hint_lbl.add_theme_font_size_override("font_size", 15)
+	hint_lbl.add_theme_color_override("font_color", Color(0.9, 0.85, 0.95))
+	hint_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(hint_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(spacer)
+	var close_btn2 := Button.new()
+	close_btn2.text = _tr("EASTER_EGG_CLOSE")
+	close_btn2.custom_minimum_size = Vector2(120, 40)
+	close_btn2.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	UIStyleManager.apply_button_style(close_btn2, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn2, 1.06)
+	close_btn2.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn2.pressed.connect(overlay.queue_free)
+	vbox.add_child(close_btn2)
+	panel.gui_input.connect(func(event: InputEvent) -> void:
+		if not (event is InputEventMouseButton):
+			return
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			click_count += 1
+			var remaining := CLICKS_NEEDED - click_count
+			if remaining > 0:
+				hint_lbl.text = _tr("EASTER_EGG_SUPER_GIRLS_CLICK").format({"remaining": remaining})
+				if is_instance_valid(panel):
+					var t := create_tween()
+					t.tween_property(panel, "scale", Vector2(1.06, 1.06), 0.07)
+					t.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.07)
+			else:
+				OS.shell_open(SUPER_GIRLS_URL)
+				overlay.queue_free()
+	)
+	overlay.modulate.a = 0.0
+	UIStyleManager.fade_in(overlay, 0.25)
+	add_child(overlay)
+	_debug_log("[StartMenu] Easter egg triggered: Super Girls")
