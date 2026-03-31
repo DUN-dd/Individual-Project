@@ -453,7 +453,6 @@ func _generate_preset_dilemma(template_type: String) -> void:
 	current_dilemma["generated_at"] = Time.get_datetime_string_from_system()
 	current_dilemma["preset"] = true
 	dilemma_generated.emit(current_dilemma)
-
 func _build_preset_dilemma_data(template_type: String, lang: String) -> Dictionary:
 	match template_type:
 		"classic":
@@ -468,7 +467,6 @@ func _build_preset_dilemma_data(template_type: String, lang: String) -> Dictiona
 			return _preset_positive_energy_trap_dilemma(lang)
 		_:
 			return _preset_default_dilemma(lang)
-
 func _preset_classic_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {
@@ -519,7 +517,6 @@ func _preset_classic_dilemma(lang: String) -> Dictionary:
 		],
 		"thematic_point": "'The greater good' is always the most convenient excuse to abandon the vulnerable.",
 	}
-
 func _preset_sacrifice_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {
@@ -588,7 +585,6 @@ func _preset_sacrifice_dilemma(lang: String) -> Dictionary:
 		],
 		"thematic_point": "Every 'solution' makes you complicit in a different atrocity.",
 	}
-
 func _preset_complicity_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {
@@ -639,7 +635,6 @@ func _preset_complicity_dilemma(lang: String) -> Dictionary:
 		],
 		"thematic_point": "Silence is never neutral, it just chose the safer side.",
 	}
-
 func _preset_lesser_evil_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {
@@ -708,7 +703,6 @@ func _preset_lesser_evil_dilemma(lang: String) -> Dictionary:
 		],
 		"thematic_point": "With limited resources, every rescue is simultaneously an abandonment.",
 	}
-
 func _preset_positive_energy_trap_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {
@@ -759,7 +753,6 @@ func _preset_positive_energy_trap_dilemma(lang: String) -> Dictionary:
 		],
 		"thematic_point": "The cruelest part of toxic positivity: it makes victims believe their suffering is their own fault.",
 	}
-
 func _preset_default_dilemma(lang: String) -> Dictionary:
 	if lang == "zh":
 		return {

@@ -420,11 +420,11 @@ func _show_cant_touch_easter_egg() -> void:
 	add_child(overlay)
 	var tween := create_tween()
 	tween.tween_property(overlay, "modulate:a", 1.0, 0.35)
-
 func _show_super_girls_easter_egg() -> void:
 	const SUPER_GIRLS_URL := "https://youtube.com/@supergirlsgroup"
 	const CLICKS_NEEDED := 5
-	var click_count := 0
+	var counter := [0]  
+	var panel_tween: Tween = null
 	var overlay := Control.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -502,14 +502,16 @@ func _show_super_girls_easter_egg() -> void:
 			return
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
-			click_count += 1
-			var remaining := CLICKS_NEEDED - click_count
+			counter[0] += 1
+			var remaining: int = CLICKS_NEEDED - counter[0] as int
 			if remaining > 0:
 				hint_lbl.text = _tr("EASTER_EGG_SUPER_GIRLS_CLICK").format({"remaining": remaining})
 				if is_instance_valid(panel):
-					var t := create_tween()
-					t.tween_property(panel, "scale", Vector2(1.06, 1.06), 0.07)
-					t.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.07)
+					if is_instance_valid(panel_tween):
+						panel_tween.kill()
+					panel_tween = create_tween()
+					panel_tween.tween_property(panel, "scale", Vector2(1.06, 1.06), 0.07)
+					panel_tween.tween_property(panel, "scale", Vector2(1.0, 1.0), 0.07)
 			else:
 				OS.shell_open(SUPER_GIRLS_URL)
 				overlay.queue_free()
