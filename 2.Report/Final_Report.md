@@ -458,6 +458,14 @@ func get_current_provider():
     return null
 ```
 
+## Analytics Export and Narrative Archive
+
+Two export subsystems were implemented late in the development cycle as practical tools for both research evaluation and player experience.
+
+The **AI Usage Analytics Export** (`SettingsMenuAILogExport`) emerged directly from my evaluation methodology. To perform the functional testing described in Section 9, I needed structured records of every AI request, not just pass/fail observations. I implemented a telemetry pipeline in which `AIRequestManager` captures a dictionary of metadata for each API call, including provider, model, token counts, latency, mode, purpose, prompt text, and response text. These records accumulate in memory and are persisted via `AIUsageStatsStore` to the user data directory. The Settings menu then exposes CSV and JSON export buttons: the CSV export additionally invokes `SettingsMenuAIAnalytics` to compute derived series (provider success rates, hourly call distributions, cumulative token curves, tokens-per-second throughput) before writing the file. The CSV produced during testing is included in the project repository as a concrete evaluation artefact, demonstrating actual provider performance across the functional testing period.
+
+The **Story Narrative HTML Export** (`StoryExporter`) was conceived as a player-facing feature that transforms the AI-generated narrative into a persistent artefact. After each session, the player can export their complete story as a self-contained HTML document styled with a parchment theme. The document includes a cover page summarising session statistics, a grid of final stat values, a chronological choice chronicle drawn from the `ButterflyEffectTracker`'s recorded choices (showing scene number, severity, stats at decision time, and triggered consequences), a key events log, and a closing quote calibrated to the player's Reality and Entropy scores. The HTML is entirely self-contained with embedded CSS, including print-friendly media queries, making it distributable without any game dependency.
+
 Each implementation challenge produced an architectural decision that made the system more robust; Section 9 describes the testing strategy designed to verify these solutions.
 
 # Testing
@@ -1147,7 +1155,7 @@ The AI interface supports eight LLM backends:
 
 Prompts are assembled by the `NarrativePromptBuilder` and `AIPromptBuilder` from structured templates managed by the `SkillManager`. The SkillManager scans the `src/skills/` directory (15 skill folders at time of submission) and parses each `SKILL.md` file's YAML frontmatter for metadata including `purpose_triggers`. Skill folders include: `mission-generation`, `teammate-interference`, `gloria-intervention`, `prayer-system`, `trolley-problem`, `scene-directives`, `character-profiles`, `choice-followup`, `consequence-generation`, `entropy-effects`, `game-recap`, `honeymoon-phase`, `intro-story`, `night-cycle`, and `force-mission-complete`. This externalises all prompt engineering from GDScript, enabling prompt iteration without recompilation.
 
-All prompts and persona strings support bilingual generation: language selection (English or Chinese) is passed through the AI call chain and resolved in `AIPromptsI18n`.
+All prompts and persona strings support trilingual generation: language selection (English, Chinese, or German) is passed through the AI call chain and resolved in `AIPromptsI18n`. Each skill folder ships three language variants — `SKILL.md` (English base), `SKILL.zh.md` (Simplified Chinese), and `SKILL.de.md` (German) — allowing the SkillManager to load the appropriate template without any code changes.
 
 Output is requested as structured JSON (`response_mime_type = "application/json"` with `response_schema` enforcement where the provider supports it) and parsed by the `NarrativeResponseParser`. Generated responses contain:
 
@@ -1161,9 +1169,11 @@ Voice output is supported via `VoiceBridge` and `VoiceSessionManager` (wrapping 
 
 ### 4.14 The FSM 30-Day Rebirth Challenge
 
-The FSM 30-Day Rebirth Challenge is a fully implemented game mode, accessible from the main menu, that reframes the core loop as a structured 30-day self-improvement programme endorsed by the Flying Spaghetti Monster. Players commit to completing one daily mission for 30 consecutive days, each day presenting a themed content card (backed by per-day assets in `src/assets/rebirth_challenge/`, days 1–8 illustrated). The mode is managed by the `FSMChallengeModule` class, which tracks `challenge_start_date`, `current_day`, `days_completed`, and login continuity.
+The FSM 30-Day Rebirth Challenge is a fully implemented standalone game mode, accessible from the main menu, that reframes the core loop as a structured 30-day self-improvement programme endorsed by the Flying Spaghetti Monster. Players commit to completing one daily mission for 30 consecutive days, each day presenting a themed content card (backed by per-day pixel-art assets in `src/assets/rebirth_challenge/`, days 1–8 illustrated). The mode is managed by the `FSMChallengeModule` class, which tracks `challenge_start_date`, `current_day`, `days_completed`, and `last_login_date` for continuity enforcement.
 
-The central satirical mechanic is an inevitable, scripted crash: the module enforces `DAYS_BEFORE_CRASH = 8`, meaning the challenge always catastrophically collapses on day 8 regardless of player performance. Daily themes (Days 1–8, keyed in `FSMDailyContentData`) escalate in toxic-positivity intensity before the crash triggers `challenge_crash_triggered` and locks further progress. A `FSMRebirthExplanation` scene then presents an ironic post-mortem. This design deliberately subverts the real-world "30-day challenge" genre, embodying the game's central thesis that manufactured positivity is structurally self-defeating. The constant `TOTAL_DAYS = 30` remains inaccessible by design.
+Progress is gated by real calendar time: the `can_advance_day()` method compares the current system date against the stored `challenge_start_date` to determine whether the player is genuinely eligible to advance. If the player misses a day, the `check_and_reset_if_missed()` method detects a gap of more than one calendar day since `last_login_date` and resets the challenge to day one, forcing the player to restart — a mechanic that satirises the fragility of "streak-based" self-improvement apps. Daily content (theme, motivational text, and sublimation commentary) is keyed in `FSMDailyContentData` and resolved through the `LocalizationManager` at runtime, supporting English, Chinese, and German.
+
+The central satirical mechanic is an inevitable, scripted crash: the module enforces `DAYS_BEFORE_CRASH = 8`, meaning the challenge always catastrophically collapses on day 8 regardless of the player's consistency or positivity. Daily themes (Days 1–8) escalate in toxic-positivity intensity before the crash triggers the `challenge_crash_triggered` signal and locks further progress. The `FSMRebirthExplanation` scene then presents an ironic post-mortem blaming the player's residual negativity. This design deliberately subverts the real-world "30-day challenge" genre, embodying the game's central thesis that manufactured positivity is structurally self-defeating. The constant `TOTAL_DAYS = 30` is defined but permanently inaccessible by design — a silent joke visible only in the source code.
 
 ### 4.15 Localisation and Language Support
 
@@ -1211,6 +1221,31 @@ Five font size scales are user-selectable at runtime (Tiny 0.75×, Small 0.85×,
 | `night_concert_crowd.mp3`, `night_concert_guitar.mp3` | Teacher Chan concert atmosphere layers |
 | `hidden_credits-backup.mp3` | Hidden credits sequence |
 | `background_music.mp3` | Main menu and fallback background |
+
+### 4.18 AI Usage Logging and Analytics Export
+
+The game implements a comprehensive AI usage telemetry system designed to support both research evaluation and provider cost management. Every API call made during gameplay is recorded by the `AIRequestManager`, which captures: timestamp, provider name, model identifier, HTTP status code, input and output token counts, wall-clock response latency, request mode (`live`/`mock`/`mock_fallback`), request purpose (e.g. `mission-generation`, `prayer-system`), any error message, the full serialised request body (including assembled prompt), and the raw response body. These records are persisted to a JSON file in Godot's sandboxed user data directory by the `AIUsageStatsStore` class.
+
+The Settings menu exposes two export actions through `SettingsMenuAILogExport`:
+
+- **CSV Export** (file: `ai_usage_charts_[timestamp].csv`): produces a two-section CSV. The first section contains one row per API call with columns `section`, `timestamp`, `provider`, `model`, `status`, `input_tokens`, `output_tokens`, `response_time_sec`, `mode`, `purpose`, `error`, `prompt_text`, `prompt_modules_active`, and `ai_response_text`. The second section appends derived analytics series computed by `SettingsMenuAIAnalytics`, including: provider success rates, total and per-provider token usage, average response times, tokens-per-second throughput, mode distribution (live/mock/fallback), model call counts, hourly call and token breakdowns, and cumulative token progression. This format is designed for direct import into spreadsheet tools for visual analysis.
+- **JSON Export** (file: `ai_call_log_[timestamp].json`): exports the complete raw call log alongside a pre-computed metrics summary dictionary, suitable for programmatic analysis.
+
+These export capabilities serve the project's research methodology by creating auditable records of AI system behaviour during functional testing sessions. The CSV produced during development is available as an artefact in the project root (`ai_usage_2026-03-30_19-38-42.csv`), demonstrating actual provider performance data collected across the functional testing period.
+
+### 4.19 Story Narrative HTML Export
+
+The `StoryExporter` class (`story_exporter.gd`) generates a self-contained HTML document that captures the player's complete narrative journey as a shareable artefact, independent of the game executable. The export is triggered from the in-game journal or settings menu and produces a file named `GDA_Story_YYYY-MM-DD.html` using the export date.
+
+The exported HTML document is structured in five sections:
+
+1. **Cover Page**: game title, total mission count, total choice count, scene count, and current game phase.
+2. **Stats Summary**: a responsive grid displaying the player's final Reality Score, Positive Energy, Entropy Level, and all four skill values (Logic, Perception, Composure, Empathy).
+3. **Choice Chronicle**: a detailed chronological record of every player choice captured by the `ButterflyEffectTracker`, showing scene number, choice severity (minor/major/critical), choice text, the player's stat snapshot at decision time, and any butterfly effect consequences triggered.
+4. **Key Events Section**: up to 50 significant events drawn from the `GameState` event log, each displayed with its contextual description.
+5. **Closing Page**: a contextual ending quote derived from the player's final Reality and Entropy scores, providing a narrative coda appropriate to their playstyle.
+
+The HTML is fully self-contained with embedded CSS, using a custom parchment theme (CSS variables `--parchment`, `--ink`, `--gold`, `--gold-light`) with responsive grid layout, colour-coded choice severity indicators (minor/major/critical use progressively deeper ink tones), and print-friendly media queries. This feature transforms the ephemeral AI-generated narrative into a persistent, archivable document, allowing players to preserve and share their unique story outside the game.
 
 ## 5. Testing Strategy and Evidence Plan
 
