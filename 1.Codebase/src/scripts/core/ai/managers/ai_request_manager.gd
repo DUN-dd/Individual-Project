@@ -722,7 +722,7 @@ func _fetch_recent_assets_metadata() -> Array:
 	return []
 func _validate_prompt(normalized_prompt: String, is_mock_request: bool = false) -> Dictionary:
 	var prompt_length := normalized_prompt.length()
-	if prompt_length < GameConstants.AI.PROMPT_MIN_LENGTH:
+	if not is_mock_request and prompt_length < GameConstants.AI.PROMPT_MIN_LENGTH:
 		return {
 			"message": "AI prompt cannot be empty.",
 			"code": "prompt_empty",
