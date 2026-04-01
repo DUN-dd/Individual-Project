@@ -1,5 +1,5 @@
 extends Node
-const EmbeddedSkillRegistry = preload("res://1.Codebase/generated/embedded_skill_registry.gd")
+const EMBEDDED_REGISTRY_PATH := "res://1.Codebase/generated/embedded_skill_registry.gd"
 const SKILLS_BASE_PATHS := [
 	"res://1.Codebase/src/skills",
 	"res://src/skills",
@@ -66,7 +66,7 @@ func _scan_skills_from_directory(base_path: String) -> int:
 	dir.list_dir_end()
 	return loaded_count
 func _load_embedded_skills() -> bool:
-	var embedded_skills: Dictionary = EmbeddedSkillRegistry.get_skills()
+	var embedded_skills: Dictionary = _get_embedded_skills()
 	if embedded_skills.is_empty():
 		return false
 	for skill_name_variant in embedded_skills.keys():
@@ -78,6 +78,27 @@ func _load_embedded_skills() -> bool:
 		return false
 	_initialized = true
 	return true
+func _get_embedded_skills() -> Dictionary:
+	if not FileAccess.file_exists(EMBEDDED_REGISTRY_PATH):
+		return {}
+	var registry_script: Variant = load(EMBEDDED_REGISTRY_PATH)
+	if registry_script == null:
+		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Embedded skill registry could not be loaded", {
+			"path": EMBEDDED_REGISTRY_PATH,
+		})
+		return {}
+	if not registry_script.has_method("get_skills"):
+		ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Embedded skill registry missing get_skills", {
+			"path": EMBEDDED_REGISTRY_PATH,
+		})
+		return {}
+	var skills_variant: Variant = registry_script.call("get_skills")
+	if skills_variant is Dictionary:
+		return skills_variant
+	ErrorReporterBridge.report_warning(ERROR_CONTEXT, "Embedded skill registry returned invalid payload", {
+		"path": EMBEDDED_REGISTRY_PATH,
+	})
+	return {}
 func _register_skill(skill_name: String, metadata: Dictionary) -> void:
 	var normalized := metadata.duplicate(true)
 	normalized["name"] = skill_name
