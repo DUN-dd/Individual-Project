@@ -1087,7 +1087,7 @@ Overarching Aim: To investigate how far a bespoke, AI-driven 2D RPG narrative sy
 \subsubsection*{1.2 Objectives}
 
 \begin{enumerate}
-  \item To build a Foundational 2D RPG framework in Godot 4.6.1.
+  \item To build a Foundational 2D RPG framework in Godot 4.7-dev3.
   \item To implement an LLM integration \& runtime pipeline --- implement a request/response pipeline that translates game state → structured prompt → LLM reply → in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
   \item To design and implement a multi-layer context management system for narrative coherence:
     \begin{itemize}
@@ -1134,7 +1134,7 @@ The project is structured into four main phases, spanning the Autumn and Spring 
 \subsection*{5. Expected Deliverables}
 
 \begin{itemize}
-  \item Playable Godot 4.6.1 prototype demonstrating end-to-end AI-driven dialogue and story progression with multi-layer context.
+  \item Playable Godot 4.7-dev3 prototype demonstrating end-to-end AI-driven dialogue and story progression with multi-layer context.
   \item Source code repository with documentation and architecture diagrams (plus optional static documentation website).
   \item Final dissertation including the critical comparison with world-model approaches like Genie.
   \item Recorded gameplay video showcasing key AI-driven narrative moments for presentation and demonstration.
@@ -1163,7 +1163,7 @@ University of Sussex, Engineering \& Informatics\\[0.05cm]
 An AI native 2D role-playing game where you are a reluctant hero in a dysfunctional team, whose attempts to save the world with ``positive energy'' only accelerate its destruction in a dark, toxic positivity.
 
 \subsubsection*{1.2 Format and Platforms}
-The game is designed for PC platforms using the Godot 4.6.1 Engine, targeting players who have access to desktop computing environments. The technical foundation will support integration with various AI language models to enable dynamic narrative generation, which defines the core gameplay experience.
+The game is designed for PC platforms using the Godot 4.7-dev3 Engine, targeting players who have access to desktop computing environments. The technical foundation will support integration with various AI language models to enable dynamic narrative generation, which defines the core gameplay experience.
 
 \subsubsection*{1.3 Genre and Theme}
 The game blends RPG mechanics with narrative-driven gameplay, wrapped in layers of dark comedy and satire. At its thematic heart lies a critique of toxic positivity and modern hustle culture, exploring how good intentions can spiral into catastrophic consequences. The narrative weaves together concepts of entropy, determinism, and the psychological damage caused by forced optimism, all delivered through black humour that encourages players to question the systems they participate in.
@@ -1192,7 +1192,7 @@ The game's most distinctive element is its AI-native narrative engine, where cor
 Supporting this narrative foundation is an AI-driven visual scene system featuring a comprehensive library of two-dimensional assets:
 \begin{itemize}
   \item Twenty-two environmental backgrounds establish locations and moods
-  \item Sixty-nine character sprites: 48 expression sprites across six characters (eight each), 6 full-body turnaround sheets, 6 portrait busts, and 9 additional specialty performance poses for Teacher Chan
+  \item Sixty-nine character sprites: 48 expression sprites across six characters (eight each), 6 full-body turnaround sheets, 6 portrait busts, and 8 additional specialty performance poses for Teacher Chan
   \item Twenty-nine symbolic gameplay objects add interactive elements, each tagged for AI querying by theme
   \item Generic creature and NPC types (beast, guardian, spirit, wandering soul) allow the AI to populate scenes with supporting characters
 \end{itemize}
@@ -1352,7 +1352,7 @@ This system bridges AI-generated narratives with finite art asset sets through i
 The asset libraries include:
 \begin{itemize}
   \item Twenty-two environmental backgrounds (14 in-game scene locations plus 8 UI/utility backgrounds) organised by setting type
-  \item Sixty-nine character sprites: 48 expression sprites (8 per character across 5 characters), 16 specialty performance poses for Teacher Chan, 6 full-body turnaround sheets, and 6 portrait busts
+  \item Sixty-nine character sprites: 48 expression sprites (8 per character across 6 characters, including Teacher Chan's standard set), 8 additional specialty performance poses for Teacher Chan, 6 full-body turnaround sheets, and 6 portrait busts
   \item Twenty-nine symbolic assets of gameplay objects, each registered in \texttt{AssetRegistry} with tags and descriptive summaries for AI filtering
   \item 42 audio assets: 12 background music tracks (entropy-scaled by narrative stage) and 30 dedicated sound effects
 \end{itemize}
@@ -1622,7 +1622,7 @@ The exported HTML document is structured in five sections:
 The HTML is fully self-contained with embedded CSS, using a custom parchment theme (CSS variables \texttt{--parchment}, \texttt{--ink}, \texttt{--gold}, \texttt{--gold-light}) with responsive grid layout, colour-coded choice severity indicators (minor/major/critical use progressively deeper ink tones), and print-friendly media queries. This feature transforms the ephemeral AI-generated narrative into a persistent, archivable document, allowing players to preserve and share their unique story outside the game.
 
 \subsection*{5. Testing Strategy and Evidence Plan}
-An extensive testing infrastructure has been implemented, comprising 20+ automated test files located in \texttt{/5.Codebase/Unit Test/}, providing comprehensive coverage across all major system components. The testing strategy employs Godot's built-in testing framework (GUT --- Godot Unit Test) with assertion-based validation.
+An extensive testing infrastructure has been implemented, comprising 60+ automated test files located in \texttt{1.Codebase/Unit Test/}, providing comprehensive coverage across all major system components. The testing strategy employs Godot's built-in testing framework (GUT --- Godot Unit Test) with assertion-based validation.
 
 \subsubsection*{5.1 Unit and Component Testing}
 Individual components have been tested in isolation to verify correct functionality before integration. Implemented test suites include:

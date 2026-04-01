@@ -813,7 +813,7 @@ Overarching Aim: To investigate how far a bespoke, AI-driven 2D RPG narrative sy
 
 ### 1.2 Objectives
 
-1. To build a Foundational 2D RPG framework in Godot 4.6.1.
+1. To build a Foundational 2D RPG framework in Godot 4.7-dev3.
 2. To implement an LLM integration & runtime pipeline --- implement a request/response pipeline that translates game state → structured prompt → LLM reply → in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
 3. To design and implement a multi-layer context management system for narrative coherence:
    - Static Context ("world bible" of immutable lore and themes)
@@ -852,7 +852,7 @@ The project is structured into four main phases, spanning the Autumn and Spring 
 
 ## 5. Expected Deliverables
 
-- Playable Godot 4.6.1 prototype demonstrating end-to-end AI-driven dialogue and story progression with multi-layer context.
+- Playable Godot 4.7-dev3 prototype demonstrating end-to-end AI-driven dialogue and story progression with multi-layer context.
 - Source code repository with documentation and architecture diagrams (plus optional static documentation website).
 - Final dissertation including the critical comparison with world-model approaches like Genie.
 - Recorded gameplay video showcasing key AI-driven narrative moments for presentation and demonstration.
@@ -877,7 +877,7 @@ An AI native 2D role-playing game where you are a reluctant hero in a dysfunctio
 
 ### 1.2 Format and Platforms
 
-The game is designed for PC platforms using the Godot 4.6.1 Engine, targeting players who have access to desktop computing environments. The technical foundation will support integration with various AI language models to enable dynamic narrative generation, which defines the core gameplay experience.
+The game is designed for PC platforms using the Godot 4.7-dev3 Engine, targeting players who have access to desktop computing environments. The technical foundation will support integration with various AI language models to enable dynamic narrative generation, which defines the core gameplay experience.
 
 ### 1.3 Genre and Theme
 
@@ -911,7 +911,7 @@ The game's most distinctive element is its AI-native narrative engine, where cor
 Supporting this narrative foundation is an AI-driven visual scene system featuring a comprehensive library of two-dimensional assets:
 
 - Twenty-two environmental backgrounds establish locations and moods
-- Sixty-nine character sprites: 48 expression sprites across six characters (eight each), 6 full-body turnaround sheets, 6 portrait busts, and 9 additional specialty performance poses for Teacher Chan
+- Sixty-nine character sprites: 48 expression sprites across six characters (eight each), 6 full-body turnaround sheets, 6 portrait busts, and 8 additional specialty performance poses for Teacher Chan
 - Twenty-nine symbolic gameplay objects add interactive elements, each tagged for AI querying by theme
 - Generic creature and NPC types (beast, guardian, spirit, wandering soul) allow the AI to populate scenes with supporting characters
 
@@ -1014,7 +1014,7 @@ This system bridges AI-generated narratives with finite art asset sets through i
 The asset libraries include:
 
 - Twenty-two environmental backgrounds (14 in-game scene locations plus 8 UI/utility backgrounds) organised by setting type
-- Sixty-nine character sprites: 48 expressions (8 per character across 5 characters), 16 specialty performance poses for Teacher Chan, 6 full-body turnaround sheets, and 6 portrait busts
+- Sixty-nine character sprites: 48 expressions (8 per character across 6 characters, including Teacher Chan's standard set), 8 additional specialty performance poses for Teacher Chan, 6 full-body turnaround sheets, and 6 portrait busts
 - Twenty-nine symbolic assets of gameplay objects, each registered in `AssetRegistry` with tags and descriptive summaries for AI filtering
 - 42 audio assets: 12 background music tracks (entropy-scaled by narrative stage) and 30 dedicated sound effects
 
@@ -1249,7 +1249,7 @@ The HTML is fully self-contained with embedded CSS, using a custom parchment the
 
 ## 5. Testing Strategy and Evidence Plan
 
-An extensive testing infrastructure has been implemented, comprising 20+ automated test files located in `/5.Codebase/Unit Test/`, providing comprehensive coverage across all major system components. The testing strategy employs Godot's built-in testing framework (GUT --- Godot Unit Test) with assertion-based validation.
+An extensive testing infrastructure has been implemented, comprising 60+ automated test files located in `1.Codebase/Unit Test/`, providing comprehensive coverage across all major system components. The testing strategy employs Godot's built-in testing framework (GUT --- Godot Unit Test) with assertion-based validation.
 
 ### 5.1 Unit and Component Testing
 
@@ -1287,7 +1287,7 @@ Validation criteria verified by test suites include: no UI blocking during AI ge
 
 The following artefacts constitute the complete project deliverables:
 
-1. **Playable Game Build** — A self-contained Godot 4.6.1 project that runs on PC, supporting multiple AI provider backends (Gemini, Ollama, OpenRouter, OpenAI, Claude, LM Studio) and a fully functional mock mode for provider-independent operation.
+1. **Playable Game Build** — A self-contained Godot 4.7-dev3 project that runs on PC, supporting multiple AI provider backends (Gemini, Ollama, OpenRouter, OpenAI, Claude, LM Studio) and a fully functional mock mode for provider-independent operation.
 2. **Source Code Repository** — All GDScript source files organised under `1.Codebase/src/`, including automated unit and integration test suites under `1.Codebase/Unit Test/`, with GUT-compatible test scripts.
 3. **AI Usage Telemetry Artefacts** — A CSV export (`ai_usage_YYYY-MM-DD_HH-MM-SS.csv`) and JSON export (`ai_call_log_YYYY-MM-DD_HH-MM-SS.json`) collected during functional testing, demonstrating real provider performance data across the evaluation period.
 4. **Story Narrative HTML** — Sample exported story file (`GDA_Story_YYYY-MM-DD.html`) demonstrating the self-contained parchment-themed narrative archive feature.
@@ -1321,7 +1321,7 @@ The `AIContextManager` maintains narrative coherence across extended sessions us
 - **Short-term memory**: The most recent twelve conversation exchanges, preserved verbatim to maintain immediate narrative continuity.
 - **Summarised memory**: When total entries exceed twenty-four, older entries are summarised into a compressed block (computed as `max(SHORT_TERM_WINDOW, memory_full_entries * 2)`) to remain within the model's context window.
 
-At prompt assembly time, `AIPromptBuilder` applies a budget-aware compression pass: unchanged sections are replaced with single-line markers, over-budget sections degrade to summary placeholders, and short-term entries are individually trimmed when the token ceiling is reached. The current default budget of 4096 tokens (capped at 8192) is configurable per provider via `AIConfigManager`.
+At prompt assembly time, `AIPromptBuilder` applies a budget-aware compression pass: unchanged sections are replaced with single-line markers, over-budget sections degrade to summary placeholders, and short-term entries are individually trimmed when the token ceiling is reached. The current default budget of 24,000 tokens (configurable per provider via `AIConfigManager`) is estimated at roughly four characters per token.
 
 ### 7.3 GameState Modular Decomposition
 
