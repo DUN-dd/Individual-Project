@@ -1,4 +1,4 @@
-ï»¿%% Final Year Project Report Template
+%% Final Year Project Report Template
 %% University of Sussex - School of Engineering and Informatics
 %% Based on standard UK academic report format
 
@@ -260,11 +260,11 @@ The central engineering challenge was the ``controllability problem'': balancing
 
 \subsection{Large Language Models for Interactive Narratives}
 
-Researchers have demonstrated that LLMs can generate context-aware NPC dialogue aligned with character personas (Chen, 2025) and produce procedural quest descriptions comparable to human-authored content (VÃ¤rtinen et al., 2022). These results came from prompt engineering rather than model re-training. In this project, that insight is applied to the game's core teammate characters: Saint Gloria, whose speech is shaped by toxic positivity; Cosplayer Donkey, whose dialogue reflects delusional heroic posturing; and Cosplayer ARK, whose voice is dominated by bureaucratic control and opaque planning. The AI prompt pipeline therefore embeds explicit persona definitions for these characters so that their responses remain distinguishable and thematically consistent (Yang et al., 2024).
+Researchers have demonstrated that LLMs can generate context-aware NPC dialogue aligned with character personas (Chen, 2025) and produce procedural quest descriptions comparable to human-authored content (Vartinen et al., 2022). These results came from prompt engineering rather than model re-training. In this project, that insight is applied to the game's core teammate characters: Saint Gloria, whose speech is shaped by toxic positivity; Cosplayer Donkey, whose dialogue reflects delusional heroic posturing; and Cosplayer ARK, whose voice is dominated by bureaucratic control and opaque planning. The AI prompt pipeline therefore embeds explicit persona definitions for these characters so that their responses remain distinguishable and thematically consistent (Yang et al., 2024).
 
-The distinction between ``world model'' and ``bespoke pipeline'' approaches was critical. World models, exemplified by Park et al.'s (2023) ``Generative Agents'', simulate entire environments from the ground up with agents possessing memory, reflection, and planning capabilities. The bespoke pipeline integrates an LLM as one component within a traditional game engine, grounding it with structured game state data (GÃ³ngora et al., 2025). In my implementation, the Godot engine maintains authoritative game state whilst the LLM operates as a content generation service.
+The distinction between ``world model'' and ``bespoke pipeline'' approaches was critical. World models, exemplified by Park et al.'s (2023) ``Generative Agents'', simulate entire environments from the ground up with agents possessing memory, reflection, and planning capabilities. The bespoke pipeline integrates an LLM as one component within a traditional game engine, grounding it with structured game state data (Gongora et al., 2025). In my implementation, the Godot engine maintains authoritative game state whilst the LLM operates as a content generation service.
 
-World models promise emergence and player freedom but face limitations in ensuring consistent narratives and require immense computational cost (Yang et al., 2024). Bespoke pipelines offer authorial control but at the cost of emergent possibility (GÃ³ngora et al., 2025). Wan et al. (2025) confirmed that making LLMs adhere to complex constraints requires continuous architectural attention.
+World models promise emergence and player freedom but face limitations in ensuring consistent narratives and require immense computational cost (Yang et al., 2024). Bespoke pipelines offer authorial control but at the cost of emergent possibility (Gongora et al., 2025). Wan et al. (2025) confirmed that making LLMs adhere to complex constraints requires continuous architectural attention.
 
 \subsection{Bespoke Pipelines vs. World-Model Approaches}
 
@@ -452,36 +452,19 @@ I organised my codebase into three primary layers. The Core Systems Layer contai
 
 I employed several established design patterns, each chosen to address specific architectural challenges.
 
-For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as \texttt{get\_game\_state()} and \texttt{get\_ai\_manager()}, enabling IDE autocompletion whilst maintaining loose coupling between components (see \texttt{service\_locator.gd:76--123} for implementation).
+For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to global services. This kept scene code loosely coupled while reducing refactor overhead as the number of subsystems grew.
 
-For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, and AI Router, with mock behaviour handled as a dedicated request-layer mode rather than a separate network provider. Each concrete provider implements the \texttt{AIProviderBase} interface, which defines \texttt{send\_request()}, \texttt{cancel\_request()}, and \texttt{is\_configured()} methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The \texttt{AIProviderManager} coordinates provider selection and synchronisation (\texttt{ai\_provider\_manager.gd:75--96}).
+For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, and AI Router, with mock behaviour handled as a dedicated request-layer mode rather than a separate network provider. This design proved essential during development because it allowed provider changes without rewriting calling code when rate limits or configuration issues occurred.
 
-For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like \texttt{reality\_score\_changed} rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (\texttt{event\_bus.gd:147--195}).
+For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements therefore react to events such as stat updates without directly polling \texttt{GameState}, reducing circular-dependency risk and keeping the interface layer reactive.
 
 For simplifying AI integration, the AIManager presents a facade interface to the rest of the game, hiding the complexity of provider selection, prompt construction, context-management, and response parsing. Calling code simply invokes generation methods with context dictionaries, unaware of the underlying multi-layered prompt assembly process.
 
 \subsection{Context Management Architecture}
 
-The context-management system operates at two complementary layers: \textbf{storage-level compression} in \texttt{AIMemoryStore} and \textbf{runtime budget-aware assembly} in \texttt{AIPromptBuilder} with \texttt{AIContextDelta}. Conceptually, the system still groups information into three context categories, but the budget-aware pipeline is the actual mechanism that decides how those categories enter the final prompt. Together they ensure the final prompt stays within the token budget while preserving narrative coherence.
+The context-management system operates at two complementary layers: storage-level retention in \texttt{AIMemoryStore} and runtime budget-aware assembly in \texttt{AIPromptBuilder} with \texttt{AIContextDelta}. Conceptually, the system still groups information into three categories, short-term history, longer-term continuity, and persistent notes, but at runtime these categories are filtered, compressed, and reordered according to token budget and request priority.
 
-\subsubsection{Storage Layer --- AIMemoryStore}
-
-I implemented three distinct data structures within the \texttt{AIMemoryStore} class (\texttt{ai\_memory\_store.gd}). The short-term memory layer retains the most recent entries calculated as \texttt{max(SHORT\_TERM\_WINDOW, memory\_full\_entries * 2)}; with \texttt{SHORT\_TERM\_WINDOW = 5} and \texttt{memory\_full\_entries = 6}, this yields \texttt{max(5, 12) = 12} entries kept in full detail. When story memory exceeds the configurable threshold of twenty-four entries, older entries are migrated to the long-term summaries layer. Crucially, this migration is \textbf{sampling-based compression rather than semantic summarisation}: the \texttt{\_summarize\_entries()} function selects representative samples at the earliest, quarter, middle, three-quarter, and latest positions from the archived block, tagging each with its temporal position (e.g.\ ``Earliest'', ``Early'', ``Middle'', ``Late'', ``Latest summary''). For a block of one hundred entries, five representative samples are retained. This approach preserves key narrative landmarks without requiring an additional LLM call for summarisation. The notes register layer maintains persistent facts and constraints that should influence all generations, regardless of when they were established.
-
-\subsubsection{Runtime Layer --- AIPromptBuilder and AIContextDelta}
-
-The true runtime compression occurs in \texttt{AIPromptBuilder} (\texttt{ai\_prompt\_builder.gd}) working with \texttt{AIContextDelta} (\texttt{ai\_context\_delta.gd}). Rather than naively concatenating all context, the builder operates within a configurable token budget (default 4096 tokens, capped at 8192, with token estimates derived from a rough four-characters-per-token heuristic) and performs \textbf{incremental, budget-aware prompt assembly}:
-
-\begin{enumerate}
-    \item \textbf{Token reservation}: Before assembling context sections, the builder estimates the minimum user-message size and reserves that many tokens from the budget, ensuring the player's prompt is never crowded out by context sections.
-    \item \textbf{Section fingerprinting}: Each context section (static rules, system persona, entropy modifiers, long-term summaries, notes, short-term memory) is fingerprinted by hashing its content. \texttt{AIContextDelta} compares each section's current fingerprint against the previous request's fingerprint.
-    \item \textbf{Incremental sending}: If a section is unchanged from the previous request, the builder substitutes a lightweight marker --- \texttt{[context:\{section\_name\} unchanged from previous request]} --- saving the tokens that would have been spent resending identical content. Sections are forced to resend after eight consecutive unchanged cycles to guard against context drift.
-    \item \textbf{Budget overflow degradation}: When a changed section exceeds the remaining budget, the builder replaces it with a compressed summary marker --- \texttt{[context:\{section\_name\} updated, \{msg\_count\} messages, \~{}\{total\_chars\} chars --- truncated for budget]} --- preserving awareness of the section's existence without transmitting its full content.
-    \item \textbf{Short-term memory trimming}: Short-term entries are appended one by one until the budget is exhausted; any remaining entries are summarised as omitted counts.
-    \item \textbf{Final user message truncation}: If the user message itself exceeds the remaining budget after all context has been assembled, it is truncated to fit.
-\end{enumerate}
-
-This layered construction ensures that the AI always receives the most critical constraints first, with more recent context following. The entropy modifier system dynamically adjusts prompt parameters based on the calculated Void Entropy value, shifting the AI's generation towards more chaotic or stable content depending on the current game phase.
+At the storage layer, older story history is compressed into representative continuity summaries rather than replayed in full, while persistent notes survive independently of the rolling conversation log. At the prompt-assembly layer, the builder reserves space for the player's current message, prioritises the most important control sections, reuses unchanged context through compact markers, and degrades oversized sections to summary placeholders when necessary. This approach reduced token waste whilst preserving enough continuity for the AI to maintain narrative tone and callback structure. Full implementation details are documented in Appendix C: GDD, Section 7.2.
 
 \subsection{Response Parsing and Validation}
 
@@ -504,7 +487,7 @@ In this section I describe the key components I produced, focusing on the concep
 
 \subsection{The AI Integration Journey: From Simple Calls to Robust Architecture}
 
-API connection failures emerged immediately during early development: HTTP 429 rate limiting errors and CORS restrictions. These failures occurred silently in my initial implementation, leaving the game-in an undefined state. This taught me that AI integration requires defensive programming at every layer. The multi-provider architecture became essential: the Ollama local provider enabled unlimited development testing, whilst built-in mock mode enabled UI development without live AI dependency.
+API connection failures emerged immediately during early development: HTTP 429 rate limiting errors and CORS restrictions. These failures occurred silently in my initial implementation, leaving the game in an undefined state. This taught me that AI integration requires defensive programming at every layer. The multi-provider architecture became essential: the Ollama local provider enabled unlimited development testing, whilst built-in mock mode enabled UI development without live AI dependency.
 
 I implemented the \texttt{AIRequestRateLimiter} class to enforce configurable minimum intervals between API calls, proactively preventing rate limit errors rather than handling them reactively.
 
@@ -512,7 +495,7 @@ I implemented the \texttt{AIRequestRateLimiter} class to enforce configurable mi
 
 Prompt engineering required numerous iterations. Initial prompts were overly general, lacking the specific satirical tone required. The breakthrough came when I restructured prompts using explicit role definition and contextual grounding, providing detailed persona instructions establishing the game's ironic worldview.
 
-Game state must directly influence prompt parameters. The Void Entropy calculation (\texttt{player\_stats.gd:54--59}) produces a normalised value between zero and-one that modifies tonal instructions. At low-entropy, prompts request ``subtle irony''; at high entropy, ``absurdist chaos.''
+Game state must directly influence prompt parameters. The Void Entropy calculation (\texttt{player\_stats.gd:54--59}) produces a normalised value between zero and one that modifies tonal instructions. At low entropy, prompts request ``subtle irony''; at high entropy, ``absurdist chaos.''
 
 For the Prayer System, I implemented templated prompt construction that explicitly instructs the AI to ``interpret the prayer's intent and twist it toward an ironic disaster.'' This explicit ironic inversion instruction proved far more reliable than implicit contextual cues.
 
@@ -522,7 +505,7 @@ Despite requesting structured JSON output, AI responses frequently arrived in un
 
 \subsection{Memory Management: Balancing Context and Token Cost}
 
-Context window management presented a genuine engineering challenge. Simply including entire conversation history led to both token cost issues and degraded output quality. The specific thresholds in my context-management system (Section 7.3) required empirical tuning. The current configuration of twenty-four entries before summarisation, with the most recent twelve entries preserved in full (calculated as \texttt{max(SHORT\_TERM\_WINDOW, memory\_full\_entries * 2)}), represents a balance reached through extended testing. At the prompt-assembly layer, the \texttt{AIPromptBuilder} applies additional budget-aware compression: unchanged sections become single-line markers, over-budget sections degrade to summary placeholders, and short-term entries are individually trimmed when the token ceiling is reached.
+Context window management presented a genuine engineering challenge. Simply including entire conversation history led to both token cost issues and degraded output quality. The final implementation therefore combines stored continuity summaries with runtime budget-aware assembly rather than replaying full transcripts. This balance was reached through extended testing and is specified in Appendix C: GDD, Section 7.2.
 
 The notes register implements importance scoring to preserve high-importance notes whilst allowing lower-importance notes to be displaced as the register fills.
 
@@ -673,7 +656,7 @@ func get_current_provider():
 
 Two export subsystems were implemented late in the development cycle as practical tools for both research evaluation and player experience.
 
-The \textbf{AI Usage Analytics Export} (\texttt{SettingsMenuAILogExport}) emerged directly from my evaluation methodology. To perform the functional testing described in Section 9, I needed structured records of every AI request, not just pass/fail observations. I implemented a telemetry pipeline in which \texttt{AIRequestManager} captures a dictionary of metadata for each API call, including provider, model, token counts, latency, mode, purpose, prompt text, and response text. These records accumulate in memory and are persisted via \texttt{AIUsageStatsStore} to the user data directory. The Settings menu then exposes CSV and JSON export buttons: the CSV export additionally invokes \texttt{SettingsMenuAIAnalytics} to compute derived series (provider success rates, hourly call distributions, cumulative token curves, tokens-per-second throughput) before writing the file. The CSV produced during testing is included in the project repository as a concrete evaluation artefact, demonstrating actual provider performance across the functional testing period.
+The \textbf{AI Usage Analytics Export} (\texttt{SettingsMenuAILogExport}) emerged directly from my evaluation methodology. To support functional testing, I needed auditable records of AI behaviour rather than pass/fail observations alone. The implemented telemetry pipeline records provider choice, latency, token usage, mode, prompts, and responses, then exposes both CSV and JSON export so those sessions can be reviewed outside the game. The detailed export structure is documented in Appendix C: GDD, Section 8.1.
 
 The \textbf{Story Narrative HTML Export} (\texttt{StoryExporter}) was conceived as a player-facing feature that transforms the AI-generated narrative into a persistent artefact. After each session, the player can export their complete story as a self-contained HTML document styled with a parchment theme. The document includes a cover page summarising session statistics, a grid of final stat values, a chronological choice chronicle drawn from the \texttt{ButterflyEffectTracker}'s recorded choices (showing scene number, severity, stats at decision time, and triggered consequences), a key events log, and a closing quote calibrated to the player's Reality and Entropy scores. The HTML is entirely self-contained with embedded CSS, including print-friendly media queries, making it distributable without any game dependency.
 
@@ -688,17 +671,17 @@ In this section I describe my approach to ensuring system correctness, encompass
 
 Testing AI-integrated systems presents unique challenges that traditional testing methodologies do not fully address. Unit tests can verify that a function correctly parses a JSON response, but they cannot verify that the AI will consistently produce parseable responses. My testing strategy therefore operates on two distinct levels: deterministic component testing using automated GDScript suites, and non-deterministic behaviour testing using functional observation.
 
-The current automated layer is substantially larger and more structured than the early project proposal implied. The repository now contains 55 dedicated \texttt{test\_*.gd} suites under \texttt{1.Codebase/Unit Test}, plus additional targeted suites under \texttt{1.Codebase/src/scripts/tests} and \texttt{1.Codebase/src/scripts/ui}. Rather than using GUT, the project relies on custom headless runners such as \texttt{all\_tests\_runner.gd}, \texttt{ui\_tests\_runner.gd}, and \texttt{prompt\_tests\_runner.gd}. In particular, \texttt{all\_tests\_runner.gd} recursively scans three roots, runs an inline sanity suite first, applies a 60-second watchdog per suite, aggregates pass/fail counters from each test node, and exits with a failure code when tracked assertions fail. This infrastructure is what made repeated refactoring practical late in development.
+The automated layer is substantially larger and more structured than the early project proposal implied. Rather than using GUT, the project now relies on custom headless runners and dedicated suites for core systems, AI integration, prompt handling, persistence, and UI behaviour. This infrastructure is what made repeated refactoring practical late in development; full suite organisation is documented in Appendix C: GDD, Section 5.
 
 \subsection{Unit Testing Approach}
 
-I implemented these tests as standalone GDScript suites that are instantiated by custom runners, with small scene wrappers in \texttt{src/scenes/tests} used only where headless scene execution is convenient. Most suites expose \texttt{tests\_passed} and \texttt{tests\_failed} counters so the runner can capture structured results. The async/await structure is deliberate: many cases need frame or timer waits to test signals, save/load cycles, audio state changes, and UI refresh behaviour without race conditions.
+I implemented these tests as standalone GDScript suites instantiated by custom runners, with small scene wrappers used only where headless scene execution is convenient. The async/await structure is deliberate because many cases require frame or timer waits to test signals, save/load cycles, audio state changes, and UI refresh behaviour without race conditions.
 
-Coverage now extends well beyond the original core-state tests. For example, \texttt{test\_scene\_directives\_parser.gd} exercises malformed and mixed-format directive payloads; \texttt{test\_ai\_providers.gd} and \texttt{test\_live\_api\_client.gd} validate provider configuration and Gemini Live setup behaviour with mocked clients; \texttt{test\_narrative\_prompt\_skill\_loading.gd} and \texttt{test\_ai\_prompt\_builder.gd} cover prompt assembly, context layering, and budget-aware trimming; \texttt{test\_polish\_regressions.gd} captures late-stage regressions introduced during UI and persistence refactors; and \texttt{test\_markdown\_parser.gd} covers the UI-side markdown-to-BBCode conversion path used for rendered AI text.
+Coverage now extends well beyond the original core-state tests, including provider configuration, live voice setup, prompt assembly, context trimming, story-scene refactors, parsing logic, markdown rendering, and late-stage regression checks. Appendix C: GDD, Section 5 provides the detailed suite inventory.
 
 \subsection{Integration Testing Between Components}
 
-Integration tests verify correct interaction between components rather than only isolated methods. \texttt{test\_gamestate\_integration.gd} checks that stat changes propagate correctly through EventBus-driven flows and survive save/load cycles; \texttt{test\_story\_scene\_modules.gd} exercises the decomposed story-scene controllers after the large scene refactor; \texttt{test\_save\_load\_system.gd} covers backup recovery and migration-safe loading; and \texttt{test\_voice\_interaction\_controller.gd} verifies the microphone and cancellation lifecycle around the optional live voice path. Together, these suites reflect the actual architectural seams of the current codebase rather than the earlier monolithic scene structure.
+Integration tests verify correct interaction between components rather than only isolated methods. In practice, this meant focusing on the architectural seams created by refactoring, such as EventBus-driven state updates, save/load boundaries, decomposed story-scene controllers, and the optional live voice path, rather than only testing isolated helper methods.
 
 \subsection{Functional Testing for AI Behaviour}
 
@@ -957,7 +940,7 @@ My ``Glorious Deliverance Agency 1'' prototype demonstrates that AI-generated na
 \textbf{Agent Architectures and Long-Term Coherence}
 
 \begin{enumerate}
-\item GÃ³ngora, S., et al. (2025) PAYADOR: A Minimalist Approach to Grounding Language Models on Structured Data for Interactive Storytelling and Role-playing Games. arXiv preprint arXiv:2504.07304. Available at: \url{https://arxiv.org/abs/2504.07304} (Accessed: 18 January 2026).
+\item Gongora, S., et al. (2025) PAYADOR: A Minimalist Approach to Grounding Language Models on Structured Data for Interactive Storytelling and Role-playing Games. arXiv preprint arXiv:2504.07304. Available at: \url{https://arxiv.org/abs/2504.07304} (Accessed: 18 January 2026).
 
 \item Park, J.S., et al. (2023) `Generative Agents: Interactive Simulacra of Human Behaviour'. In: \textit{The 36th Annual ACM Symposium on User Interface Software and Technology}. Available at: \url{https://arxiv.org/abs/2304.03442} (Accessed: 18 January 2026).
 
@@ -979,7 +962,7 @@ My ``Glorious Deliverance Agency 1'' prototype demonstrates that AI-generated na
 
 \item Wan, L. and Ma, W. (2025) StoryBench: A Dynamic Benchmark for Evaluating Long-Term Memory with Multi-Turns. arXiv preprint arXiv:2506.13356. Available at: \url{https://arxiv.org/abs/2506.13356} (Accessed: 18 January 2026).
 
-\item VÃ¤rtinen, S., HÃ¤mÃ¤lÃ¤inen, P., and Guckelsberger, C. (2024). Generating role-playing game quests with GPT language models. \textit{IEEE Transactions on Games}, 16(1), pp. 127--139. \url{https://doi.org/10.1109/TG.2022.3228480}
+\item Vartinen, S., Hamalainen, P., and Guckelsberger, C. (2024). Generating role-playing game quests with GPT language models. \textit{IEEE Transactions on Games}, 16(1), pp. 127--139. \url{https://doi.org/10.1109/TG.2022.3228480}
 \end{enumerate}
 
 \textbf{Practical Deployment and Constraints}
@@ -1085,7 +1068,7 @@ Overarching Aim: To investigate how far a bespoke, AI-driven 2D RPG narrative sy
 
 \begin{enumerate}
   \item To build a Foundational 2D RPG framework in Godot 4.6.1.
-  \item To implement an LLM integration \& runtime pipeline --- implement a request/response pipeline that translates game state â†’ structured prompt â†’ LLM reply â†’ in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
+  \item To implement an LLM integration \& runtime pipeline --- implement a request/response pipeline that translates game state ¡÷ structured prompt ¡÷ LLM reply ¡÷ in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
   \item To design and implement a multi-layer context management system for narrative coherence:
     \begin{itemize}
       \item Static Context (``world bible'' of immutable lore and themes)
@@ -1219,13 +1202,13 @@ Beyond its mechanical innovations, the game aspires to thematic depth by functio
 \begin{subfigure}[b]{0.3\linewidth}
   \centering
   \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_donkey.png}
-  \caption*{\textbf{Sir Donkey}}
+  \caption*{\textbf{Cosplayer Donkey}}
 \end{subfigure}
 
 \begin{subfigure}[b]{0.3\linewidth}
   \centering
   \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_ark.png}
-  \caption*{\textbf{ARK}}
+  \caption*{\textbf{Cosplayer ARK}}
 \end{subfigure}\hfill
 \begin{subfigure}[b]{0.3\linewidth}
   \centering
@@ -1257,11 +1240,11 @@ The player's teammates function not as traditional allies but as the primary ant
 
 \textbf{Saint Gloria} is the Guardian of the Greenhouse and the embodiment of weaponised innocence. She has built a sterile bubble of love and tolerance around herself and classifies dissent, logic, and discomfort as negative energy requiring purification. She believes the Flying Spaghetti Monster will solve every problem without effort on her part, so when confronted with concrete failures she reframes them as emotional harm, pivots to guilt, and claims that the player's attitude has hurt her. Her tolerance is selective: she accepts teammates' incompetence and prejudice, but cannot accept principled anger or rational critique. She represents refined selfishness that protects personal emotional comfort by redefining reality itself.
 
-\textbf{Cosplayer Donkey, the Glory Knight} is the Self-Proclaimed Hero and a conceptual bankrupt who lives inside a stale heroic fantasy. He believes that striking heroic poses should automatically summon applause, glory, and princesses, despite possessing none of the skills needed for genuine heroism. He disappears during real work but becomes hyperactive on social media and in performative flirtation, and nearly every idea he offers is another hero-saves-the-girl trope shaped by objectifying patriarchal thinking. When challenged, Gloria demands tolerance on his behalf. He also reinforces the team's exclusionary clique by using broken German with Gloria and ARK to lock One out of the conversation. He symbolises immature fantasy, blame-shifting, and performative masculinity detached from reality.
+\textbf{Cosplayer Donkey, the Glory Knight} is the Self-Proclaimed Hero and a conceptual bankrupt who lives inside a stale heroic fantasy. He believes that striking heroic poses should automatically summon applause, glory, and princesses, despite possessing none of the skills needed for genuine heroism. He disappears during real work but becomes hyperactive on social media and in performative flirtation, and nearly every idea he offers is another hero-saves-the-girl trope shaped by objectifying patriarchal thinking. When challenged, Gloria demands tolerance on his behalf. He also reinforces the team's exclusionary clique by using broken German with Gloria and Cosplayer ARK to lock One out of the conversation. He symbolises immature fantasy, blame-shifting, and performative masculinity detached from reality.
 
-\textbf{Cosplayer ARK, the Order Apostle} is the Diligent Saboteur and the Architect of the Black Box. He functions as the team's de-facto lead through sheer effort, but his compulsive need for control and inability to communicate openly make him a destroyer of trust. He assigns work through private messages, asks for opinions only after making up his mind, issues vague instructions with no clear completion standards, and then demands full rewrites when results fail to match his undisclosed expectations. He collaborates with Donkey in broken German, further isolating One, and his obsession with process turns coordination itself into a source of collapse. He represents bureaucratic control, information asymmetry, and the damage caused by leadership without transparent communication.
+\textbf{Cosplayer ARK, the Order Apostle} is the Diligent Saboteur and the Architect of the Black Box. He functions as the team's de-facto lead through sheer effort, but his compulsive need for control and inability to communicate openly make him a destroyer of trust. He assigns work through private messages, asks for opinions only after making up his mind, issues vague instructions with no clear completion standards, and then demands full rewrites when results fail to match his undisclosed expectations. He collaborates with Cosplayer Donkey in broken German, further isolating One, and his obsession with process turns coordination itself into a source of collapse. He represents bureaucratic control, information asymmetry, and the damage caused by leadership without transparent communication.
 
-\textbf{One, the Isolated Old Friend} is the Silent Witness and the Voiceless Accomplice. He is the player's earliest ally and the only genuinely capable and principled member of the team, but his aversion to conflict turns him into a passive witness to repeated injustice. He is marginalised by the German-speaking trio of Gloria, Donkey, and ARK, reduced to a passive recipient of instructions, and excluded from decisions that affect him directly. In public he says he is fine to preserve harmony; in private he honestly expresses his frustration and pain to the protagonist. He symbolises how kindness without courage becomes complicity inside a toxic system.
+\textbf{One, the Isolated Old Friend} is the Silent Witness and the Voiceless Accomplice. He is the player's earliest ally and the only genuinely capable and principled member of the team, but his aversion to conflict turns him into a passive witness to repeated injustice. He is marginalised by the German-speaking trio of Gloria, Cosplayer Donkey, and Cosplayer ARK, reduced to a passive recipient of instructions, and excluded from decisions that affect him directly. In public he says he is fine to preserve harmony; in private he honestly expresses his frustration and pain to the protagonist. He symbolises how kindness without courage becomes complicity inside a toxic system.
 
 \textbf{Teacher Chan} is the Soul-Soothing Singer, the Apocalypse Idol, and the Harbinger of Doom. As a national-level idol singer, her image radiates pure, white-robed compassion, yet her songs about letting go, acceptance, and growth operate as a curse rather than a cure. She genuinely believes what she sings, which makes her more frightening, not less. Her performances rationalise failure as spiritual success, intensify cognitive dissonance, and function as large-scale entropy rituals that accelerate the world's collapse. She is not a healer but a world destroyer wearing the voice of comfort.
 
@@ -1499,8 +1482,8 @@ The \texttt{TeammateSystem} uses a structured \texttt{BEHAVIOR\_LIBRARY} contain
 
 \begin{itemize}
   \item \textbf{Gloria's repertoire:} \texttt{moral\_blackmail} (reality $-8$, PE $+12$, entropy $+4$), \texttt{issue\_replacement} ($-6/+8/+3$), \texttt{divine\_protection} ($-4/+10/+5$)
-  \item \textbf{Donkey's repertoire:} \texttt{heroic\_nonsense} ($-5/+6/+4$), \texttt{blame\_shifting} ($-7/+5/+2$), \texttt{epic\_planning} ($-3/+7/+3$)
-  \item \textbf{ARK's repertoire:} \texttt{overcomplicate} ($-6/+4/+5$), \texttt{black\_box\_operation} ($-5/+6/+6$), \texttt{absolute\_plan} ($-4/+5/+7$)
+  \item \textbf{Cosplayer Donkey's repertoire:} \texttt{heroic\_nonsense} ($-5/+6/+4$), \texttt{blame\_shifting} ($-7/+5/+2$), \texttt{epic\_planning} ($-3/+7/+3$)
+  \item \textbf{Cosplayer ARK's repertoire:} \texttt{overcomplicate} ($-6/+4/+5$), \texttt{black\_box\_operation} ($-5/+6/+6$), \texttt{absolute\_plan} ($-4/+5/+7$)
   \item \textbf{One's repertoire:} \texttt{silent\_agreement} ($-2/+3/+1$), \texttt{reliable\_execution} ($-1/+4/+2$), \texttt{private\_confession} ($-3/+2/+1$)
 \end{itemize}
 
@@ -1577,7 +1560,7 @@ Five font size scales are user-selectable at runtime (Tiny 0.75$\times$, Small 0
 \subsubsection*{4.17 Music Credits}
 \textbf{Public Domain Classical Works:}
 \begin{itemize}
-  \item \textbf{Chopin --- Nocturne in E-flat major, Op.\,9 No.\,2} (\texttt{chopin\_nocturne\_op9\_no2.mp3}). FrÃ©dÃ©ric Chopin (1810--1849). Published 1833. Public domain.
+  \item \textbf{Chopin --- Nocturne in E-flat major, Op.\,9 No.\,2} (\texttt{chopin\_nocturne\_op9\_no2.mp3}). Frederic Chopin (1810--1849). Published 1833. Public domain.
   \item \textbf{Grieg --- Peer Gynt Suite No.\,1, Op.\,23: IV. ``In the Hall of the Mountain King''} (\texttt{Peer Gynt, Op. 23 - IV. In the Hall of the Mountain King.mp3}). Edvard Grieg (1843--1907). Published 1876. Public domain.
 \end{itemize}
 
@@ -1594,16 +1577,9 @@ Five font size scales are user-selectable at runtime (Tiny 0.75$\times$, Small 0
 \end{itemize}
 
 \subsubsection*{4.18 AI Usage Logging and Analytics Export}
-The game implements a comprehensive AI usage telemetry system designed to support both research evaluation and provider cost management. Every API call made during gameplay is recorded by the \texttt{AIRequestManager}, which captures: timestamp, provider name, model identifier, HTTP status code, input and output token counts, wall-clock response latency, request mode (\texttt{live}/\texttt{mock}/\texttt{mock\_fallback}), request purpose (e.g.\ \texttt{mission-generation}, \texttt{prayer-system}), any error message, the full serialised request body (including assembled prompt), and the raw response body. These records are persisted to a JSON file in Godot's sandboxed user data directory by the \texttt{AIUsageStatsStore} class.
+The game records AI usage telemetry to support evaluation, auditing, and provider comparison during development. \texttt{AIRequestManager} stores one record per API call, including the selected provider and model, token usage, latency, request mode, request purpose, and the associated prompt and response payloads. \texttt{AIUsageStatsStore} persists this log to \texttt{user://ai\_call\_log.json}, allowing completed play sessions to be reviewed after runtime.
 
-The Settings menu exposes two export actions through \texttt{SettingsMenuAILogExport}:
-
-\begin{itemize}
-  \item \textbf{CSV Export} (file: \texttt{ai\_usage\_charts\_[timestamp].csv}): produces a two-section CSV. The first section contains one row per API call with columns \texttt{section}, \texttt{timestamp}, \texttt{provider}, \texttt{model}, \texttt{status}, \texttt{input\_tokens}, \texttt{output\_tokens}, \texttt{response\_time\_sec}, \texttt{mode}, \texttt{purpose}, \texttt{error}, \texttt{prompt\_text}, \texttt{prompt\_modules\_active}, and \texttt{ai\_response\_text}. The second section appends derived analytics series computed by \texttt{SettingsMenuAIAnalytics}, including: provider success rates, total and per-provider token usage, average response times, tokens-per-second throughput, mode distribution (live/mock/fallback), model call counts, hourly call and token breakdowns, and cumulative token progression. This format is designed for direct import into spreadsheet tools for visual analysis.
-  \item \textbf{JSON Export} (file: \texttt{ai\_call\_log\_[timestamp].json}): exports the complete raw call log alongside a pre-computed metrics summary dictionary, suitable for programmatic analysis.
-\end{itemize}
-
-These export capabilities serve the project's research methodology by creating auditable records of AI system behaviour during functional testing sessions. The CSV produced during development is available as an artefact in the project root (\texttt{ai\_usage\_2026-03-30\_19-38-42.csv}), demonstrating actual provider performance data collected across the functional testing period.
+The Settings menu exposes both JSON and CSV export through \texttt{SettingsMenuAILogExport}, while the AI Log interface presents the same data in a browsable in-game view. JSON export preserves the full call history together with summary metrics, and CSV export restructures the records into spreadsheet-friendly tables for later analysis. Supporting charts rendered by \texttt{AIChartCanvas} and \texttt{AIMetricsChart} provide a visual summary of provider performance, call distribution, and aggregate token usage across a session.
 
 \subsubsection*{4.19 Story Narrative HTML Export}
 The \texttt{StoryExporter} class (\texttt{story\_exporter.gd}) generates a self-contained HTML document that captures the player's complete narrative journey as a shareable artefact, independent of the game executable. The export is triggered from the in-game journal or settings menu and produces a file named \texttt{GDA\_Story\_YYYY-MM-DD.html} using the export date.
@@ -1812,7 +1788,7 @@ Draft interim report delivered for review, continuing to integrate the project p
 
 \subsubsection*{Issues discussed at this meeting}
 \begin{itemize}
-  \item Document review process: Reviewed how to view tracked changes in Word (Review â†’ Show Comments and Track Changes). Discussed accepting/rejecting insertions and managing document revisions.
+  \item Document review process: Reviewed how to view tracked changes in Word (Review ¡÷ Show Comments and Track Changes). Discussed accepting/rejecting insertions and managing document revisions.
   \item Extensive discussion on ethics compliance for the project.
   \item Emphasis on functional testing as the methodology rather than user testing with external participants.
   \item Need to complete software testing with the user's compliance form.
@@ -1828,3 +1804,5 @@ Draft interim report delivered for review, continuing to integrate the project p
 
 %TC:endignore
 \end{document}
+
+
