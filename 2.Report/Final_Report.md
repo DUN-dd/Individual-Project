@@ -36,13 +36,13 @@ On a personal note, I am deeply grateful to the late Sita Chan. Although she tra
 
 Finally, this project has been a personal reminder of the importance of balance. The process of building a game that critiques relentless productivity and blind optimism naturally prompted reflection on those same values in my own approach to work. I hope that message resonates with anyone who plays it.
 
-# Summary {#summary .unnumbered}
+# Abstract {#abstract .unnumbered}
 
 This project investigates the integration of Large Language Models (LLMs) into interactive narrative games through the development of "Glorious Deliverance Agency 1," a 2D text-based RPG built in the Godot engine. The game employs a bespoke pipeline architecture where the LLM operates within explicit developer-defined constraints to generate dynamic narrative content whilst maintaining thematic coherence.
 
-The implementation features a multi-provider AI architecture supporting Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers, enabling development flexibility and cost management. A three-layer context-management system balances narrative coherence with token efficiency, whilst the "Reality vs. Positive Energy" thematic framework constrains AI generation to produce satirically appropriate content.
+The implementation features a multi-provider AI architecture with seven concrete backends (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, and AI Router) plus a built-in mock mode for offline development and graceful fallback. Conceptually, the context model still uses three content categories: short-term memory, long-term continuity summaries, and persistent notes. In implementation, however, these categories are assembled through a budget-aware prompt pipeline that also combines static context and runtime control signals, whilst the "Reality vs. Positive Energy" thematic framework constrains AI generation to produce satirically appropriate content.
 
-Key technical contributions include the Strategy pattern for provider abstraction, an EventBus for cross-module communication, and defensive multi-stage response parsing to handle non-deterministic AI outputs. The project demonstrates that bespoke pipeline approaches can successfully integrate LLM-generated content into playable games, providing practical insights for developers considering similar integrations.
+Key technical contributions include the Strategy pattern for provider abstraction, ServiceLocator and EventBus based decoupling between gameplay systems, optional Gemini Live voice support, and defensive multi-stage response parsing to handle non-deterministic AI outputs. The project demonstrates that bespoke pipeline approaches can successfully integrate LLM-generated content into playable games, providing practical insights for developers considering similar integrations.
 
 Functional testing across approximately one hundred narrative generations achieved fewer than ten percent requiring intervention due to tonal inconsistency, meeting the defined success criteria. The comparative analysis identifies concrete trade-offs between bespoke pipelines and world model approaches regarding control versus emergence, development complexity versus scope, and predictability versus novelty.
 
@@ -50,21 +50,19 @@ Functional testing across approximately one hundred narrative generations achiev
 
 ## Project Aims and Objectives
 
-This project develops "Glorious Deliverance Agency 1," a 2D text-based RPG built in the Godot engine that uses Large Language Model (LLM) integration to generate dynamic narrative content. The game places players as a reluctant hero in a dysfunctional team, whose attempts to save the world with "positive energy" only accelerate its destruction through a darkly comedic narrative that responds to their choices in real-time.
+Traditional RPG narratives rely on pre-scripted dialogue trees and fixed storylines, limiting replayability and player agency. While LLMs offer the potential for dynamic content generation, integrating them into games presents significant challenges: maintaining narrative coherence over extended play sessions, ensuring thematic consistency with authorial intent, and managing the practical constraints of API latency and token costs. This project will explore whether a carefully structured "bespoke pipeline" approach, where the LLM operates within explicit developer-defined constraints, can address these challenges to produce a playable, thematically coherent RPG experience. The central research question is therefore: to what extent can a text-based LLM, integrated as a controlled component within a traditional game engine, generate coherent and thematically consistent narrative content for an interactive RPG? To answer this question, this project will develop "Glorious Deliverance Agency 1," a 2D text-based RPG built in the Godot engine that uses Large Language Model (LLM) integration to generate dynamic narrative content. The game places players as a reluctant hero in a dysfunctional team whose attempts to save the world with "positive energy" only accelerate its destruction through a darkly comedic narrative that responds to their choices in real time.
 
-Traditional RPG narratives rely on pre-scripted dialogue trees and fixed storylines, limiting replayability and player agency. While LLMs offer the potential for dynamic content generation, integrating them into games presents significant challenges: maintaining narrative coherence over extended play sessions, ensuring thematic consistency with authorial intent, and managing the practical constraints of API latency and token costs. This project investigates whether a carefully structured "bespoke pipeline" approach, where the LLM operates within explicit developer-defined constraints, can address these challenges to produce a playable, thematically coherent RPG experience. The central research question is therefore: to what extent can a text-based LLM, integrated as a controlled component within a traditional game engine, generate coherent and thematically consistent narrative content for an interactive RPG?
+The primary aim is supported by three foundational pillars. The first pillar, Technical Development, involves the design and implementation of a functional AI-driven 2D RPG narrative system. The game features dynamically generated storylines and NPC dialogue, where "dynamically" refers to the real-time generation of narrative content based on the current game state and player choices, moving beyond traditional pre-scripted narratives. The technical focus is on enabling emergent, non-linear story paths while maintaining narrative coherence over extended gameplay sessions through a context-management architecture that began as a three-layer concept and evolved into the budget-aware pipeline detailed in Appendix C, Section 7.2.
 
-The primary aim is supported by three foundational pillars. The first pillar, Technical Development, involves the design and implementation of a functional AI-driven 2D RPG narrative system. The game will feature dynamically generated storylines and NPC dialogue, where "dynamically" refers to the real-time generation of narrative content based on the current game state and player choices, moving beyond traditional pre-scripted narratives. The technical focus is on enabling emergent, non-linear story paths while maintaining narrative coherence over extended gameplay sessions through a three-layer context-management system (detailed in Appendix C: GDD, Section 7.2).
+The second pillar, Thematic Execution, centres on creating a satirical allegory exploring the conflict between "positive energy" ideology and the concept of Void Entropy. The core gameplay mechanics, including the Reality vs. Positive Energy system and the Prayer System, deliberately subvert conventional RPG expectations (see Appendix C: GDD, Sections 4.2--4.3 for detailed mechanics). These thematic concepts will be embedded directly into the AI's prompt engineering, ensuring that generated content aligns with the project's darkly satirical tone rather than producing generic positive outcomes.
 
-The second pillar, Thematic Execution, centres on creating a satirical allegory exploring the conflict between "positive energy" ideology and the concept of Void Entropy. The core gameplay mechanics, including the Reality vs. Positive Energy system and the Prayer System, deliberately subvert conventional RPG expectations (see Appendix C: GDD, Sections 4.2--4.3 for detailed mechanics). These thematic concepts are embedded directly into the AI's prompt engineering, ensuring that generated content aligns with the project's darkly satirical tone rather than producing generic positive outcomes.
+The third pillar, Critical Analysis, involves producing a comparative analysis of the "bespoke pipeline" methodology against the theoretical "world model" paradigm. This project will examine architectural trade-offs between fine-grained developer control and emergent simulation capabilities, the shifting role of the developer from systems architect to high-level director, and the practical feasibility of each approach based on direct implementation experience.
 
-The third pillar, Critical Analysis, involves producing a comparative analysis of the "bespoke pipeline" methodology against the theoretical "world model" paradigm. This examination covers architectural trade-offs between fine-grained developer control and emergent simulation capabilities, the shifting role of the developer from systems architect to high-level director, and the practical feasibility of each approach based on direct implementation experience.
+To ensure these aims remain achievable within the project's constraints, this project will define concrete success criteria. For Technical Development, success means producing a functional prototype that can generate coherent narrative content across multiple consecutive scenes without critical errors, with measurable metrics including API response latency under five seconds and successful context preservation across save/load cycles. For Thematic Execution, success means the AI consistently generates content that aligns with the "Reality vs. Positive Energy" framework during functional testing, with fewer than one in ten generations requiring manual intervention due to tonal inconsistency. For Critical Analysis, success means producing a structured comparison document that draws on direct implementation experience to identify at least three concrete architectural trade-offs between bespoke pipelines and world-models. These criteria are deliberately scoped to be demonstrable through functional testing rather than requiring extensive user studies.
 
-To ensure these aims remain achievable within the project's constraints, concrete success criteria have been defined. For Technical Development, success means producing a functional prototype that can generate coherent narrative content across multiple consecutive scenes without critical errors, with measurable metrics including API response latency under five seconds and successful context preservation across save/load cycles. For Thematic Execution, success means the AI consistently generates content that aligns with the "Reality vs. Positive Energy" framework during functional testing, with fewer than one in ten generations requiring manual intervention due to tonal inconsistency. For Critical Analysis, success means producing a structured comparison document that draws on direct implementation experience to identify at least three concrete architectural trade-offs between bespoke pipelines and world-models. These criteria are deliberately scoped to be demonstrable through functional testing rather than requiring extensive user studies.
+## Justification of Technical and Narrative Choice
 
-## Justification of Technical and Narrative Choices
-
-The Godot 4.x engine was selected as the development platform for several complementary reasons. Its open-source nature and scene-node architecture facilitate the construction of UI-heavy applications suitable for narrative-driven games, and its lightweight footprint ensures rapid iteration during development. Crucially, prior familiarity with both the engine and its native GDScript language was a decisive factor. GDScript's Python-like syntax means that AI-related code patterns, many of which originate in the Python ecosystem, can be translated into GDScript with minimal friction. Alternative engines were considered: Unity offers a mature ecosystem but is not open-source, and Panda3D supports Python natively but lacks the scene-editing workflow required for rapid UI prototyping. Given the project's ambitious scope of integrating a complete AI narrative pipeline within a single academic year, choosing an engine already well understood reduced the learning overhead and allowed development effort to concentrate on the AI integration itself rather than engine familiarisation. Without this existing proficiency, completing the project to the required standard within the available timeframe would not have been feasible.
+The Godot engine has been selected for this project due to its open-source nature and scene-node architecture, both of which suit a UI-heavy, narrative-driven game. Its lightweight footprint supports rapid iteration, while prior familiarity with both the engine and its native GDScript language reduces development overhead. GDScript's Python-like syntax also means that AI-related code patterns, many of which originate in the Python ecosystem, can be translated into GDScript with relatively little friction. Alternative engines were considered: Unity offers a mature ecosystem but is not open-source, and Panda3D supports Python natively but lacks the scene-editing workflow required for rapid UI prototyping. Given the project's scope of integrating a complete AI narrative pipeline within a single academic year, selecting an already familiar engine makes it more feasible to focus effort on AI integration rather than engine familiarisation.
 
 Gemini 3.1 Flash Lite was employed as the primary LLM provider, selected based on latency and cost performance, convenient API and toolchain integration, and sufficient context length to support extended interactive narrative sessions (Google, 2025). Actual available context and performance vary by model and configuration; therefore, the final evaluation criteria are based on functional test results within the project's specific scenario, including long-term narrative consistency, response time, and cost monitoring, rather than pure specification comparisons. This approach ensures the assessment reflects practical implementation requirements rather than theoretical capabilities.
 
@@ -72,25 +70,25 @@ The narrative framework, centred on the thematic tension between "Reality" and "
 
 ## Target User Group and Scope
 
-During development, the author served as the primary user, functioning as the sole tester in a functional testing capacity. This reflects the project's nature as a research prototype investigating AI-driven narrative generation, where the unpredictable nature of LLM outputs necessitates thorough internal validation before external exposure.
+Because this project explores AI-driven narrative generation, the choice of testing method required particular care. As a prototype focused on technical feasibility and thematic coherence rather than external user research, developer-led functional testing was selected as the most appropriate approach. This made it possible to inspect non-deterministic outputs closely for structural validity, tonal consistency, and content-safety issues before exposing the system to outside participants.
 
 The intended eventual audience for "Glorious Deliverance Agency 1" is detailed in Appendix C: Game Design Document, Section 1.5 (Target Audience), which defines both primary and secondary user groups. The game's dark satirical tone and thematic content make it unsuitable for younger audiences; a mature content advisory would be appropriate for any public release.
 
-For the purposes of this academic project, the scope is limited to demonstrating technical feasibility and thematic coherence through developer-led functional testing. Formal user studies with external participants are explicitly beyond the scope of this project; the project is primarily a development and integration effort. As discussed in Section 11.2, user testing is identified as a critical next step for future development, contingent on resolving specific prerequisites including content safety confidence and ethical approval.
+For the purposes of this academic project, the scope is limited to demonstrating technical feasibility and thematic coherence through developer-led functional testing. Formal user studies with external participants are explicitly beyond the scope of this project, because the immediate aim is first to establish confidence in the system's output behaviour, safety boundaries, and architectural reliability. As discussed in Section 11.2, user testing is identified as a critical next step for future development once those prerequisites have been satisfied.
 
 ## Expected Findings and Achievements
 
-By the project's completion, the aim is to demonstrate that a bespoke pipeline architecture can successfully integrate LLM-generated content into a playable RPG while maintaining thematic coherence. Specifically, the project will show that the three-layer context-management system preserves narrative consistency across extended play sessions, that the "Reality vs. Positive Energy" framework effectively constrains AI generation to produce satirically appropriate content, and that the multi-provider architecture enables practical development within budget constraints. The comparative analysis will identify concrete trade-offs between bespoke pipelines and world model approaches, providing insights for developers considering similar integrations. While the prototype may not achieve commercial-quality polish, it will demonstrate the viability of controlled LLM integration for narrative games.
+This project is expected to show that a bespoke pipeline architecture can integrate LLM-generated content into a playable RPG while maintaining thematic coherence. More specifically, the project aims to demonstrate that a structured context-management approach can preserve narrative continuity across extended play sessions, that the "Reality vs. Positive Energy" framework can constrain AI generation towards satirically appropriate output, and that a multi-provider architecture can support practical development within budget and reliability constraints. The comparative analysis is expected to identify concrete trade-offs between bespoke pipelines and world model approaches, providing useful insights for developers considering similar integrations.
 
 ## Report Structure
 
-This report is organised as follows. Section 2 reviews relevant literature on AI in games, LLM integration, and narrative coherence, establishing the theoretical foundation for my approach. Section 3 addresses professional and ethical considerations, particularly regarding AI-generated content. Section 4 presents my project specification and methodology, including success criteria and evaluation plans. Section 5 provides an overview of the system design through architectural diagrams. Section 6 reflects on project management, discussing planning approaches and lessons learned. Section 7 details the design decisions and patterns employed in my implementation. Section 8 describes the implementation process, including challenges encountered and solutions developed. Section 9 covers my testing strategy and results. Section 10 evaluates the project against original requirements and provides a comparative analysis of bespoke pipelines versus world-models. Finally, Section 11 concludes with a summary of achievements, lessons learned, and directions for future work.
+This report is organised as follows. Section 2 reviews relevant literature on AI in games, LLM integration, and narrative coherence, establishing the theoretical foundation for my approach. Section 3 addresses professional and ethical considerations, particularly regarding AI-generated content. Section 4 presents my project specification and methodology, including success criteria and evaluation plans. Section 5 provides an overview of the system design through architectural diagrams. Section 6 reflects on project management decisions and lessons learned. Section 7 details the design decisions and patterns employed in my implementation. Section 8 describes the implementation process, including challenges encountered and solutions developed. Section 9 covers my testing strategy and results. Section 10 evaluates the project outcomes, identifies future player-testing opportunities, and develops recommendations for further work. Finally, Section 11 concludes with a summary of achievements, lessons learned, and directions for future work.
 
 # Background and Literature Review
 
 ## AI in Games and Generative Narrative Systems
 
-The emerging field of generative narrative systems, increasingly powered by Procedural Content Generation (PCG) and Large Language Models (LLMs), treats story not as a fixed script but as a co-creative space shaped by both the player and the system in real-time (Sun et al., 2023; Al-Surayhi et al., 2025). In "Glorious Deliverance Agency 1," I positioned the LLM as the "story director" itself, orchestrating scene transitions, generating contextual NPC responses, and determining narrative consequences based on player choices and current game state.
+The emerging field of generative narrative systems, increasingly powered by Procedural Content Generation (PCG) and Large Language Models (LLMs), treats story not as a fixed script but as a co-creative space shaped by both the player and the system in real-time (Sun et al., 2023; Al-Surayhi et al., 2025). This framing directly informs the intent of this project: rather than using the model only for isolated dialogue generation, "Glorious Deliverance Agency 1" treats the LLM as a constrained "story director" that helps orchestrate scene transitions, contextual NPC responses, and narrative consequences based on player choices and current game state.
 
 The "storylet" concept, a small, self-contained narrative unit with defined prerequisites and effects that the system sequences dynamically based on game state (Short, 2019), directly shaped my architecture. I adopted this pattern in my AIManager, which generates discrete narrative "beats" triggered by specific game conditions, each producing defined effects on the game state.
 
@@ -98,34 +96,33 @@ The central engineering challenge was the "controllability problem": balancing A
 
 ## Large Language Models for Interactive Narratives
 
-Researchers have demonstrated that LLMs can generate context-aware NPC dialogue aligned with character personas (Chen, 2025) and produce procedural quest descriptions comparable to human-authored content (Värtinen et al., 2022). These results came from prompt engineering rather than model re-training. My AIManager constructs prompts that embed persona definitions for each NPC, ensuring Saint Gloria's toxic positivity, Sir Donkey's delusional heroism, and ARK's obsessive bureaucracy maintain distinct voices (Yang et al., 2024).
+Researchers have demonstrated that LLMs can generate context-aware NPC dialogue aligned with character personas (Chen, 2025) and produce procedural quest descriptions comparable to human-authored content (Värtinen et al., 2022). These results came from prompt engineering rather than model re-training. In this project, that insight is applied to the game's core teammate characters: Saint Gloria, whose speech is shaped by toxic positivity; Cosplayer Donkey, whose dialogue reflects delusional heroic posturing; and Cosplayer ARK, whose voice is dominated by bureaucratic control and opaque planning. The AI prompt pipeline therefore embeds explicit persona definitions for these characters so that their responses remain distinguishable and thematically consistent (Yang et al., 2024).
 
-The distinction between "world model" and "bespoke pipeline" approaches was critical. World models, exemplified by Park et al.'s (2023) "Generative Agents", simulate entire environments from the ground up with agents possessing memory, reflection, and planning capabilities. The bespoke pipeline integrates an LLM as one component within a traditional game engine, grounding it with structured game state data (Góngora et al., 2025). In my implementation, the Godot engine maintains authoritative game state whilst the LLM operates as a content generation service.
+The distinction between "world model" and "bespoke pipeline" approaches was critical. World models, exemplified by Park et al.'s (2023) "Generative Agents", simulate entire environments from the ground up with agents possessing memory, reflection, and planning capabilities. The bespoke pipeline integrates an LLM as one component within a traditional game engine, grounding it with structured game state data (G?ngora et al., 2025). In my implementation, the Godot engine maintains authoritative game state whilst the LLM operates as a content generation service.
 
-World models promise emergence and player freedom but face limitations in ensuring consistent narratives and require immense computational cost (Yang et al., 2024). Bespoke pipelines offer authorial control but at the cost of emergent possibility (Góngora et al., 2025). Wan et al. (2025) confirmed that making LLMs adhere to complex constraints requires continuous architectural attention.
+World models promise emergence and player freedom but face limitations in ensuring consistent narratives and require immense computational cost (Yang et al., 2024). Bespoke pipelines offer authorial control but at the cost of emergent possibility (G?ngora et al., 2025). Wan et al. (2025) confirmed that making LLMs adhere to complex constraints requires continuous architectural attention.
 
 ## Bespoke Pipelines vs. World-Model Approaches
 
-Here I contextualise my architectural choice before the implementation chapters that follow. A bespoke pipeline integrates a general-purpose LLM as a component within a traditional game engine, in my case, Godot plus an LLM API, enabling controlled state management and narrative guidance through explicit developer-defined constraints. When I began researching alternatives, I found that world model approaches pursue end-to end generation of entire interactive environments, but current publicly accessible systems remain insufficient for a single-developer project of this scope (Parker-Holder and Fruchter, 2025). The bespoke pipeline was therefore not merely a preference but a practical necessity. My implementation reflects this clearly: the Godot engine handles all game logic, state persistence, and UI rendering, whilst the LLM API is invoked only for narrative text generation, with clearly defined input schemas and output formats. This separation allowed me to develop, test, and debug each layer independently.
+A bespoke pipeline integrates a general-purpose LLM as a component within a traditional game engine, in this case Godot plus an LLM API, enabling controlled state management and narrative guidance through explicit developer-defined constraints. By contrast, world model approaches pursue end-to-end generation of entire interactive environments, but current publicly accessible systems remain insufficient for a single-developer project of this scope (Parker-Holder and Fruchter, 2025). The bespoke pipeline was therefore not merely a stylistic preference but a practical necessity. In this architectural arrangement, the game engine handles logic, persistence, and UI rendering, while the LLM is invoked only for narrative text generation through defined inputs and outputs. This distinction contextualises the implementation choice developed in the chapters that follow.
 
 ## Coherence and Evaluation in AI-Generated Narratives
 
 Narrative coherence, the logical and causal consistency of events, character behaviours, and world stability, is where generative systems tend to fail (Yi et al., 2025). For my project, coherence failures would manifest as NPCs forgetting conversations, contradicting plot points, or shifting from satirical to sincere tone.
 
-For a single-developer project generating non-deterministic outputs, I concluded that functional testing was more appropriate than automated benchmarking (Wan and Ma, 2025; El Boudouri et al., 2025). I adopted a protocol built around three questions: did the AI maintain the thematic framework? Did content align with the dark satirical tone? Did the context-management system prevent contradictions?
+For a single-developer project generating non-deterministic outputs, the literature suggests that evaluation cannot rely on automated benchmarking alone (Wan and Ma, 2025; El Boudouri et al., 2025). Instead, it points towards qualitative functional testing that asks whether the AI maintains the intended thematic framework, whether content remains aligned with the dark satirical tone, and whether the context-management architecture prevents contradictions over time.
 
-The memory management literature informed my three-layer context model (Yi et al., 2025; Park et al., 2023), with specific token allocations detailed in Appendix C: GDD, Section 7.2.
+The memory-management literature informed the project's three-layer context model (Yi et al., 2025; Park et al., 2023). At the conceptual level, this model separates fixed thematic rules and persona constraints, recent interaction history, and compressed longer-term continuity notes so that different kinds of narrative information can be preserved for different purposes. This matters because simply replaying the full transcript is both expensive and coherence-degrading; the literature instead supports layered retention, summarisation, and selective recall. In the implementation described later, these conceptual layers are assembled through a budget-aware pipeline, with full technical details provided in Appendix C: GDD, Section 7.2.
 
 ## Runtime Constraints and Practical Considerations
 
-Latency significantly impacts immersion in interactive narratives (Schomay, 2024; Juliani, 2025). I addressed this through the Strategy pattern in my AIManager, enabling runtime provider switching depending on performance conditions (documented in Appendix C: GDD, Section 7.1).
+Latency significantly impacts immersion in interactive narratives (Schomay, 2024; Juliani, 2025). For a project of this kind, that means the architecture must anticipate provider variability, support graceful fallback, and avoid coupling the entire game loop to a single response path.
 
-Token budgets required careful management. Rather than feeding entire conversation histories into prompts, production systems use hierarchical summarisation, Retrieval-Augmented Generation, and automated pruning (Sridi, 2025; Anthropic, 2025; DZone, 2024). I implemented token monitoring in my AIManager, logging input and output counts per API call.
-This was also consistent with how GitHub Copilot and Claude handle long contexts in practice: layered summaries and relevance filtering instead of replaying full transcripts. That industry pattern directly influenced my three-layer memory architecture (static rules, short-term events, long-term summaries).
+Token budgets also require careful management. Rather than feeding entire conversation histories into prompts, production systems use hierarchical summarisation, Retrieval-Augmented Generation, and automated pruning (Sridi, 2025; Anthropic, 2025; DZone, 2024). This suggests that an implementation should preserve a small amount of recent detail, compress older continuity, and prioritise the most relevant state at prompt assembly time rather than replaying full transcripts.
 
-For content safety, I constrained the input space at the UI level, requiring players to choose from predefined buttons rather than type freely (Buongiorno et al., 2024; O'Brien, 2024). This eliminated unexpected prompt inputs before they reached the AI.
+For content safety, prior work implies that prototypes should constrain the input space as early as possible (Buongiorno et al., 2024; O'Brien, 2024). In practical design terms, this favours structured player choices and tightly controlled text entry over unrestricted prompting.
 
-Juliani's (2025) warning about "infinite trash" and Vidler and Walsh's (2025) findings on LLM statistical biases informed my approach: the AI needed explicit directional constraints about narrative goals, not just content restrictions. For a narrative game built around ironic inversion, this was essential.
+Juliani's (2025) warning about "infinite trash" and Vidler and Walsh's (2025) findings on LLM statistical biases further suggest that a narrative system needs explicit directional constraints about thematic goals, not just content restrictions. For a project built around ironic inversion, this is especially important because the desired output is not merely relevant text, but text that preserves a very specific tonal contradiction.
 
 ## Thematic Control and Values-Based Systems
 
@@ -147,7 +144,7 @@ Building this project required me to consider professional and ethical responsib
 
 ## Primary Risk: AI Content Generation
 
-The key ethical insight for my project is that the primary risk is not traditional data privacy concerns, but rather the potential for generative AI to produce unexpected or inappropriate content. Given my project's deliberately dark satirical narrative framework, there exists a genuine possibility that the AI could generate content that crosses boundaries of acceptability. At this stage of development, it is not possible to predict with certainty what content the AI might generate, which is precisely why formalised user testing with external participants is not appropriate until the system's output behaviour has been thoroughly validated.
+The key ethical insight for this project is that the primary risk is not traditional data privacy concerns, but rather the potential for generative AI to produce unexpected or inappropriate content. Public-facing deployment and formal user testing with external participants are not within the scope of this project. Instead, the immediate ethical task is to evaluate whether the prototype can be made sufficiently reliable and bounded before any broader exposure is considered.
 
 ## Functional Testing as Ethical Safeguard
 
@@ -157,7 +154,7 @@ The following categories constitute definitive red lines that would trigger imme
 
 ## Control Measures
 
-My primary mitigation strategy is embedded in the core UI design: the system uses predefined button choices for player interaction rather than open-ended text input, significantly constraining the space of possible prompts sent to the AI. I explicitly considered and rejected voice input due to ethical concerns including the potential for inadvertently recording background conversations.
+My primary mitigation strategy is embedded in the core UI design: the system uses predefined button choices for most player interaction rather than open-ended text input, significantly constraining the space of possible prompts sent to the AI. In the current codebase this remains the default path, but the architecture now also includes an optional Gemini Live voice layer with explicit UI activation, provider-capability checks, and settings-gated input/output modes. Voice therefore moved from a rejected concept to a tightly scoped, opt-in subsystem rather than a primary interaction model.
 
 The Prayer System permits short text input as an ironic game mechanic but remains constrained by cooldown timers, templated prompt construction, and content filtering.
 
@@ -175,7 +172,7 @@ I built the system using the Godot 4.x game engine with a modular architecture e
 
 My system employs a Strategy design pattern supporting multiple provider types (detailed in Appendix C: GDD, Section 7.1). This architecture enables development flexibility and cost management through provider switching.
 
-As I identified in Section 2.5, effective context-management is critical for maintaining narrative coherence. I implemented a three-layer context model balancing narrative coherence with token efficiency (see Appendix C: GDD, Section 7.2 for complete specifications).
+As identified in Section 2.5, effective context-management is critical for maintaining narrative coherence. The implemented system uses a layered context model, later assembled through a budget-aware prompt pipeline, to balance narrative coherence with token efficiency (see Appendix C: GDD, Section 7.2 for complete specifications).
 
 ![Three-Layer Context Management Architecture. The diagram illustrates how static context, short-term context, and long-term memory are combined into a final prompt for AI generation.](image/Interim-Report_281967.pdf-8-0.png){#fig:context-management width="85%"}
 
@@ -187,7 +184,7 @@ My evaluation assessed whether core systems operated correctly through direct te
 
 Functional testing determined whether AI-generated content aligned with my project's specific thematic intent. Did the system maintain the "Reality vs. Positive Energy" thematic framework consistently? Did the Prayer System reliably produce ironic, satirically appropriate outcomes rather than generic positive responses? Did my three-layer context model effectively prevent narrative contradictions and thematic drift across extended gameplay? As the functional tester, I made qualitative assessments of whether generated content served the artistic vision or undermined it.
 
-While formal player testing with external participants was not appropriate at this development stage, my functional testing process evaluated whether the system generated content that could constitute an engaging player experience. Drawing on established game design frameworks, "fun" in this context comprises several elements: challenge (do player choices present meaningful dilemmas?), rules (are the game's systems comprehensible and consistent?), goals (does the narrative create clear objectives and progression?), and options (does the AI provide sufficiently varied choices?). I assessed whether the implemented features, dynamic narrative generation, state-based choice consequences, teammate interference systems, moral dilemmas, functioned not merely technically but also served to create an experience with these qualities.
+Because formal player testing with external participants was outside the scope of this development stage, the methodology focused on developer-led functional testing. Within that scope, I still examined whether the generated content exhibited qualities that could support an engaging player experience, such as meaningful dilemmas, comprehensible systems, clear goals, and varied options. The purpose here was not to claim validated player-experience findings, but to determine whether the implemented mechanics showed enough promise to justify future user testing once ethical and safety prerequisites are satisfied.
 
 My comparison to "world model" approaches remained purely theoretical, based on public documentation (Parker-Holder and Fruchter, 2025), focusing on architectural trade-offs rather than direct performance benchmarks. I drew on my implementation experience and functional testing observations from this bespoke pipeline to provide grounded insights into the practical implications of architectural choices.
 
@@ -215,17 +212,17 @@ I have designed the system architecture to be modular and scalable, built around
 
 ![Game Loop State Machine. The diagram shows the core gameplay flow from Honeymoon through Mission, Choice, AIGeneration, UpdateStats, and CheckTrigger states, with branching paths to special events (GloriaEvent, Concert, Dilemma) and scene transitions.](image/Interim-Report_281967.pdf-11-0.png){#fig:game-loop width="80%"}
 
-![AI Subsystem Architecture. The AI Manager Facade coordinates Sub-Managers (Config Manager, Provider Manager, Context Manager, Request Manager, Voice Manager), which interface with multiple AI Providers (Gemini, Ollama, OpenRouter, Mock) through a unified Prompt Builder and Request Queue.](image/Interim-Report_281967.pdf-11-1.png){#fig:ai-subsystem width="80%"}
+![AI Subsystem Architecture. The AI Manager Facade coordinates Sub-Managers (Config Manager, Provider Manager, Context Manager, Request Manager, Voice Manager), which interface with the current provider layer (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router) while mock mode is handled at the request layer through a unified Prompt Builder and Request Queue.](image/Interim-Report_281967.pdf-11-1.png){#fig:ai-subsystem width="80%"}
 
-![High-Level System Architecture. The UI Layer (Story Scene, Prayer System, Journal System, Menus and Settings) interfaces with Core Systems (Game State, AI Manager, Asset Registry, Audio Manager), Support Services (Event Bus, Save/Load, Localisation), and External Services (Gemini API, Ollama Local, OpenRouter).](image/Interim-Report_281967.pdf-12-0.png){#fig:high-level-arch width="80%"}
+![High-Level System Architecture. The UI Layer (Story Scene, Prayer System, Journal System, Menus and Settings) interfaces with Core Systems (Game State, AI Manager, Asset Registry, Audio Manager), Support Services (Event Bus, Save/Load, Localisation), and external AI backends including Gemini, OpenRouter, Ollama, OpenAI-compatible services, Claude, LM Studio, and AI Router.](image/Interim-Report_281967.pdf-12-0.png){#fig:high-level-arch width="80%"}
 
 This modular architecture proved essential for managing the complexity of AI integration. The clear separation between deterministic game logic and non-deterministic AI generation enabled independent development and testing of each layer, whilst the signal-based communication patterns facilitated debugging when unexpected AI outputs propagated through the system.
 
 These design boundaries enabled the development workflow described in Section 6, where provider switching and isolated component testing were essential for progress.
 
-# Project Management Reflection
+# Project Management and Reflection
 
-I organised the project into five phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure [8](#fig:gantt-chart){reference-type="ref" reference="fig:gantt-chart"}. The multi-provider architecture strategy, planning for Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers from the outset, proved essential as both a technical feature and a project management strategy, enabling development to continue when I encountered API rate limiting issues. This defensive planning approach was critical for working with non-deterministic AI systems where outputs cannot be fully predicted in advance.
+This section reflects on how project-management decisions affected the development process and final outcome. I organised the project into five phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure?[8](#fig:gantt-chart){reference-type="ref" reference="fig:gantt-chart"}. The multi-provider architecture strategy, planning for Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and a built-in mock mode from the outset, proved essential as both a technical feature and a project-management strategy, enabling development to continue when I encountered API rate limiting issues. This defensive planning approach was critical for working with non-deterministic AI systems where outputs cannot be fully predicted in advance.
 I also built explicit buffer time between phases; this reserve absorbed unexpected response parsing issues during Core Development without causing a full schedule slip. In addition, I changed prompt engineering from a fixed two-week milestone into an ongoing parallel track, because output instability and rate-limit constraints required repeated template refinement across the whole implementation period.
 
 ![AI-Powered RPG Development Timeline (Gantt Chart). The timeline spans from Week 00 to Week 22, organised into five phases: Foundation (project inception, background research, proposal writing), Planning (literature review, methodology design, report drafting), Core Development (context-management, AI integration, gameplay loop, testing), Integration (scene and asset system, mechanics completion, extended testing), and Finalisation (bug fixes, report writing, critical analysis, user testing, submission preparation).](image/Interim-Report_281967.pdf-13-0.png){#fig:gantt-chart width="90%"}
@@ -246,30 +243,30 @@ I organised my codebase into three primary layers. The Core Systems Layer contai
 
 I employed several established design patterns, each chosen to address specific architectural challenges.
 
-For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as `get_game_state()` and `get_ai_manager()`, enabling IDE autocompletion whilst maintaining loose coupling between components (see `service_locator.gd:76–123` for implementation).
+For dependency management, rather than passing dependencies through constructor chains or using global singletons directly, I implemented a Service Locator that manages access to all global services. This decision emerged from practical necessity during development; as the project grew, I found myself frequently refactoring constructor signatures when adding new dependencies. The ServiceLocator provides typed accessor methods such as `get_game_state()` and `get_ai_manager()`, enabling IDE autocompletion whilst maintaining loose coupling between components (see `service_locator.gd:76??23` for implementation).
 
-For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and Mock providers. Each provider implements the `AIProviderBase` interface, which defines `send_request()`, `cancel_request()`, and `is_configured()` methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The `AIProviderManager` coordinates provider selection and synchronisation (`ai_provider_manager.gd:75–96`).
+For AI provider management, the multi-provider architecture uses the Strategy pattern to enable runtime switching between Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, and AI Router, with mock behaviour handled as a dedicated request-layer mode rather than a separate network provider. Each concrete provider implements the `AIProviderBase` interface, which defines `send_request()`, `cancel_request()`, and `is_configured()` methods. This design proved essential during development; when I encountered rate limiting on the Gemini API during intensive testing, I could switch to Ollama without modifying any calling code. The `AIProviderManager` coordinates provider selection and synchronisation (`ai_provider_manager.gd:75??6`).
 
-For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like `reality_score_changed` rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (`event_bus.gd:147–195`).
+For cross-module communication, I implemented a publish-subscribe EventBus to decouple UI components from game state changes. UI elements subscribe to events like `reality_score_changed` rather than directly polling GameState, ensuring that the UI layer remains reactive without creating circular dependencies. The EventBus also maintains event history and statistics for debugging purposes (`event_bus.gd:147??95`).
 
 For simplifying AI integration, the AIManager presents a facade interface to the rest of the game, hiding the complexity of provider selection, prompt construction, context-management, and response parsing. Calling code simply invokes generation methods with context dictionaries, unaware of the underlying multi-layered prompt assembly process.
 
 ## Context Management Architecture
 
-The context-management system operates at two complementary layers: **storage-level compression** in `AIMemoryStore` and **runtime budget-aware assembly** in `AIPromptBuilder` with `AIContextDelta`. Together they ensure the final prompt stays within the token budget while preserving narrative coherence.
+The context-management system operates at two complementary layers: **storage-level compression** in `AIMemoryStore` and **runtime budget-aware assembly** in `AIPromptBuilder` with `AIContextDelta`. Conceptually, the system still groups information into three context categories, but the budget-aware pipeline is the actual mechanism that decides how those categories enter the final prompt. Together they ensure the final prompt stays within the token budget while preserving narrative coherence.
 
-### Storage Layer — AIMemoryStore
+### Storage Layer --- AIMemoryStore
 
 I implemented three distinct data structures within the `AIMemoryStore` class (`ai_memory_store.gd`). The short-term memory layer retains the most recent entries calculated as `max(SHORT_TERM_WINDOW, memory_full_entries * 2)`; with `SHORT_TERM_WINDOW = 5` and `memory_full_entries = 6`, this yields `max(5, 12) = 12` entries kept in full detail. When story memory exceeds the configurable threshold of twenty-four entries, older entries are migrated to the long-term summaries layer. Crucially, this migration is **sampling-based compression rather than semantic summarisation**: the `_summarize_entries()` function selects representative samples at the earliest, quarter, middle, three-quarter, and latest positions from the archived block, tagging each with its temporal position (e.g. "Earliest", "Early", "Middle", "Late", "Latest summary"). For a block of one hundred entries, five representative samples are retained. This approach preserves key narrative landmarks without requiring an additional LLM call for summarisation. The notes register layer maintains persistent facts and constraints that should influence all generations, regardless of when they were established.
 
-### Runtime Layer — AIPromptBuilder and AIContextDelta
+### Runtime Layer --- AIPromptBuilder and AIContextDelta
 
-The true runtime compression occurs in `AIPromptBuilder` (`ai_prompt_builder.gd`) working with `AIContextDelta` (`ai_context_delta.gd`). Rather than naively concatenating all context, the builder operates within a token budget (default 24,000 tokens, estimated at roughly four characters per token) and performs **incremental, budget-aware prompt assembly**:
+The true runtime compression occurs in `AIPromptBuilder` (`ai_prompt_builder.gd`) working with `AIContextDelta` (`ai_context_delta.gd`). Rather than naively concatenating all context, the builder operates within a configurable token budget (default 4096 tokens, capped at 8192, with token estimates derived from a rough four-characters-per-token heuristic) and performs **incremental, budget-aware prompt assembly**:
 
 1. **Token reservation**: Before assembling context sections, the builder estimates the minimum user-message size and reserves that many tokens from the budget, ensuring the player's prompt is never crowded out by context sections.
 2. **Section fingerprinting**: Each context section (static rules, system persona, entropy modifiers, long-term summaries, notes, short-term memory) is fingerprinted by hashing its content. `AIContextDelta` compares each section's current fingerprint against the previous request's fingerprint.
-3. **Incremental sending**: If a section is unchanged from the previous request, the builder substitutes a lightweight marker — `[context:{section_name} unchanged from previous request]` — saving the tokens that would have been spent resending identical content. Sections are forced to resend after eight consecutive unchanged cycles to guard against context drift.
-4. **Budget overflow degradation**: When a changed section exceeds the remaining budget, the builder replaces it with a compressed summary marker — `[context:{section_name} updated, {msg_count} messages, ~{total_chars} chars — truncated for budget]` — preserving awareness of the section's existence without transmitting its full content.
+3. **Incremental sending**: If a section is unchanged from the previous request, the builder substitutes a lightweight marker --- `[context:{section_name} unchanged from previous request]` --- saving the tokens that would have been spent resending identical content. Sections are forced to resend after eight consecutive unchanged cycles to guard against context drift.
+4. **Budget overflow degradation**: When a changed section exceeds the remaining budget, the builder replaces it with a compressed summary marker --- `[context:{section_name} updated, {msg_count} messages, ~{total_chars} chars --- truncated for budget]` --- preserving awareness of the section's existence without transmitting its full content.
 5. **Short-term memory trimming**: Short-term entries are appended one by one until the budget is exhausted; any remaining entries are summarised as omitted counts.
 6. **Final user message truncation**: If the user message itself exceeds the remaining budget after all context has been assembled, it is truncated to fit.
 
@@ -295,7 +292,7 @@ In this section I describe the key components I produced, focusing on the concep
 
 ## The AI Integration Journey: From Simple Calls to Robust Architecture
 
-API connection failures emerged immediately during early development: HTTP 429 rate limiting errors and CORS restrictions. These failures occurred silently in my initial implementation, leaving the game-in an undefined state. This taught me that AI integration requires defensive programming at every layer. The multi-provider architecture became essential: the Ollama local provider enabled unlimited development testing, whilst the Mock provider enabled UI development without AI dependency.
+API connection failures emerged immediately during early development: HTTP 429 rate limiting errors and CORS restrictions. These failures occurred silently in my initial implementation, leaving the game-in an undefined state. This taught me that AI integration requires defensive programming at every layer. The multi-provider architecture became essential: the Ollama local provider enabled unlimited development testing, whilst built-in mock mode enabled UI development without live AI dependency.
 
 I implemented the `AIRequestRateLimiter` class to enforce configurable minimum intervals between API calls, proactively preventing rate limit errors rather than handling them reactively.
 
@@ -303,7 +300,7 @@ I implemented the `AIRequestRateLimiter` class to enforce configurable minimum i
 
 Prompt engineering required numerous iterations. Initial prompts were overly general, lacking the specific satirical tone required. The breakthrough came when I restructured prompts using explicit role definition and contextual grounding, providing detailed persona instructions establishing the game's ironic worldview.
 
-Game state must directly influence prompt parameters. The Void Entropy calculation (`player_stats.gd:54–59`) produces a normalised value between zero and-one that modifies tonal instructions. At low-entropy, prompts request "subtle irony"; at high entropy, "absurdist chaos."
+Game state must directly influence prompt parameters. The Void Entropy calculation (`player_stats.gd:54??9`) produces a normalised value between zero and-one that modifies tonal instructions. At low-entropy, prompts request "subtle irony"; at high entropy, "absurdist chaos."
 
 For the Prayer System, I implemented templated prompt construction that explicitly instructs the AI to "interpret the prayer's intent and twist it toward an ironic disaster." This explicit ironic inversion instruction proved far more reliable than implicit contextual cues.
 
@@ -327,7 +324,7 @@ Implementing this system taught me about the challenges of managing temporal nar
 
 Throughout implementation, I developed a philosophy of graceful degradation for AI-dependent features. Every AI request includes a timeout (currently twenty-four seconds), and timeout handling returns the player to a stable state rather than leaving the game frozen. The `ErrorReporter` class provides centralised error tracking with severity levels, enabling me to distinguish between recoverable warnings and critical failures requiring intervention.
 
-The most significant error handling challenge involved API key configuration. Users might misconfigure their API keys in various ways: leaving them empty, pasting a URL instead of a key, or using an expired key. The `GeminiProvider` now validates key format before attempting requests (`gemini_provider.gd:425–444`), providing specific error messages for common misconfiguration patterns rather than generic failure notifications.
+The most significant error handling challenge involved API key configuration. Users might misconfigure their API keys in various ways: leaving them empty, pasting a URL instead of a key, or using an expired key. The `GeminiProvider` now validates key format before attempting requests (`gemini_provider.gd:425??44`), providing specific error messages for common misconfiguration patterns rather than generic failure notifications.
 
 ## Key Code Examples
 
@@ -343,7 +340,7 @@ func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
     _pre_user_token_reserve = min(_delta.token_budget,
         _delta.estimate_tokens(minimum_user_message))
     _delta.begin_build()
-    # Sections appended incrementally — unchanged sections become markers
+    # Sections appended incrementally ??unchanged sections become markers
     _append_section_incremental(messages, "static_context",
         _get_static_context_messages(language))
     _append_single_incremental(messages, "system_persona",
@@ -359,7 +356,7 @@ func build_prompt(prompt: String, context: Dictionary) -> Array[Dictionary]:
         _get_notes_context(language))
     _append_short_term_memory(messages,               # one-by-one until budget exhausted
         _get_short_term_memory(), language)
-    # Final user message — overflow check, truncation, voice-inline attachment
+    # Final user message ??overflow check, truncation, voice-inline attachment
     var user_available_tokens := _delta.remaining_budget()
     var user_message_content := _build_user_message_incremental(
         prompt, context, language, user_available_tokens)
@@ -389,12 +386,12 @@ func _append_section_incremental(messages: Array[Dictionary],
             _delta.record_section(section_name, fingerprint)
             _delta.add_tokens(_delta.estimate_tokens(fingerprint))
         else:
-            # Over budget — degrade to a lightweight summary marker
+            # Over budget ??degrade to a lightweight summary marker
             var summary := _summarize_section(section_name, section_msgs)
             if _append_budgeted_message(messages, { "role": "system", "content": summary }):
                 _delta.record_section(section_name, summary)
     else:
-        # Unchanged — single-line marker instead of full content
+        # Unchanged ??single-line marker instead of full content
         _append_budgeted_message(messages,
             _delta.build_unchanged_marker(section_name), _pre_user_token_reserve)
 ```
@@ -474,25 +471,25 @@ In this section I describe my approach to ensuring system correctness, encompass
 
 ## Testing Strategy Overview
 
-Testing AI-integrated systems presents unique challenges that traditional testing methodologies do not fully address. Unit tests can verify that a function correctly parses a JSON response, but they cannot verify that the AI will consistently produce parseable responses. My testing strategy therefore operates on two distinct levels: deterministic component testing using traditional unit tests, and non-deterministic behaviour testing using functional observation.
+Testing AI-integrated systems presents unique challenges that traditional testing methodologies do not fully address. Unit tests can verify that a function correctly parses a JSON response, but they cannot verify that the AI will consistently produce parseable responses. My testing strategy therefore operates on two distinct levels: deterministic component testing using automated GDScript suites, and non-deterministic behaviour testing using functional observation.
 
-I developed over sixty unit test scripts located in the `Unit Test/` directory and additional test directories, covering core systems including `test_ai_prompt_builder.gd`, `test_event_bus.gd`, `test_game_state.gd`, `test_save_load_system.gd`, and `test_butterfly_effect_tracker.gd`. These tests verify that deterministic components behave correctly given specific inputs, enabling confident refactoring without fear of introducing regressions.
+The current automated layer is substantially larger and more structured than the early project proposal implied. The repository now contains 55 dedicated `test_*.gd` suites under `1.Codebase/Unit Test`, plus additional targeted suites under `1.Codebase/src/scripts/tests` and `1.Codebase/src/scripts/ui`. Rather than using GUT, the project relies on custom headless runners such as `all_tests_runner.gd`, `ui_tests_runner.gd`, and `prompt_tests_runner.gd`. In particular, `all_tests_runner.gd` recursively scans three roots, runs an inline sanity suite first, applies a 60-second watchdog per suite, aggregates pass/fail counters from each test node, and exits with a failure code when tracked assertions fail. This infrastructure is what made repeated refactoring practical late in development.
 
 ## Unit Testing Approach
 
-I implemented unit tests as standalone Godot scenes that execute test sequences and report results to the console, following an async/await structure to handle systems requiring frame processing. Each test script follows a consistent structure: setup phase, individual test methods, and teardown phase.
+I implemented these tests as standalone GDScript suites that are instantiated by custom runners, with small scene wrappers in `src/scenes/tests` used only where headless scene execution is convenient. Most suites expose `tests_passed` and `tests_failed` counters so the runner can capture structured results. The async/await structure is deliberate: many cases need frame or timer waits to test signals, save/load cycles, audio state changes, and UI refresh behaviour without race conditions.
 
-The `test_scene_directives_parser.gd` tests exercise the parsing system with various edge cases encountered during development: JSON embedded in markdown, unexpected whitespace, and alternative key names.
+Coverage now extends well beyond the original core-state tests. For example, `test_scene_directives_parser.gd` exercises malformed and mixed-format directive payloads; `test_ai_providers.gd` and `test_live_api_client.gd` validate provider configuration and Gemini Live setup behaviour with mocked clients; `test_narrative_prompt_skill_loading.gd` and `test_ai_prompt_builder.gd` cover prompt assembly, context layering, and budget-aware trimming; `test_polish_regressions.gd` captures late-stage regressions introduced during UI and persistence refactors; and `test_markdown_parser.gd` covers the UI-side markdown-to-BBCode conversion path used for rendered AI text.
 
 ## Integration Testing Between Components
 
-Integration tests verify correct interaction between components. The `test_gamestate_integration.gd` suite verifies that changes to player statistics correctly propagate through the EventBus, and that save/load cycles preserve all relevant state. A key integration test verifies that the AI context system correctly incorporates butterfly effect data.
+Integration tests verify correct interaction between components rather than only isolated methods. `test_gamestate_integration.gd` checks that stat changes propagate correctly through EventBus-driven flows and survive save/load cycles; `test_story_scene_modules.gd` exercises the decomposed story-scene controllers after the large scene refactor; `test_save_load_system.gd` covers backup recovery and migration-safe loading; and `test_voice_interaction_controller.gd` verifies the microphone and cancellation lifecycle around the optional live voice path. Together, these suites reflect the actual architectural seams of the current codebase rather than the earlier monolithic scene structure.
 
 ## Functional Testing for AI Behaviour
 
 Functional testing was the appropriate and deliberate methodological choice for this project. The primary objective is to develop a working AI-integrated narrative system, not to conduct user experience research. Functional testing directly serves this development objective: it validates that the implemented systems operate correctly, that the AI generates thematically appropriate content, and that the architecture handles edge cases gracefully. Without functional testing, the system would not have reached its current level of reliability. User testing, while valuable, is a separate concern that belongs in a future development phase once the system's output behaviour has been validated.
 
-Since AI outputs are non-deterministic, I observe patterns across multiple generation sessions. My functional testing protocol involves extended play sessions monitoring for thematic consistency, narrative coherence, and appropriate response to game state changes. Test scenarios include raising Positive Energy to maximum, making contradictory choices, and testing prayer ironic inversion.
+Because AI outputs are non-deterministic, I documented behaviour across multiple generation sessions rather than treating any single run as representative. My functional testing protocol combined extended play sessions with exported AI logs and written review notes, allowing me to track thematic consistency, narrative coherence, and response to changing game state over time. Test scenarios included raising Positive Energy to maximum, making contradictory choices, and testing prayer ironic inversion.
 
 To document AI behaviour systematically, I implemented logging infrastructure within the AIManager that captures complete request-response pairs, including prompt content, AI output, latency measurements, and token consumption for every API call. During extended testing sessions, I exported these logs and organised them into structured tables for manual review. Each entry was assessed against three criteria: thematic alignment with the satirical framework, narrative coherence with prior context, and structural validity of the returned JSON directives. This manual review process, while labour-intensive, was essential for identifying subtle patterns that automated checks could not detect, such as gradual tonal drift across consecutive generations or the AI reverting to sincerely helpful advice despite ironic persona instructions.
 
@@ -564,7 +561,7 @@ World models would reposition me as a high-level director. Instead of writing pa
 
 ### Practical Feasibility Assessment
 
-Table [1](#tab:pipeline-vs-worldmodel){reference-type="ref" reference="tab:pipeline-vs-worldmodel"} summarises the practical differences I observed between the two paradigms.
+Table?[1](#tab:pipeline-vs-worldmodel){reference-type="ref" reference="tab:pipeline-vs-worldmodel"} summarises the practical differences I observed between the two paradigms.
 
 ::: {#tab:pipeline-vs-worldmodel}
   **Dimension**          **Bespoke Pipeline**                                                                                      **World-Model**
@@ -593,19 +590,19 @@ If world model technology matured to the point of practical deployment, I would 
 
 For developers considering similar projects, I would offer three recommendations grounded in what I learnt. First, if your project requires precise control over generated text, particularly satirical, ironic, or tonally sensitive material, a bespoke pipeline remains the only viable approach at the time of writing. Second, world-models should be monitored as a rapidly evolving prototyping tool: even in their current state, they could accelerate early-stage concept validation before traditional engines are employed for production (Parker-Holder and Fruchter, 2025). Third, the architectural patterns I developed, particularly the Strategy pattern for provider abstraction and the layered context-management system, are equally applicable to future hybrid systems that may combine bespoke components with world model capabilities.
 
-## Player Experience Evaluation
+## Future Player Testing Opportunities
 
-Formal external user testing is beyond the scope of this project. As discussed in Section 1.3, this is primarily a development and integration project; the project scope is to demonstrate technical feasibility and thematic coherence through developer-led functional testing. User testing with external participants is identified as the critical next step for future development (Section 11.2), contingent on resolving content safety prerequisites and obtaining ethical approval.
+Formal external user testing is beyond the scope of this project. As discussed in Section 1.3, this is primarily a development and integration project concerned with technical feasibility and thematic coherence through developer-led functional testing. The appropriate next step is therefore not to claim player-experience validation, but to identify what future player testing should focus on once ethical approval and content-safety confidence are in place.
 
-That said, I can report what I observed during my own extended functional testing sessions, where I deliberately tried to play the game as a fresh user would. The choice system presents meaningful dilemmas where each archetype, cautious, balanced, reckless, positive, and complain, produces noticeably different narrative consequences. The AI generates contextually appropriate responses that acknowledge previous player decisions, and the thematic framework creates a coherent sense of escalating absurdity as the Void Entropy increases across a session.
+The first opportunity lies in testing whether players interpret the choice system as meaningfully different across archetypes such as cautious, balanced, reckless, positive, and complain. My own functional testing suggests these choices produce noticeably different narrative consequences, but that observation now needs external confirmation.
 
-The Butterfly Effect system (see Appendix C: GDD, Section 4.9) produces satisfying moments when past choices resurface with consequences, creating a sense of narrative weight that pre-scripted systems struggle to achieve. However, the system's effectiveness depends on the AI correctly incorporating callback suggestions that I inject into the prompt through the `=== BUTTERFLY EFFECT: PAST CHOICES ===` section of my `AIContextBuilder`. Approximately one in five callback opportunities were missed because the AI did not naturally integrate the suggested reference into its narrative output. I suspect this would be more noticeable to external testers, who would lack my awareness of which callbacks were supposed to appear.
+The second opportunity concerns callback visibility. The Butterfly Effect system (see Appendix C: GDD, Section 4.9) can produce satisfying moments when past choices resurface with consequences, but approximately one in five callback opportunities were missed during my own testing because the AI did not naturally integrate the suggested reference into its narrative output. External participants would be better placed to reveal how noticeable these misses are in practice.
 
-Response latency remains the most significant player experience limitation. During AI generation, the game displays loading indicators that interrupt the narrative flow. For a text-based game where reading pace is central to the experience, these interruptions are particularly noticeable. I implemented loading state animations and the `_start_connecting_animation()` cycling text feedback, but I cannot eliminate the latency inherent in API-based generation, typically two to four seconds per request under normal conditions.
+The third opportunity concerns response latency and pacing. During AI generation, the game displays loading indicators that interrupt narrative flow. For a text-based game where reading pace is central to the experience, these interruptions may be especially noticeable to fresh players. A future study should therefore examine tolerable waiting thresholds, perceived flow disruption, and whether additional interface feedback would improve the experience.
 
-## Original Requirements Assessment
+## Assessment Against Original Recommendations
 
-Returning to the three pillars defined in Section 1.1, Table [2](#tab:requirements-assessment){reference-type="ref" reference="tab:requirements-assessment"} maps each original objective to its outcome.
+Returning to the three pillars defined in Section 1.1, Table?[2](#tab:requirements-assessment){reference-type="ref" reference="tab:requirements-assessment"} maps each original objective to its current outcome and provides the basis for the recommendations that follow.
 
 ::: {#tab:requirements-assessment}
   **Pillar**          **Objective**                                               **Status**        **Evidence**
@@ -624,7 +621,7 @@ Returning to the three pillars defined in Section 1.1, Table [2](#tab:requireme
 
 Regarding technical development, I successfully designed and implemented a functional AI-driven narrative system. The prototype generates coherent narrative content, meets latency targets under normal conditions, and maintains context across save/load cycles. The multi-provider architecture with its emergency mock fallback (via `_attempt_emergency_mock_fallback()`) means the game never crashes due to an API failure, it degrades gracefully instead. I consider the technical pillar fully achieved, with the caveat that latency under high API load remains outside my control.
 
-Regarding thematic execution, the satirical framework is successfully embedded in AI generation through the Reality vs. Positive Energy system and entropy-based prompt modification (see Appendix C: GDD, Sections 4.2 and 4.8). The eight percent tonal inconsistency rate is within my stated tolerance, but I am not fully satisfied with it, I believe further prompt refinement, particularly adding more explicit ironic examples to the low-entropy system prompt, could reduce this to below five percent. The Prayer System's ironic inversion represents the project's strongest thematic achievement, and I attribute its higher consistency to the more constrained prompt template that leaves the AI less interpretive latitude.
+Regarding thematic execution, the satirical framework is successfully embedded in AI generation through the Reality vs.?Positive Energy system and entropy-based prompt modification (see Appendix C: GDD, Sections 4.2 and 4.8). The eight percent tonal inconsistency rate is within my stated tolerance, but I am not fully satisfied with it, I believe further prompt refinement, particularly adding more explicit ironic examples to the low-entropy system prompt, could reduce this to below five percent. The Prayer System's ironic inversion represents the project's strongest thematic achievement, and I attribute its higher consistency to the more constrained prompt template that leaves the AI less interpretive latitude.
 
 Regarding critical analysis, this report itself demonstrates completion of the third pillar. I have produced a comparative analysis drawing on direct implementation experience, identifying concrete trade-offs between bespoke pipelines and world-models. The analysis is grounded in what I actually built and tested, not in theoretical speculation.
 
@@ -670,7 +667,7 @@ External user testing is the critical next step for validating player experience
 
 The world model approach deserves further investigation as the technology matures. Even during the course of this project, the AI landscape shifted significantly. The launch of Google DeepMind's Genie 3 triggered a sharp sell-off in video game developer stocks, with major publishers falling approximately ten percent in a single day as investors concluded that systems capable of generating interactive environments from text could eventually make conventional development workflows obsolete (Wellington, 2026). Goldman Sachs extended this concern broadly, warning of AI-related disruption to traditional software models (Campbell, 2026). This market reaction illustrates how rapidly the competitive context is evolving. The bespoke pipeline developed in this project remains the only viable approach for projects requiring precise tonal control at the time of writing, but the landscape is in flux and definitive conclusions about long-term architectural choices are premature. Future work should monitor world model capabilities as they mature and assess whether hybrid architectures combining neural rendering with symbolic constraint enforcement become practically feasible.
 
-Voice integration represents an unexplored opportunity. The Gemini Live API supports native audio output, and the architecture accommodates voice session components. Implementing spoken narrative delivery could enhance the storytelling experience, though it would introduce new challenges around generation latency and audio quality.
+Voice integration has moved beyond a purely speculative idea. The current architecture already includes Gemini Live voice session components, optional voice input/output settings, and supporting UI hooks, but it still requires broader validation and design refinement before it can be treated as a finished player-facing feature. Further work should focus on latency, audio quality, accessibility, and when spoken interaction genuinely improves the narrative experience rather than merely demonstrating technical capability.
 
 The content filtering system could be enhanced with more sophisticated detection methods. The current keyword-based approach identifies obvious harmful content but may miss subtle problematic generations. Machine learning-based content classification could improve detection accuracy, though at the cost of additional computational overhead.
 
@@ -714,7 +711,7 @@ My "Glorious Deliverance Agency 1" prototype demonstrates that AI-generated narr
 
 **Agent Architectures and Long-Term Coherence**
 
-1.  Góngora, S., et al. (2025) PAYADOR: A Minimalist Approach to Grounding Language Models on Structured Data for Interactive Storytelling and Role-playing Games. arXiv preprint arXiv:2504.07304. Available at: <https://arxiv.org/abs/2504.07304> (Accessed: 18 January 2026).
+1.  G?ngora, S., et al. (2025) PAYADOR: A Minimalist Approach to Grounding Language Models on Structured Data for Interactive Storytelling and Role-playing Games. arXiv preprint arXiv:2504.07304. Available at: <https://arxiv.org/abs/2504.07304> (Accessed: 18 January 2026).
 
 2.  Park, J.S., et al. (2023) 'Generative Agents: Interactive Simulacra of Human Behaviour'. In: *The 36th Annual ACM Symposium on User Interface Software and Technology*. Available at: <https://arxiv.org/abs/2304.03442> (Accessed: 18 January 2026).
 
@@ -732,7 +729,7 @@ My "Glorious Deliverance Agency 1" prototype demonstrates that AI-generated narr
 
 2.  Wan, L. and Ma, W. (2025) StoryBench: A Dynamic Benchmark for Evaluating Long-Term Memory with Multi-Turns. arXiv preprint arXiv:2506.13356. Available at: <https://arxiv.org/abs/2506.13356> (Accessed: 18 January 2026).
 
-3.  Värtinen, S., Hämäläinen, P., and Guckelsberger, C. (2024). Generating role-playing game quests with GPT language models. *IEEE Transactions on Games*, 16(1), pp. 127--139. <https://doi.org/10.1109/TG.2022.3228480>
+3.  V??tinen, S., H?????徆nen, P., and Guckelsberger, C. (2024). Generating role-playing game quests with GPT language models. *IEEE Transactions on Games*, 16(1), pp. 127--139. <https://doi.org/10.1109/TG.2022.3228480>
 
 **Practical Deployment and Constraints**
 
@@ -814,11 +811,12 @@ Overarching Aim: To investigate how far a bespoke, AI-driven 2D RPG narrative sy
 ### 1.2 Objectives
 
 1. To build a Foundational 2D RPG framework in Godot 4.6.1.
-2. To implement an LLM integration & runtime pipeline --- implement a request/response pipeline that translates game state → structured prompt → LLM reply → in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
+2. To implement an LLM integration & runtime pipeline --- implement a request/response pipeline that translates game state ??structured prompt ??LLM reply ??in-game events/NPC lines. The initial provider will be Google Gemini, with a Settings page allowing users to supply their own API key and optionally select OpenRouter as an alternative provider. This pipeline will prioritise efficient token usage and responsive narrative generation.
 3. To design and implement a multi-layer context management system for narrative coherence:
    - Static Context ("world bible" of immutable lore and themes)
    - Short-Term Context (most recent scene/dialogue)
    - Long-Term Memory (periodic AI summaries of key plot points/decisions stored for future prompts). A "notes/to-do list" mechanism will record emergent facts to ensure consistency across generations, with a focus on minimising narrative drift.
+
 4. To Author the seed narrative and world setting --- provide initial backstories and the philosophical conflict for Glorious Deliverance Agency 1 (GDA1), including Void Entropy and the Positive Energy Curse as the canonical seeds that guide generation, ensuring a strong thematic foundation for the AI.
 5. To conduct a deep comparative analysis and system evaluation:
    - a) **System Performance Evaluation:** Collect development artefacts and generation samples throughout the project to inform a critical analysis of this bespoke pipeline. Planned measurements include: narrative consistency (sample AI-generated passages and annotating contradictions vs. world rules --- lower is better); player experience (feedback on immersion, control, consistency, and pacing); latency & cost (average response time per turn and API spend); ablations (compare with/without the notes/summarisation mechanism; contrast cloud vs. local model performance).
@@ -877,7 +875,7 @@ An AI native 2D role-playing game where you are a reluctant hero in a dysfunctio
 
 ### 1.2 Format and Platforms
 
-The game is designed for PC platforms using the Godot 4.6.1 Engine, targeting players who have access to desktop computing environments. The technical foundation will support integration with various AI language models to enable dynamic narrative generation, which defines the core gameplay experience.
+The game is designed for PC platforms using Godot 4.7-dev3, targeting players who have access to desktop computing environments. The current executable flow boots into `splash_sequence.tscn`, transitions to the main menu, and from there enters the story scene and optional side modes. The technical foundation supports integration with multiple AI language models and a built-in mock mode, which together define the core gameplay experience.
 
 ### 1.3 Genre and Theme
 
@@ -927,32 +925,32 @@ Beyond its mechanical innovations, the game aspires to thematic depth by functio
 
 The protagonist embodies pragmatic realism, reflecting anyone worn down by repeated disappointments and betrayals. At the story's beginning, they harbour deep mistrust toward divine intervention and blind faith, preferring rational thinking over magical solutions. This worldview crumbles when Saint Gloria deploys masterful psychological manipulation, convincing the protagonist that their negativity causes all personal and interpersonal failures. Pushed to the edge of mental breakdown, the protagonist desperately accepts Gloria's salvation and adopts her simplistic positive energy creed as a last resort to avoid harming others. This forced conversion sets the stage for their tragic journey as reluctant believers who know better but feel they have no choice.
 
-![The Protagonist — full-body character design (pixel art)](../1.Codebase/src/assets/characters/turnaround_protagonist.png)  
-*Figure: The Protagonist — full-body character design*
+![The Protagonist - full-body character design (pixel art)](../1.Codebase/src/assets/characters/turnaround_protagonist.png)  
+*Figure: The Protagonist - full-body character design*
 
 ### 2.2 Non-Player Characters: The Team
 
 The player's teammates function not as traditional allies but as the primary antagonists and obstacles. Each embodies a distinct, flawed ideology that systematically undermines every mission.
 
-**Saint Gloria** serves as the Guardian of the Greenhouse, a weaponised innocent who has constructed a sterile bubble of love and tolerance around herself. She perceives any dose of reality that might shatter this bubble as negative energy requiring purification. While she believes her life has been blessed and smooth, she has actually survived numerous personal tragedies by choosing not to process them, instead embracing belief in the Positive Energy Law and the Flying Spaghetti Monster as a cure-all defence mechanism. Her god is not real but rather a personification of her denial. Gloria never attacks directly, instead deploying moral blackmail through phrases like "your actions have hurt me" to induce guilt and control. When confronted with concrete problems, she pivots to criticising others' negative emotional reactions, derailing the original issue. She tolerates the weak who don't challenge her worldview, but cannot abide those who use logic to question it. She represents refined selfishness that prioritises personal peace over confronting complex realities.
+**Saint Gloria** is the Guardian of the Greenhouse and the embodiment of weaponised innocence. She has built a sterile bubble of love and tolerance around herself and classifies dissent, logic, and discomfort as negative energy requiring purification. She believes the Flying Spaghetti Monster will solve every problem without effort on her part, so when confronted with concrete failures she reframes them as emotional harm, pivots to guilt, and claims that the player's attitude has hurt her. Her tolerance is selective: she accepts teammates' incompetence and prejudice, but cannot accept principled anger or rational critique. She represents refined selfishness that protects personal emotional comfort by redefining reality itself.
 
-**Sir Donkey** is the Self-Proclaimed Hero, a bankrupt concept who lives as a cosplayer trapped in an archaic epic. He believes striking heroic poses automatically entitles him to glory and princesses, despite lacking any skills required for genuine heroism. His entire worldview derives from clichéd, gender-stereotyped fantasy novels and web fiction, making him profoundly positive in the most toxic way. He performs chivalry through flattery and boasting, but remains utterly passive and responsibility-avoidant in practice. His creative solutions invariably revolve around hero-saves-damsel tropes that objectify women, and when challenged, Gloria insists others tolerate his views. When his plans fail, he immediately shifts blame and frames himself as a misunderstood hero held back by incompetent allies. He symbolises infantile mentality steeped in outdated fantasies and incapable of facing real challenges.
+**Cosplayer Donkey, the Glory Knight** is the Self-Proclaimed Hero and a conceptual bankrupt who lives inside a stale heroic fantasy. He believes that striking heroic poses should automatically summon applause, glory, and princesses, despite possessing none of the skills needed for genuine heroism. He disappears during real work but becomes hyperactive on social media and in performative flirtation, and nearly every idea he offers is another hero-saves-the-girl trope shaped by objectifying patriarchal thinking. When challenged, Gloria demands tolerance on his behalf. He also reinforces the team's exclusionary clique by using broken German with Gloria and ARK to lock One out of the conversation. He symbolises immature fantasy, blame-shifting, and performative masculinity detached from reality.
 
-**ARK** is the Diligent Destroyer, an Architect of the Black Box who zealously pursues order and planning. However, his order merely wraps chaos in complex rules, leading to more spectacular and thorough collapse. Coming from a chaotic background, he developed pathological cravings for control and certainty, never questioning his own plans but always questioning those who refused to obey them. He issues commands online and holds meetings solely for others to rubberstamp his pre-made decisions in a sham democracy. He operates in isolation, never syncing progress or explaining methods, thereby destroying team trust. He pours immense energy into minor execution details while remaining careless with crucial strategic planning and communication, demonstrating tactical diligence paired with strategic laziness. He represents bureaucratic thinking that worships procedure and authority while losing the capacity for communication and adaptation.
+**Cosplayer ARK, the Order Apostle** is the Diligent Saboteur and the Architect of the Black Box. He functions as the team's de-facto lead through sheer effort, but his compulsive need for control and inability to communicate openly make him a destroyer of trust. He assigns work through private messages, asks for opinions only after making up his mind, issues vague instructions with no clear completion standards, and then demands full rewrites when results fail to match his undisclosed expectations. He collaborates with Donkey in broken German, further isolating One, and his obsession with process turns coordination itself into a source of collapse. He represents bureaucratic control, information asymmetry, and the damage caused by leadership without transparent communication.
 
-**One** is the Silent Witness, the Unwitting Accomplice who stands as the only truly competent and principled person on the team. His kindness and conflict-avoidant nature lead him to remain silent in toxic environments, making him a witness to injustice and a source of moral torment for the protagonist. As an old friend who built trust with the protagonist through early trials, he proves loyal and reliable, yet suffers subtle ostracism from other teammates due to his background or language. He practices passive goodness, never actively harming anyone, but also never intervening when others are harmed, fearing he will disrupt harmony. Gloria's love and tolerance never extend to him. He maintains public peace with claims of being okay while privately expressing true pain and frustration to the protagonist. He represents how silence from good people can become a form of complicity within toxic systems.
+**One, the Isolated Old Friend** is the Silent Witness and the Voiceless Accomplice. He is the player's earliest ally and the only genuinely capable and principled member of the team, but his aversion to conflict turns him into a passive witness to repeated injustice. He is marginalised by the German-speaking trio of Gloria, Donkey, and ARK, reduced to a passive recipient of instructions, and excluded from decisions that affect him directly. In public he says he is fine to preserve harmony; in private he honestly expresses his frustration and pain to the protagonist. He symbolises how kindness without courage becomes complicity inside a toxic system.
 
-**Teacher Chan** is the Soul-Soothing Singer, the Harbinger of Doom who serves as high priestess of the God of Blinding Light. As a national-level idol singer, her image radiates pure, white-robed compassion. Her gentle songs filled with lyrics about letting go, forgiveness, and growth are not balms but curses. She genuinely believes in her message, which makes her terrifying. Her concerts function as massive rituals that dramatically amplify the Void Entropy, accelerating the world's end. She is not a spiritual guide but a world destroyer wearing the guise of one.
+**Teacher Chan** is the Soul-Soothing Singer, the Apocalypse Idol, and the Harbinger of Doom. As a national-level idol singer, her image radiates pure, white-robed compassion, yet her songs about letting go, acceptance, and growth operate as a curse rather than a cure. She genuinely believes what she sings, which makes her more frightening, not less. Her performances rationalise failure as spiritual success, intensify cognitive dissonance, and function as large-scale entropy rituals that accelerate the world's collapse. She is not a healer but a world destroyer wearing the voice of comfort.
 
 <p align="center">
 <img src="../1.Codebase/src/assets/characters/turnaround_gloria.png" height="130" title="Saint Gloria" alt="Saint Gloria">&nbsp;&nbsp;
-<img src="../1.Codebase/src/assets/characters/turnaround_donkey.png" height="130" title="Sir Donkey" alt="Sir Donkey">&nbsp;&nbsp;
-<img src="../1.Codebase/src/assets/characters/turnaround_ark.png" height="130" title="ARK" alt="ARK">&nbsp;&nbsp;
+<img src="../1.Codebase/src/assets/characters/turnaround_donkey.png" height="130" title="Cosplayer Donkey" alt="Cosplayer Donkey">&nbsp;&nbsp;
+<img src="../1.Codebase/src/assets/characters/turnaround_ark.png" height="130" title="Cosplayer ARK" alt="Cosplayer ARK">&nbsp;&nbsp;
 <img src="../1.Codebase/src/assets/characters/turnaround_one.png" height="130" title="One" alt="One">&nbsp;&nbsp;
 <img src="../1.Codebase/src/assets/characters/turnaround_teacher_chan.png" height="130" title="Teacher Chan" alt="Teacher Chan">
 </p>
 
-*Figure: NPC full-body character designs — Saint Gloria · Sir Donkey · ARK · One · Teacher Chan (pixel art)*
+*Figure: NPC full-body character designs - Saint Gloria, Cosplayer Donkey, Cosplayer ARK, One, Teacher Chan (pixel art)*
 
 ## 3. Narrative and Story
 
@@ -984,14 +982,14 @@ Positive Energy Score increases through agreeing with teammates' foolish plans, 
 
 This system functions as a direct interface for players to prompt them to engineer their own doom. Before missions, a user interface appears where players must type prayers to the Flying Spaghetti Monster. The more positive and hopeful the text about cooperation and mission success, the more heavily the AI is instructed to generate ironic, disastrous outcomes that subvert those prayers. Players actively write scripts for their own failures.
 
-![The Prayer System — players submit hopeful prayers, which the AI subverts into disasters](../1.Codebase/src/assets/ui/praytoMonster.png)  
-*Figure: The Prayer System — the Flying Spaghetti Monster receives player prayers*
+![The Prayer System - players submit hopeful prayers, which the AI subverts into disasters](../1.Codebase/src/assets/ui/praytoMonster.png)  
+*Figure: The Prayer System - the Flying Spaghetti Monster receives player prayers*
 
 ### 4.4 Teacher Chan's Apocalypse Concert
 
 Mandatory cutscene events trigger after mission successes. Pre-rendered video of Teacher Chan plays with AI-generated lyrics appearing as subtitles. The lyrics consist of generic, feel-good platitudes that reframe preceding disasters as triumphs of spirit. After concerts, players are afflicted with Cognitive Dissonance debuffs that temporarily lower Logic and critical thinking skills, and may force positive keywords into next prayers, ensuring downward spirals continue.
 
-![Teacher Chan's Apocalypse Concert — mandatory holographic cutscene after each mission success](../1.Codebase/src/assets/ui/miss_chan_on_stage.png)  
+![Teacher Chan's Apocalypse Concert - mandatory holographic cutscene after each mission success](../1.Codebase/src/assets/ui/miss_chan_on_stage.png)  
 *Figure: Teacher Chan's Apocalypse Concert*
 
 ### 4.5 Gloria's Intervention Event
@@ -1004,7 +1002,7 @@ This system provides players' only true outlet and serves as a key feature for m
 
 ### 4.7 AI-Driven Visual Scene and Asset System
 
-This system bridges AI-generated narratives with finite art asset sets through intelligent asset selection and contextual arrangement. The AI will receive detailed asset manifests as part of its system prompt, enabling the selection of appropriate visual elements that match the narrative context. The AI will generate structured scene directives specifying:
+This system bridges AI-generated narratives with finite art asset sets through intelligent asset selection and contextual arrangement. The AI receives detailed asset manifests as part of its system prompt, enabling the selection of appropriate visual elements that match the narrative context. The AI generates structured scene directives specifying:
 
 - Scene configuration: background type, atmospheric mood, and lighting conditions
 - Character composition: determining which characters appear with which expressions
@@ -1018,7 +1016,7 @@ The asset libraries include:
 - Twenty-nine symbolic assets of gameplay objects, each registered in `AssetRegistry` with tags and descriptive summaries for AI filtering
 - 42 audio assets: 12 background music tracks (entropy-scaled by narrative stage) and 30 dedicated sound effects
 
-The system will support asset querying by tags and themes, allowing the AI to request dangerous outdoor locations or mystical indoor spaces without specifying exact file names.
+The system supports asset querying by tags and themes, allowing the AI to request dangerous outdoor locations or mystical indoor spaces without specifying exact file names.
 
 <p align="center">
 <img src="../1.Codebase/src/assets/backgrounds/Forest.png" width="23%" title="Forest" alt="Forest">&nbsp;
@@ -1027,7 +1025,7 @@ The system will support asset querying by tags and themes, allowing the AI to re
 <img src="../1.Codebase/src/assets/backgrounds/crystal_cavern.png" width="23%" title="Crystal Cavern" alt="Crystal Cavern">
 </p>
 
-*Figure: Sample background environments — Forest · Temple · Dungeon · Crystal Cavern (from the 22-background library)*
+*Figure: Sample background environments - Forest, Temple, Dungeon, Crystal Cavern (from the background library)*
 
 <p align="center">
 <img src="../1.Codebase/src/assets/icons/orb.png" width="10%" title="Orb">&nbsp;
@@ -1046,11 +1044,11 @@ The system will support asset querying by tags and themes, allowing the AI to re
 
 The game implements relationships between player actions and core metrics through the PlayerStats class, which is delegated from GameState.
 
-**Reality Score** represents the player's grasp on bleak, objective reality, with an initial value of 50 and a range from 0 to 100. High scores (≥ 80) indicate strong alignment with objective truth and trigger increased Gloria intervention frequency, while low scores (≤ 20) suggest descent into delusion, can trigger the Cognitive Dissonance debuff (−3 to Logic skill checks), and may force game over at 0.
+**Reality Score** represents the player's grasp on bleak, objective reality, with an initial value of 50 and a range from 0 to 100. High scores (>= 80) indicate strong alignment with objective truth and trigger increased Gloria intervention frequency, while low scores (<= 20) suggest descent into delusion, can trigger the Cognitive Dissonance debuff (-3 to Logic skill checks), and may force game over at 0.
 
-**Positive Energy** represents attempts to impose cheerful, optimistic outlooks on the world with ironic consequences, starting at 50 with a range from 0 to 100. Every increase in Positive Energy immediately adds twice that amount to the cumulative `entropy_level` integer ("Positive Energy curse"), directly destabilising the world. Gloria's interference triggers when a complaint counter reaches a threshold AND Reality is ≤ 65 AND Positive Energy is ≥ 35 (base 35% chance per scene), or when Reality climbs ≥ 80, at which point fewer complaints are needed. Increased Positive Energy also makes Empathy checks easier and raises teammate "friendliness," though their help remains actively destructive.
+**Positive Energy** represents attempts to impose cheerful, optimistic outlooks on the world with ironic consequences, starting at 50 with a range from 0 to 100. Every increase in Positive Energy immediately adds twice that amount to the cumulative `entropy_level` integer ("Positive Energy curse"), directly destabilising the world. Gloria's interference triggers when a complaint counter reaches a threshold AND Reality is <= 65 AND Positive Energy is >= 35 (base 35% chance per scene), or when Reality climbs >= 80, at which point fewer complaints are needed. Increased Positive Energy also makes Empathy checks easier and raises teammate "friendliness," though their help remains actively destructive.
 
-**Void Entropy** combines two values. The floating-point `void_entropy` (0.0–1.0) drives AI prompt tone:
+**Void Entropy** combines two values. The floating-point `void_entropy` (0.0-1.0) drives AI prompt tone:
 
 ```
 void_entropy = (positive_energy / 100.0) * 0.7 + (1.0 - (reality_score / 200.0)) * 0.3
@@ -1061,14 +1059,14 @@ Positive Energy is the dominant driver (70% weight); reality loss contributes 30
 Entropy thresholds (applied to `void_entropy`):
 
 - Low (< 0.35) produces normal but bleak events
-- Medium (0.35–0.70) introduces strange and unexpected elements
-- High (≥ 0.70) generates surreal, darkly humorous, ironic events that directly subvert recent positive actions
+- Medium (0.35-0.70) introduces strange and unexpected elements
+- High (>= 0.70) generates surreal, darkly humorous, ironic events that directly subvert recent positive actions
 
-The skill system implements four core skills (Logic, Perception, Composure, and Empathy), each with a base value of 5 and a range of 0--20. Skill checks use a 1d10 roll plus skill value versus a difficulty threshold. The Cognitive Dissonance debuff applies −3 penalty specifically to Logic checks, simulating impaired critical thinking after Teacher Chan's concerts or excessive Positive Energy exposure.
+The skill system implements four core skills (Logic, Perception, Composure, and Empathy), each with a base value of 5 and a range of 0--20. Skill checks use a 1d10 roll plus skill value versus a difficulty threshold. The Cognitive Dissonance debuff applies a -3 penalty specifically to Logic checks, simulating impaired critical thinking after Teacher Chan's concerts or excessive Positive Energy exposure.
 
 ### 4.9 The Butterfly Effect Tracking System
 
-The ButterflyEffectTracker component has been implemented to transform the game from isolated decisions into a living, interconnected narrative where every choice creates ripples that cascade forward through time. Unlike traditional branching narratives, this creates emergent consequences that surface scenes later, reminding players that their past decisions have lasting weight.
+The ButterflyEffectTracker component transforms the game from isolated decisions into a living, interconnected narrative where every choice creates ripples that cascade forward through time. Unlike traditional branching narratives, this creates emergent consequences that surface scenes later, reminding players that their past decisions have lasting weight.
 
 The system records different types of choices (minor, major, critical) with comprehensive metadata. Each recorded choice captures:
 
@@ -1079,12 +1077,12 @@ The system records different types of choices (minor, major, critical) with comp
 
 Consequence seeds are stored as arrays of potential outcomes, each with a scheduled scene number (3--20 scenes ahead), description, triggered status flag, and severity rating. The system implements weighted selection algorithms to determine when consequences trigger, with higher-severity consequences having priority. The `get_context_for_ai()` function formats relevant past choices and pending consequences for inclusion in AI prompts, enabling the AI to reference earlier decisions and create narrative callbacks.
 
-![Butterfly Effect visualisation — cascading narrative consequences from player choices](../1.Codebase/src/assets/ui/butterfly_effect.png)  
-*Figure: Butterfly Effect — choice-consequence cascade visualisation*
+![Butterfly Effect visualisation - cascading narrative consequences from player choices](../1.Codebase/src/assets/ui/butterfly_effect.png)  
+*Figure: Butterfly Effect - choice-consequence cascade visualisation*
 
 ### 4.10 The Trolley Problem Dilemma System
 
-The TrolleyProblemGenerator component has been implemented to generate dynamic moral dilemmas where every choice leads to harm, forcing players to confront the game's central thesis that in broken systems saturated with toxic positivity, you cannot escape complicity. The dilemmas expose the hypocrisy of positive energy framing and institutional dysfunction.
+The TrolleyProblemGenerator component generates dynamic moral dilemmas where every choice leads to harm, forcing players to confront the game's central thesis that in broken systems saturated with toxic positivity, you cannot escape complicity. The dilemmas expose the hypocrisy of positive energy framing and institutional dysfunction.
 
 The system implements five core template types:
 
@@ -1096,7 +1094,7 @@ The system implements five core template types:
 
 For each template, the system maintains fallback presets in both English and Chinese to ensure gameplay continues if AI generation fails.
 
-Trigger conditions are calculated dynamically: base 30% chance per mission after mission 3, with bonuses (+10% for high entropy ≥ 0.7, +15% for saturated Positive Energy ≥ 80, +10% for low Reality < 30), capped at maximum 85% in crisis phases.
+Trigger conditions are calculated dynamically: base 30% chance per mission after mission 3, with bonuses (+10% for high entropy >= 0.7, +15% for saturated Positive Energy >= 80, +10% for low Reality < 30), capped at maximum 85% in crisis phases.
 
 The `generate_dilemma()` function builds prompts via the `SkillManager`, loading the `trolley-problem` skill template from a structured markdown file with YAML frontmatter. This approach externalises prompt engineering from the game code, allowing templates to be refined without recompilation. Prompts include current stats and recent mission summaries, then request structured JSON output (enforced via `response_schema` and `response_mime_type = "application/json"`) containing: scenario setup; distinct choices with framing labels (positive/honest/neutral); immediate stat changes; long-term consequence descriptions; thematic commentary. Language is selected at runtime (English or Chinese) based on `GameState.current_language`.
 
@@ -1106,7 +1104,7 @@ All dilemma outcomes are automatically logged to the journal system with timesta
 
 ### 4.11 The Achievement and Progress System
 
-The Achievement System has been fully implemented with exactly 20 named achievements and one hidden achievement (`one_s_voice`), each backed by its own icon in `src/assets/achievements/`. The system serves three purposes:
+The Achievement System contains exactly 20 named achievements and one hidden achievement (`one_s_voice`), each backed by its own icon in `src/assets/achievements/`. The system serves three purposes:
 
 1. Tracking player milestones and providing feedback on progression
 2. Using ironic titles and descriptions to comment on player complicity
@@ -1125,18 +1123,18 @@ The system subscribes to EventBus signals for mission completion, journal writes
 
 ### 4.12 The Teammate Behaviour System
 
-The `TeammateSystem` has been fully implemented with a structured `BEHAVIOR_LIBRARY` containing 12 named behaviours and a `TEAMMATES` dictionary defining all four NPCs. Each behaviour entry specifies a label, summary, interaction style, and direct stat impact `{reality, positive, entropy}`. The 12 behaviours are:
+The `TeammateSystem` uses a structured `BEHAVIOR_LIBRARY` containing 12 named behaviours and a `TEAMMATES` dictionary defining all four NPCs. Each behaviour entry specifies a label, summary, interaction style, and direct stat impact `{reality, positive, entropy}`. The 12 behaviours are:
 
-- **Gloria's repertoire:** `moral_blackmail` (reality −8, PE +12, entropy +4), `issue_replacement` (−6/+8/+3), `divine_protection` (−4/+10/+5)
-- **Donkey's repertoire:** `heroic_nonsense` (−5/+6/+4), `blame_shifting` (−7/+5/+2), `epic_planning` (−3/+7/+3)
-- **ARK's repertoire:** `overcomplicate` (−6/+4/+5), `black_box_operation` (−5/+6/+6), `absolute_plan` (−4/+5/+7)
-- **One's repertoire:** `silent_agreement` (−2/+3/+1), `reliable_execution` (−1/+4/+2), `private_confession` (−3/+2/+1)
+- **Gloria's repertoire:** `moral_blackmail` (-8/+12/+4), `issue_replacement` (-6/+8/+3), `divine_protection` (-4/+10/+5)
+- **Donkey's repertoire:** `heroic_nonsense` (-5/+6/+4), `blame_shifting` (-7/+5/+2), `epic_planning` (-3/+7/+3)
+- **ARK's repertoire:** `overcomplicate` (-6/+4/+5), `black_box_operation` (-5/+6/+6), `absolute_plan` (-4/+5/+7)
+- **One's repertoire:** `silent_agreement` (-2/+3/+1), `reliable_execution` (-1/+4/+2), `private_confession` (-3/+2/+1)
 
 Each teammate entry also defines a base interference probability (Gloria: 35%, Donkey: 40%), keyword triggers, stat-based trigger rules, signature phrases, and personalised AI prompt parameters (tone, length, interference goal). Teammate interference text is generated at runtime by the AI using the teammate's persona definition. All labels and persona strings are localisation-keyed for English/Chinese support via `LocalizationManager`.
 
 ### 4.13 AI-Driven Narrative Generation and Output Structure
 
-All dialogue and narrative content will be generated dynamically through integration with large language models. The system will construct context-rich prompts incorporating dynamic context, including:
+All dialogue and narrative content is generated dynamically through integration with large language models. The system constructs context-rich prompts incorporating dynamic context, including:
 
 - Current game state, such as Reality Score, Positive Energy, and Entropy Level
 - Recent player choices and their consequences
@@ -1153,9 +1151,9 @@ The AI interface supports eight LLM backends:
 - **AI Router** for automatic load-balancing across providers
 - **Mock Generator** for deterministic, cost-free UI and logic testing
 
-Prompts are assembled by the `NarrativePromptBuilder` and `AIPromptBuilder` from structured templates managed by the `SkillManager`. The SkillManager scans the `src/skills/` directory (15 skill folders at time of submission) and parses each `SKILL.md` file's YAML frontmatter for metadata including `purpose_triggers`. Skill folders include: `mission-generation`, `teammate-interference`, `gloria-intervention`, `prayer-system`, `trolley-problem`, `scene-directives`, `character-profiles`, `choice-followup`, `consequence-generation`, `entropy-effects`, `game-recap`, `honeymoon-phase`, `intro-story`, `night-cycle`, and `force-mission-complete`. This externalises all prompt engineering from GDScript, enabling prompt iteration without recompilation.
+Prompts are assembled by the `NarrativePromptBuilder` and `AIPromptBuilder` from structured templates managed by the `SkillManager`. The SkillManager scans the `src/skills/` directory, parses each `SKILL.md` file's YAML frontmatter for metadata including `purpose_triggers`, and loads 15 skill folders: `mission-generation`, `teammate-interference`, `gloria-intervention`, `prayer-system`, `trolley-problem`, `scene-directives`, `character-profiles`, `choice-followup`, `consequence-generation`, `entropy-effects`, `game-recap`, `honeymoon-phase`, `intro-story`, `night-cycle`, and `force-mission-complete`. This externalises all prompt engineering from GDScript, enabling prompt iteration without recompilation.
 
-All prompts and persona strings support trilingual generation: language selection (English, Chinese, or German) is passed through the AI call chain and resolved in `AIPromptsI18n`. Each skill folder ships three language variants — `SKILL.md` (English base), `SKILL.zh.md` (Simplified Chinese), and `SKILL.de.md` (German) — allowing the SkillManager to load the appropriate template without any code changes.
+All prompts and persona strings support trilingual generation: language selection (English, Chinese, or German) is passed through the AI call chain and resolved in `AIPromptsI18n`. Each skill folder ships three language variants - `SKILL.md` (English base), `SKILL.zh.md` (Simplified Chinese), and `SKILL.de.md` (German) - allowing the SkillManager to load the appropriate template without any code changes.
 
 Output is requested as structured JSON (`response_mime_type = "application/json"` with `response_schema` enforcement where the provider supports it) and parsed by the `NarrativeResponseParser`. Generated responses contain:
 
@@ -1169,23 +1167,25 @@ Voice output is supported via `VoiceBridge` and `VoiceSessionManager` (wrapping 
 
 ### 4.14 The FSM 30-Day Rebirth Challenge
 
-The FSM 30-Day Rebirth Challenge is a fully implemented standalone game mode, accessible from the main menu, that reframes the core loop as a structured 30-day self-improvement programme endorsed by the Flying Spaghetti Monster. Players commit to completing one daily mission for 30 consecutive days, each day presenting a themed content card (backed by per-day pixel-art assets in `src/assets/rebirth_challenge/`, days 1–8 illustrated). The mode is managed by the `FSMChallengeModule` class, which tracks `challenge_start_date`, `current_day`, `days_completed`, and `last_login_date` for continuity enforcement.
+The `FSMChallengeModule` tracks `is_challenge_active`, `challenge_start_date`, `last_login_date`, `current_day`, `days_completed`, `challenge_completed`, and `challenge_crashed`. The art set includes explicit day-card assets for days 1-8, matching the intentional scripted crash point of the mode.
 
-Progress is gated by real calendar time: the `can_advance_day()` method compares the current system date against the stored `challenge_start_date` to determine whether the player is genuinely eligible to advance. If the player misses a day, the `check_and_reset_if_missed()` method detects a gap of more than one calendar day since `last_login_date` and resets the challenge to day one, forcing the player to restart — a mechanic that satirises the fragility of "streak-based" self-improvement apps. Daily content (theme, motivational text, and sublimation commentary) is keyed in `FSMDailyContentData` and resolved through the `LocalizationManager` at runtime, supporting English, Chinese, and German.
+The FSM 30-Day Rebirth Challenge is a standalone game mode, accessible from the main menu, that reframes the core loop as a structured 30-day self-improvement programme endorsed by the Flying Spaghetti Monster. Players commit to completing one daily mission for 30 consecutive days, each day presenting a themed content card (backed by per-day pixel-art assets in `src/assets/rebirth_challenge/`, with days 1-8 illustrated). The mode is managed by the `FSMChallengeModule` class, which tracks `challenge_start_date`, `current_day`, `days_completed`, and `last_login_date` for continuity enforcement.
 
-The central satirical mechanic is an inevitable, scripted crash: the module enforces `DAYS_BEFORE_CRASH = 8`, meaning the challenge always catastrophically collapses on day 8 regardless of the player's consistency or positivity. Daily themes (Days 1–8) escalate in toxic-positivity intensity before the crash triggers the `challenge_crash_triggered` signal and locks further progress. The `FSMRebirthExplanation` scene then presents an ironic post-mortem blaming the player's residual negativity. This design deliberately subverts the real-world "30-day challenge" genre, embodying the game's central thesis that manufactured positivity is structurally self-defeating. The constant `TOTAL_DAYS = 30` is defined but permanently inaccessible by design — a silent joke visible only in the source code.
+Progress is gated by real calendar time: the `can_advance_day()` method compares the current system date against the stored `challenge_start_date` to determine whether the player is genuinely eligible to advance. If the player misses a day, the `check_and_reset_if_missed()` method detects a gap of more than one calendar day since `last_login_date` and resets the challenge to day one, forcing the player to restart - a mechanic that satirises the fragility of "streak-based" self-improvement apps. Daily content (theme, motivational text, and sublimation commentary) is keyed in `FSMDailyContentData` and resolved through the `LocalizationManager` at runtime, supporting English, Chinese, and German.
+
+The central satirical mechanic is an inevitable, scripted crash: the module enforces `DAYS_BEFORE_CRASH = 8`, meaning the challenge always catastrophically collapses on day 8 regardless of the player's consistency or positivity. Daily themes (Days 1-8) escalate in toxic-positivity intensity before the crash triggers the `challenge_crash_triggered` signal and locks further progress. The `FSMRebirthExplanation` scene then presents an ironic post-mortem blaming the player's residual negativity. This design deliberately subverts the real-world "30-day challenge" genre, embodying the game's central thesis that manufactured positivity is structurally self-defeating. The constant `TOTAL_DAYS = 30` is defined but permanently inaccessible by design - a silent joke visible only in the source code.
 
 ### 4.15 Localisation and Language Support
 
-The game supports three full languages — **English** (`en`), **Simplified Chinese** (`zh`), and **German** (`de`) — managed by the `LocalizationManager` singleton. Translation data is stored in `localization/gda1_translations.csv` and compiled to three Godot `.translation` binary resources. A second CSV (`intro_story_pages.csv`) provides the multilingual intro story with separate chapter, text, title, and image translation resources. Language selection is persisted via `GameState.current_language` and propagates through all text UI, AI prompt construction (`AIPromptsI18n`), achievement display, teammate behaviour labels, and the butterfly effect context passed to the LLM. Gloria's voiced lines (accept, guilt, open, pua groups) are recorded in both English and Chinese.
+The game supports three full languages - **English** (`en`), **Simplified Chinese** (`zh`), and **German** (`de`) - managed by the `LocalizationManager` singleton. Translation data is stored in `localization/gda1_translations.csv` and compiled to three Godot `.translation` binary resources. A second CSV (`intro_story_pages.csv`) provides the multilingual intro story with separate chapter, text, title, and image translation resources. Language selection is persisted via `GameState.current_language` and propagates through all text UI, AI prompt construction (`AIPromptsI18n`), achievement display, teammate behaviour labels, and the butterfly effect context passed to the LLM. Gloria's voiced lines (accept, guilt, open, pua groups) are recorded in both English and Chinese.
 
 Each supported language is assigned a dedicated default font by `FontManager`:
 
-- **English:** Trajan Pro (`TrajanPro-Bold.otf` / `TrajanPro-Regular.ttf`) — primary; Libre Baskerville as fallback. Additional selectable fonts: Play, Ticketing, Britannic Bold.
-- **Simplified Chinese:** Noto Sans CJK SC (`NotoSansCJKsc-Regular.otf`) — primary; Chiron Go Round TC (`ChironGoRoundTCVF.ttf`) as alternative. CJK font also registered as fallback for any UI rendering CJK characters.
-- **German:** Berlin Type Bold (`BerlinType-Bold.otf`) — primary.
+- **English:** Trajan Pro (`TrajanPro-Bold.otf` / `TrajanPro-Regular.ttf`) - primary; Libre Baskerville as fallback. Additional selectable fonts: Play, Ticketing, Britannic Bold.
+- **Simplified Chinese:** Noto Sans CJK SC (`NotoSansCJKsc-Regular.otf`) - primary; Chiron Go Round TC (`ChironGoRoundTCVF.ttf`) as alternative. CJK font also registered as fallback for any UI rendering CJK characters.
+- **German:** Berlin Type Bold (`BerlinType-Bold.otf`) - primary.
 
-Five font size scales are user-selectable at runtime (Tiny 0.75×, Small 0.85×, Normal 1.0×, Large 1.25×, Huge 1.5×) via `FontManager.set_font_size()`. The language-switch command is also exposed through the in-game CLI (`set-language`).
+Five font size scales are user-selectable at runtime (Tiny 0.75x, Small 0.85x, Normal 1.0x, Large 1.25x, Huge 1.5x) via `FontManager.set_font_size()`. The language-switch command is also exposed through the in-game CLI (`set-language`).
 
 ### 4.16 Font Credits
 
@@ -1206,14 +1206,14 @@ Five font size scales are user-selectable at runtime (Tiny 0.75×, Small 0.85×,
 
 | Track | Composer | Publication | Status |
 |---|---|---|---|
-| Nocturne in E-flat major, Op. 9 No. 2 (`chopin_nocturne_op9_no2.mp3`) | Frédéric Chopin (1810–1849) | 1833 | Public domain |
-| Peer Gynt Suite No. 1, Op. 23: IV. "In the Hall of the Mountain King" (`Peer Gynt, Op. 23...mp3`) | Edvard Grieg (1843–1907) | 1876 | Public domain |
+| Nocturne in E-flat major, Op. 9 No. 2 (`chopin_nocturne_op9_no2.mp3`) | Frederic Chopin (1810-1849) | 1833 | Public domain |
+| Peer Gynt Suite No. 1, Op. 23: IV. "In the Hall of the Mountain King" (`Peer Gynt, Op. 23...mp3`) | Edvard Grieg (1843-1907) | 1876 | Public domain |
 
 **Original Compositions (purpose-built for this game):**
 
 | File | Usage context |
 |---|---|
-| `story_bgm_0_10.mp3`, `story_bgm_11_20.mp3`, `story_bgm_20_30.mp3`, `story_bgm_30_41.mp3` | Phase-adaptive story BGM, escalating with `entropy_level` across missions 0–41 |
+| `story_bgm_0_10.mp3`, `story_bgm_11_20.mp3`, `story_bgm_20_30.mp3`, `story_bgm_30_41.mp3` | Phase-adaptive story BGM, escalating with `entropy_level` across missions 0-41 |
 | `gloria_intervention_bgm.mp3` | Gloria's guilt-induction event scenes |
 | `prayer_music.mp3` | Prayer System UI |
 | `trolley_problem_bgm.mp3` | Moral dilemma screens |
@@ -1249,7 +1249,7 @@ The HTML is fully self-contained with embedded CSS, using a custom parchment the
 
 ## 5. Testing Strategy and Evidence Plan
 
-An extensive testing infrastructure has been implemented, comprising 20+ automated test files located in `/5.Codebase/Unit Test/`, providing comprehensive coverage across all major system components. The testing strategy employs Godot's built-in testing framework (GUT --- Godot Unit Test) with assertion-based validation.
+The project uses an extensive testing infrastructure. The repository contains 59 GDScript files under `1.Codebase/Unit Test`, of which 55 are dedicated `test_*.gd` suites and 4 are runner/helper scripts. Additional targeted tests live under `1.Codebase/src/scripts/tests/` and `1.Codebase/src/scripts/ui/`. The project does not rely on GUT; instead it uses custom headless runners such as `all_tests_runner.gd`, `ui_tests_runner.gd`, and `prompt_tests_runner.gd`. The main runner scans multiple roots, executes an inline sanity suite before discovered files, records per-suite pass/fail counts, and applies a 60-second timeout watchdog to prevent stalled runs.
 
 ### 5.1 Unit and Component Testing
 
@@ -1257,42 +1257,52 @@ Individual components have been tested in isolation to verify correct functional
 
 **Core Systems Tests:**
 
-- `test_game_state.gd` (state management, game phase transitions)
-- `test_player_stats.gd` (stat calculation formulas, including void entropy formula verification, skill checks with 1d10 mechanics, boundary conditions for 0--100 ranges)
-- `test_gamestate_integration.gd` (save/load persistence, JSON serialisation integrity)
-- `test_event_bus.gd` (event system, signal propagation across decoupled components)
+- `test_game_state.gd` (state management, phase transitions, stat updates)
+- `test_save_load_system.gd` (manual slots, autosave, backup recovery, migration-safe loading)
+- `test_player_stats.gd` (stat calculation formulas, skill checks, boundary conditions for 0-100 ranges)
+- `test_event_bus.gd` (publish/subscribe flow, request handling, history/stat bookkeeping)
+- `test_localization_manager.gd` (CSV/resource loading and runtime language switching)
 
-**AI System Tests:**
+**AI, Voice, and UI System Tests:**
 
-- `test_ai_prompt_builder.gd` (context construction, note filtering by importance and tags, prompt layering verification)
-- `test_ai_system.gd` (provider switching between Gemini/Ollama/Mock, fallback behaviour, timeout handling)
+- `test_ai_prompt_builder.gd` (prompt construction, context layering, note filtering, budget-aware assembly)
+- `test_ai_context_compression.gd` (delta compression and long-context trimming behaviour)
+- `test_ai_system.gd` and `test_ai_providers.gd` (provider switching, configuration access, Gemini provider structure, mocked live setup)
+- `test_live_api_client.gd` (Gemini Live client session setup and message formatting)
+- `test_story_scene_modules.gd` (decomposed story scene controllers and EventBus integration)
+- `test_voice_interaction_controller.gd` (microphone pipeline, capture lifecycle, cancellation, metadata generation)
+- `test_narrative_prompt_skill_loading.gd`, `test_narrative_response_parser.gd`, and `test_markdown_parser.gd` (prompt-resource loading and text-rendering paths)
+- `test_polish_regressions.gd` (late-stage persistence, UI, and logging regressions after refactors)
+- `test_prayer_sanitization.gd` and related prayer regression tests (input scrubbing, context fixes, dissonance bugs)
 
-Testing methodology employs assertion-based validation for expected vs. actual outcomes (`assert_eq`, `assert_true`, `assert_almost_eq` for floating-point comparisons), edge case coverage for boundary conditions (reality score at 0/100, entropy at 0.0/1.0), empty inputs, and error states, and mock data injection for deterministic testing without network dependencies.
+Testing methodology uses lightweight per-script assertion helpers (for example `_assert` plus per-suite pass/fail counters), frame and timer awaits for asynchronous Godot flows, edge-case coverage for boundary conditions, empty inputs, and error states, and mock data injection for deterministic runs without network dependencies.
 
 ### 5.2 System and Integration Testing
 
-Integration testing has been implemented to verify that components work together correctly, ensuring smooth data flow between UI, logic, AI generation, and state management. Critical integration points tested include:
+Integration testing verifies that components work together correctly, ensuring smooth data flow between UI, logic, AI generation, and state management. Critical integration points tested include:
 
-**UI and Logic Flow:** Complete player interaction loops tested using `test_story_scene_modules.gd` for choice selection, stat updates via GameState delegation to PlayerStats, and UI refresh after state changes. Special event flows (Prayer System, Gloria Intervention, Moral Dilemmas) were tested with both MockAIGenerator for deterministic outcomes and live API calls for robustness.
+**UI and Logic Flow:** Complete player interaction loops are tested using `test_story_scene_modules.gd` for choice selection, stat updates via GameState delegation to PlayerStats, and UI refresh after state changes. Additional UI-facing regressions are covered by `test_story_ui_controller.gd`, `test_ui_overlap_checker.gd`, and `test_markdown_parser.gd`.
 
-**AI Context and Memory Integration:** `test_ai_prompt_builder.gd` verifies that AIManager receives accurate game state context (reality score, positive energy, entropy) and includes filtered notes (importance ≥ 3) and butterfly effect data. Thematic appropriateness is tested by validating that prompt construction modifies tone based on entropy thresholds (low/medium/high).
+**AI Context and Memory Integration:** `test_ai_prompt_builder.gd`, `test_ai_context_compression.gd`, and `test_narrative_prompt_skill_loading.gd` verify that AIManager receives accurate game state context (reality score, positive energy, entropy), includes filtered notes (importance >= 3), loads prompt assets correctly, and trims assembled context safely when token budgets are exceeded.
 
 **Save/Load Resilience:** `test_save_load_system.gd` and `test_gamestate_integration.gd` verify complete state persistence, including mid-mission saves (preserving current mission id and scene context), butterfly effect choice history with metadata arrays, achievement unlock timestamps, and corrupt file handling with fallback to default state.
 
-**Performance Monitoring:** Tests log AI latency and token consumption during test runs. Observed metrics align with expectations: local Ollama responses 2--10 seconds depending on model size, cloud API (Gemini) responses 1--5 seconds, and token consumption 500--1500 tokens per narrative generation request.
+**Telemetry and Functional Evidence:** Latency, token usage, provider choice, mode, prompt text, and raw responses are captured by the AI usage logging pipeline during functional testing rather than by assertion-only unit suites. This separates deterministic automated verification from empirical observation of live model behaviour.
 
-Validation criteria verified by test suites include: no UI blocking during AI generation (async/await pattern tested), stats updating correctly after choices (signal emission verified), no memory leaks during extended test runs (50+ simulated missions), and complete data integrity through save/load cycles (deterministic state comparison).
+Validation criteria verified by the automated suites include: no UI blocking during asynchronous generation flows, stats updating correctly after choices, stable parsing of malformed directive payloads, correct provider configuration switching, and complete data integrity through save/load cycles.
 
 ## 6. Expected Deliverables
 
 The following artefacts constitute the complete project deliverables:
 
-1. **Playable Game Build** — A self-contained Godot 4.6.1 project that runs on PC, supporting multiple AI provider backends (Gemini, Ollama, OpenRouter, OpenAI, Claude, LM Studio) and a fully functional mock mode for provider-independent operation.
-2. **Source Code Repository** — All GDScript source files organised under `1.Codebase/src/`, including automated unit and integration test suites under `1.Codebase/Unit Test/`, with GUT-compatible test scripts.
-3. **AI Usage Telemetry Artefacts** — A CSV export (`ai_usage_YYYY-MM-DD_HH-MM-SS.csv`) and JSON export (`ai_call_log_YYYY-MM-DD_HH-MM-SS.json`) collected during functional testing, demonstrating real provider performance data across the evaluation period.
-4. **Story Narrative HTML** — Sample exported story file (`GDA_Story_YYYY-MM-DD.html`) demonstrating the self-contained parchment-themed narrative archive feature.
-5. **Game Design Document** (this document) — Full specification of gameplay mechanics, narrative systems, technical architecture, and testing strategy.
-6. **Final Report** — Academic report documenting the project background, methodology, implementation, evaluation, and reflection.
+Current implementation note: the playable build now targets Godot 4.7-dev3, starts from `splash_sequence.tscn`, and supports Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and mock mode. The repository also contains both `1.Codebase/Unit Test/` suites and additional smoke tests under `1.Codebase/src/scripts/tests/`.
+
+1. **Playable Game Build** - A self-contained Godot 4.7-dev3 project for desktop, booting through `splash_sequence.tscn` into the menu and story scenes, supporting Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and a fully functional mock mode for provider-independent operation.
+2. **Source Code Repository** - All GDScript source files organised under `1.Codebase/src/`, including automated unit and integration test suites under `1.Codebase/Unit Test/` plus additional smoke tests under `1.Codebase/src/scripts/tests/`.
+3. **AI Usage Telemetry Artefacts** - A CSV export (`ai_usage_YYYY-MM-DD_HH-MM-SS.csv`) and JSON export (`ai_call_log_YYYY-MM-DD_HH-MM-SS.json`) collected during functional testing, demonstrating real provider performance data across the evaluation period.
+4. **Story Narrative HTML** - Sample exported story file (`GDA_Story_YYYY-MM-DD.html`) demonstrating the self-contained parchment-themed narrative archive feature.
+5. **Game Design Document** (this document) - Full specification of gameplay mechanics, narrative systems, technical architecture, and testing strategy.
+6. **Final Report** - Academic report documenting the project background, methodology, implementation, evaluation, and reflection.
 
 ## 7. Architecture Design
 
@@ -1306,22 +1316,22 @@ The manager classes, housed in `core/ai/managers/`, are:
 |---|---|---|
 | `AIConfigManager` | `ai_config_manager.gd` | Persists and exposes all provider configuration (API keys, model selections, safety settings, token limits) via `user://ai_settings.cfg` |
 | `AIContextManager` | `ai_context_manager.gd` | Owns the `AIMemoryStore` and `AIPromptBuilder`; assembles the full prompt for each generation request; applies safety filtering and blocked-sequence removal |
-| `AIProviderManager` | `ai_provider_manager.gd` | Instantiates and holds provider objects (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AIRouter); dispatches HTTP requests to the active provider |
+| `AIProviderManager` | `ai_provider_manager.gd` | Instantiates and holds the seven concrete provider objects (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AIRouter); dispatches requests to the active backend while mock mode is handled at the request layer |
 | `AIRequestManager` | `ai_request_manager.gd` | Manages the request lifecycle: rate limiting (`AIRequestRateLimiter`), request queuing (`AIRequestQueue`), retry logic, timeout enforcement, mock fallback, and per-call metadata capture delegated to `AIUsageStatsStore` |
 | `AIUsageStatsStore` | `ai_usage_stats_store.gd` | Provides thin file-IO helpers (`save`, `load`) for persisting the call log JSON to `user://ai_call_log.json` |
-| `AIVoiceManager` | `ai_voice_manager.gd` | Manages the Gemini Live API voice session lifecycle via `VoiceSessionManager` and `AIVoiceBridge`, including push-to-talk and continuous input modes |
+| `AIVoiceManager` | `ai_voice_manager.gd` | Manages the Gemini Live voice session lifecycle via `VoiceSessionManager` and `VoiceBridge`, including push-to-talk and continuous input modes |
 
-Provider implementations extend `AIProviderBase` (`ai_provider_base.gd`) and are selected at runtime by `AIProviderManager` based on the `AIProvider` enum value stored in `AIConfigManager`. The Strategy pattern ensures that the calling code (`AIRequestManager`) interacts with a uniform interface regardless of the active backend.
+Provider implementations extend `AIProviderBase` (`ai_provider_base.gd`) and are selected at runtime by `AIProviderManager` based on the `AIProvider` enum value stored in `AIConfigManager`. The Strategy pattern ensures that the calling code (`AIRequestManager`) interacts with a uniform interface regardless of the active backend. Mock mode is represented explicitly in the enum, but its responses are generated by `MockAIGenerator` inside `AIRequestManager` rather than by a separate provider object.
 
-### 7.2 Three-Layer Context Management
+### 7.2 Budget-Aware Context Management
 
-The `AIContextManager` maintains narrative coherence across extended sessions using a three-tier memory model implemented in `AIMemoryStore`:
+The original three-layer context concept remains useful as a conceptual model for how information is grouped, but it no longer fully describes the runtime implementation by itself. In the current codebase, `AIMemoryStore` maintains three persisted context stores:
 
-- **Long-term memory**: Permanent story facts, character introductions, and world-state entries that persist for the entire session.
-- **Short-term memory**: The most recent twelve conversation exchanges, preserved verbatim to maintain immediate narrative continuity.
-- **Summarised memory**: When total entries exceed twenty-four, older entries are summarised into a compressed block (computed as `max(SHORT_TERM_WINDOW, memory_full_entries * 2)`) to remain within the model's context window.
+- **Rolling story memory**: a capped event log (`story_memory`) whose short-term prompt window is derived from `max(SHORT_TERM_WINDOW, memory_full_entries * 2)`.
+- **Long-term continuity summaries**: compressed historical notes (`long_term_summaries`) promoted out of the rolling log to preserve narrative continuity without replaying the full transcript.
+- **Persistent notes and restrictions**: prioritised facts/constraints (`notes_register`) that survive independently of the rolling conversation history.
 
-At prompt assembly time, `AIPromptBuilder` applies a budget-aware compression pass: unchanged sections are replaced with single-line markers, over-budget sections degrade to summary placeholders, and short-term entries are individually trimmed when the token ceiling is reached. The current default budget of 4096 tokens (capped at 8192) is configurable per provider via `AIConfigManager`.
+At prompt assembly time, `AIPromptBuilder` layers static context, system persona, acknowledgement state, entropy modifiers, long-term notes, persistent notes, short-term exchanges, and the current user prompt. In other words, the three context categories describe the content structure, while the budget-aware pipeline is the actual mechanism that decides how those categories enter the final prompt. `AIContextDelta` then applies budget-aware compression: unchanged sections become compact markers, oversized sections degrade to summaries, and the final user message is truncated only as a last resort. The default budget remains 4096 tokens (capped at 8192) via `AIConfigManager`, and inline voice data can also be attached when Gemini Live input is enabled.
 
 ### 7.3 GameState Modular Decomposition
 
@@ -1335,8 +1345,8 @@ The `GameState` singleton was refactored from a monolithic class into a coordina
 | `MetadataStoreModule` | `metadata_store_module.gd` | Session metadata dictionary, arbitrary key-value game flags |
 | `ApplicationLifecycleModule` | `application_lifecycle_module.gd` | Session start/end lifecycle, `is_session_active` flag |
 | `AnalyticsModule` | `analytics_module.gd` | Session-scoped analytics counters (choices made, AI calls, etc.) |
-| `FSMChallengeModule` | `fsm_challenge_module.gd` | 30-Day Rebirth Challenge state: `challenge_start_date`, `current_day`, `days_completed`, `last_login_date` |
-| `SaveLoadSystem` | `save_load_system.gd` | JSON serialisation/deserialisation and file I/O for save slots |
+| `FSMChallengeModule` | `fsm_challenge_module.gd` | Rebirth challenge state: `is_challenge_active`, `challenge_start_date`, `last_login_date`, `current_day`, `days_completed`, `challenge_completed`, `challenge_crashed` |
+| `SaveLoadSystem` | `save_load_system.gd` | Variant-based save/load, autosave and backup slots, corrupt-save recovery, and version-migration rewrites |
 | `EventLogSystem` | `event_log_system.gd` | Append-only event log list; enforces max-entry cap with oldest-first eviction |
 | `DebuffSystem` | `debuff_system.gd` | Active debuff dictionary and expiry logic |
 
@@ -1344,7 +1354,7 @@ This decomposition enables unit testing of each submodule in isolation, removes 
 
 ### 7.4 Story Scene Decomposition
 
-The main gameplay scene's controller was decomposed from a single `StoryScene` class into fourteen coordinated files, all residing in `scripts/ui/`. The primary entry point `story_scene.gd` delegates immediately to `StorySceneCoordinator`, which owns references to the following controllers:
+The main gameplay scene has been decomposed across multiple controller files in `scripts/ui/`, but the runtime entry script remains `story_scene.gd` rather than delegating fully to `StorySceneCoordinator`. In the current implementation, `story_scene.gd` directly instantiates and coordinates the extracted controllers below, while `StorySceneCoordinator` exists as a simplified alternative coordinator used mainly for modular experimentation and isolated tests:
 
 | Controller | File | Responsibility |
 |---|---|---|
@@ -1365,7 +1375,7 @@ The main gameplay scene's controller was decomposed from a single `StoryScene` c
 
 Two supporting subsystems provide programmatic access to the game's state outside of normal gameplay:
 
-**CLI subsystem** (`core/cli/`): A command-line interface exposed during development via `CLIRunner`. Commands are organised into three command-set files — `cli_ai_commands.gd` (AI provider control, mock mode toggle), `cli_game_commands.gd` (state inspection and mutation), and `cli_save_commands.gd` (save-slot management) — parsed by `CLICommandParser`.
+**CLI subsystem** (`core/cli/`): A command-line interface exposed during development via `CLIRunner`. Commands are organised into three command-set files - `cli_ai_commands.gd` (AI provider control, mock mode toggle), `cli_game_commands.gd` (state inspection and mutation), and `cli_save_commands.gd` (save-slot management) - parsed by `CLICommandParser`.
 
 **Agent subsystem** (`core/agent/`): An HTTP-based agent server (`GameAgentServer`) that exposes the game's state and action surface to external Claude agents via `AgentProtocol`. `GameStateExporter` serialises the complete game state to a JSON snapshot suitable for agent consumption, and `AgentActionExecutor` translates incoming action requests into `GameState` and `AIManager` method calls.
 
@@ -1527,7 +1537,7 @@ The HTML header embeds all CSS inline, using CSS custom properties (`--parchment
 
 **Issues discussed at this meeting:**
 
-- Document review process: Reviewed how to view tracked changes in Word (Review → Show Comments and Track Changes). Discussed accepting/rejecting insertions and managing document revisions.
+- Document review process: Reviewed how to view tracked changes in Word (Review ??Show Comments and Track Changes). Discussed accepting/rejecting insertions and managing document revisions.
 - Extensive discussion on ethics compliance for the project.
 - Emphasis on functional testing as the methodology rather than user testing with external participants.
 - Need to complete software testing with the user's compliance form.
