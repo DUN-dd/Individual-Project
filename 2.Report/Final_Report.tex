@@ -1,4 +1,4 @@
-%% Final Year Project Report Template
+﻿%% Final Year Project Report Template
 %% University of Sussex - School of Engineering and Informatics
 %% Based on standard UK academic report format
 
@@ -31,6 +31,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{pdfpages}
+\usepackage{multicol}
 
 %% ============ CONFIGURATION ============
 \onehalfspacing
@@ -47,7 +48,8 @@
 %TC:envir table 0 0       % exclude table environments
 %TC:envir tabular 0 0     % exclude tabular content
 %TC:envir lstlisting 0 0  % exclude code listings
-\immediate\write18{texcount -inc -sum -1 -q Final_Report.tex > wordcount.txt}
+% texcount requires Perl; run build.py instead to generate wordcount.txt
+%\immediate\write18{texcount -inc -sum -1 -q Final_Report.tex > wordcount.txt}
 \newread\wordcountfile
 \openin\wordcountfile=wordcount.txt
 \ifeof\wordcountfile
@@ -134,12 +136,12 @@
     {\Huge \textbf{\reporttitle}}\\[2cm]
 
     \begin{tabular}{rl}
-        \textbf{Author:} & \authorname \\[0.3cm]
-        \textbf{Candidate Number:} & \candidatenumber \\[0.3cm]
-        \textbf{Degree Course:} & \degreecourse \\[0.3cm]
-        \textbf{Supervisor:} & \supervisor \\[0.3cm]
-        \textbf{Year of Submission:} & \submissionyear \\[0.3cm]
-        \textbf{Word Count:} & \wordcount \\[0.3cm]
+        \textbf{Author:} & \authorname \\[0.05cm]
+        \textbf{Candidate Number:} & \candidatenumber \\[0.05cm]
+        \textbf{Degree Course:} & \degreecourse \\[0.05cm]
+        \textbf{Supervisor:} & \supervisor \\[0.05cm]
+        \textbf{Year of Submission:} & \submissionyear \\[0.05cm]
+        \textbf{Word Count:} & \wordcount \\[0.05cm]
         \multicolumn{2}{p{12cm}}{\small\textit{Word count excludes: bibliography, footnotes/endnotes, appendices, abstract/summary, figure legends, tables, and acknowledgements, per University of Sussex assessment policy.}} \\
     \end{tabular}
 
@@ -1041,11 +1043,15 @@ My ``Glorious Deliverance Agency 1'' prototype demonstrates that AI-generated na
 \newpage
 \appendix
 \renewcommand{\thesection}{\Alph{section}}
-%% Reduce appendix text size and spacing to stay within ~20 pages total
-\small
+%% Aggressive appendix compression to stay within ~20 pages total
+\footnotesize
 \singlespacing
-\setlength{\parskip}{2pt}
-\setlist{itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlength{\parskip}{0pt}
+\setlength{\parindent}{0pt}
+\setlist{itemsep=0pt, topsep=1pt, parsep=0pt, partopsep=0pt}
+\titlespacing*{\section}{0pt}{5pt}{2pt}
+\titlespacing*{\subsection}{0pt}{3pt}{1pt}
+\titlespacing*{\subsubsection}{0pt}{2pt}{0pt}
 
 %% ============ APPENDIX A: ETHICS COMPLIANCE FORM ============
 \section{Ethics Compliance Form}
@@ -1054,17 +1060,18 @@ My ``Glorious Deliverance Agency 1'' prototype demonstrates that AI-generated na
 \includepdf[pages=-,pagecommand={}]{Appendix A Ethics Compliance.pdf}
 
 %% ============ APPENDIX B: PROJECT PROPOSAL ============
-\newpage
+\clearpage
 \section{Project Proposal}
 \addcontentsline{toc}{section}{Appendix B: Project Proposal}
 
 \begin{center}
-{\large\textbf{G5038: Final Year Project --- Week 3 Project Proposal}}\\[0.3cm]
-{\large\textbf{Title: AI-Powered Dynamic Narrative System for Role-Playing Games (RPGs)}}\\[0.3cm]
-\textbf{Candidate Number:} 281967 \quad \textbf{Supervisor:} Dan Creed \quad \textbf{Date:} 09 October 2025\\[0.3cm]
+{\large\textbf{G5038: Final Year Project --- Week 3 Project Proposal}}\\[0.05cm]
+{\large\textbf{Title: AI-Powered Dynamic Narrative System for Role-Playing Games (RPGs)}}\\[0.05cm]
+\textbf{Candidate Number:} 281967 \quad \textbf{Supervisor:} Dan Creed \quad \textbf{Date:} 09 October 2025\\[0.05cm]
 University of Sussex, Engineering \& Informatics
 \end{center}
 
+\begin{multicols}{2}
 \subsection*{1. Aims and Objectives}
 
 \subsubsection*{1.1 Aims}
@@ -1133,20 +1140,23 @@ The project is structured into four main phases, spanning the Autumn and Spring 
   \item Recorded gameplay video showcasing key AI-driven narrative moments for presentation and demonstration.
 \end{itemize}
 
+\end{multicols}
+
 %% ============ APPENDIX C: GAME DESIGN DOCUMENT ============
-\newpage
+\clearpage
 \section{Game Design Document}
 \addcontentsline{toc}{section}{Appendix C: Game Design Document}
 
 \begin{center}
-{\large\textbf{G5038: Final Year Project --- Game Design Document}}\\[0.3cm]
-{\large\textbf{Game Title: Glorious Deliverance Agency 1}}\\[0.3cm]
-University of Sussex, Engineering \& Informatics\\[0.3cm]
+{\large\textbf{G5038: Final Year Project --- Game Design Document}}\\[0.05cm]
+{\large\textbf{Game Title: Glorious Deliverance Agency 1}}\\[0.05cm]
+University of Sussex, Engineering \& Informatics\\[0.05cm]
 \textbf{Date:} 26 October 2025
 \end{center}
 
 \textit{Creative Statement: All characters, events, and religious metaphors in this game are purely fictional and intended for satirical purposes. There is no intention to allude to any real-life individuals, groups, or beliefs.}
 
+\begin{multicols}{2}
 \subsection*{1. Game Overview}
 
 \subsubsection*{1.1 Pitch}
@@ -1193,6 +1203,8 @@ The Reality versus Positive Energy mechanic forms the game's philosophical core,
 
 Beyond its mechanical innovations, the game aspires to thematic depth by functioning as a playable allegory. Every system and narrative beat works together to offer a satirical critique of real-world social phenomena around toxic positivity, workplace dysfunction, and the dangers of refusing to acknowledge difficult truths.
 
+\end{multicols}
+
 \subsection*{2. Characters}
 
 \begin{figure}[H]
@@ -1212,8 +1224,6 @@ Beyond its mechanical innovations, the game aspires to thematic depth by functio
   \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_donkey.png}
   \caption*{\textbf{Sir Donkey}}
 \end{subfigure}
-
-\vspace{0.4cm}
 
 \begin{subfigure}[b]{0.3\linewidth}
   \centering
@@ -1239,11 +1249,12 @@ The protagonist embodies pragmatic realism, reflecting anyone worn down by repea
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=5cm]{../1.Codebase/src/assets/characters/turnaround_protagonist.png}
+  \includegraphics[height=3cm]{../1.Codebase/src/assets/characters/turnaround_protagonist.png}
   \caption{The Protagonist --- full-body character design (pixel art)}
   \label{fig:turnaround-protagonist}
 \end{figure}
 
+\begin{multicols}{2}
 \subsubsection*{2.2 Non-Player Characters: The Team}
 The player's teammates function not as traditional allies but as the primary antagonists and obstacles. Each embodies a distinct, flawed ideology that systematically undermines every mission.
 
@@ -1257,27 +1268,30 @@ The player's teammates function not as traditional allies but as the primary ant
 
 \textbf{Teacher Chan} is the Soul-Soothing Singer, the Harbinger of Doom who serves as high priestess of the God of Blinding Light. As a national-level idol singer, her image radiates pure, white-robed compassion. Her gentle songs filled with lyrics about letting go, forgiveness, and growth are not balms but curses. She genuinely believes in her message, which makes her terrifying. Her concerts function as massive rituals that dramatically amplify the Void Entropy, accelerating the world's end. She is not a spiritual guide but a world destroyer wearing the guise of one.
 
+\end{multicols}
+
 \begin{figure}[H]
   \centering
   \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=4cm]{../1.Codebase/src/assets/characters/turnaround_gloria.png}
+    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_gloria.png}
     \caption*{\textbf{Saint Gloria}}\end{subfigure}\hfill
   \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=4cm]{../1.Codebase/src/assets/characters/turnaround_donkey.png}
+    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_donkey.png}
     \caption*{\textbf{Sir Donkey}}\end{subfigure}\hfill
   \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=4cm]{../1.Codebase/src/assets/characters/turnaround_ark.png}
+    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_ark.png}
     \caption*{\textbf{ARK}}\end{subfigure}\hfill
   \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=4cm]{../1.Codebase/src/assets/characters/turnaround_one.png}
+    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_one.png}
     \caption*{\textbf{One}}\end{subfigure}\hfill
   \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=4cm]{../1.Codebase/src/assets/characters/turnaround_teacher_chan.png}
+    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_teacher_chan.png}
     \caption*{\textbf{Teacher Chan}}\end{subfigure}
   \caption{NPC full-body character designs --- \textit{Glorious Deliverance Agency 1} (pixel art)}
   \label{fig:gdd-npc-turnarounds}
 \end{figure}
 
+\begin{multicols}{2}
 \subsection*{3. Narrative and Story}
 
 \subsubsection*{3.1 Backstory and Premise}
@@ -1305,7 +1319,7 @@ This system functions as a direct interface for players to prompt them to engine
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.6\linewidth]{../1.Codebase/src/assets/ui/praytoMonster.png}
+  \includegraphics[width=0.40\linewidth]{../1.Codebase/src/assets/ui/praytoMonster.png}
   \caption{The Prayer System --- players submit hopeful prayers to the Flying Spaghetti Monster, which the AI inverts into disasters}
   \label{fig:gdd-prayer-system}
 \end{figure}
@@ -1315,7 +1329,7 @@ Mandatory cutscene events trigger after mission successes. Pre-rendered video of
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\linewidth]{../1.Codebase/src/assets/ui/miss_chan_on_stage.png}
+  \includegraphics[width=0.50\linewidth]{../1.Codebase/src/assets/ui/miss_chan_on_stage.png}
   \caption{Teacher Chan's Apocalypse Concert --- mandatory holographic cutscene after each mission success}
   \label{fig:gdd-teacher-chan-concert}
 \end{figure}
@@ -1344,6 +1358,8 @@ The asset libraries include:
 \end{itemize}
 
 The system will support asset querying by tags and themes, allowing the AI to request dangerous outdoor locations or mystical indoor spaces without specifying exact file names.
+
+\end{multicols}
 
 \begin{figure}[H]
   \centering
@@ -1393,6 +1409,7 @@ The system will support asset querying by tags and themes, allowing the AI to re
   \label{fig:gdd-icons}
 \end{figure}
 
+\begin{multicols}{2}
 \subsubsection*{4.8 Core Mechanics and Formulas}
 The game implements relationships between player actions and core metrics through the PlayerStats class, which is delegated from GameState.
 
@@ -1428,13 +1445,16 @@ The system records different types of choices (minor, major, critical) with comp
 
 Consequence seeds are stored as arrays of potential outcomes, each with a scheduled scene number (3--20 scenes ahead), description, triggered status flag, and severity rating. The system implements weighted selection algorithms to determine when consequences trigger, with higher-severity consequences having priority. The \texttt{get\_context\_for\_ai()} function formats relevant past choices and pending consequences for inclusion in AI prompts, enabling the AI to reference earlier decisions and create narrative callbacks.
 
+\end{multicols}
+
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.75\linewidth]{../1.Codebase/src/assets/ui/butterfly_effect.png}
+  \includegraphics[width=0.50\linewidth]{../1.Codebase/src/assets/ui/butterfly_effect.png}
   \caption{Butterfly Effect visualisation --- cascading narrative consequences from player choices}
   \label{fig:gdd-butterfly-effect}
 \end{figure}
 
+\begin{multicols}{2}
 \subsubsection*{4.10 The Trolley Problem Dilemma System}
 The TrolleyProblemGenerator component has been implemented to generate dynamic moral dilemmas where every choice leads to harm, forcing players to confront the game's central thesis that in broken systems saturated with toxic positivity, you cannot escape complicity. The dilemmas expose the hypocrisy of positive energy framing and institutional dysfunction.
 
@@ -1636,11 +1656,14 @@ Integration testing has been implemented to verify that components work together
 
 Validation criteria verified by test suites include: no UI blocking during AI generation (async/await pattern tested), stats updating correctly after choices (signal emission verified), no memory leaks during extended test runs (50+ simulated missions), and complete data integrity through save/load cycles (deterministic state comparison).
 
+\end{multicols}
+
 %% ============ APPENDIX D: RECORD OF MEETINGS ============
-\newpage
+\clearpage
 \section{Record of Meetings}
 \addcontentsline{toc}{section}{Appendix D: Record of Meetings}
 
+\begin{multicols}{2}
 \subsection*{Meeting 1}
 \begin{tabular}{ll}
 \textbf{Meeting format:} & Physical \\
@@ -1793,6 +1816,8 @@ Draft interim report delivered for review, continuing to integrate the project p
   \item Evaluation and success criteria: Discussed how to measure project success through functional testing.
   \item Future meetings: After the interim submission, move to bi-weekly meetings with one planned before Christmas break.
 \end{itemize}
+
+\end{multicols}
 
 %TC:endignore
 \end{document}
