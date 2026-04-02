@@ -1236,13 +1236,31 @@ In this section I describe my approach to ensuring system correctness, encompass
 
 Testing AI-integrated systems presents unique challenges that traditional testing methodologies do not fully address. Unit tests can verify that a function correctly parses a JSON response, but they cannot verify that the AI will consistently produce parseable responses. My testing strategy therefore operates on two distinct levels: deterministic component testing using automated GDScript suites, and non-deterministic behaviour testing using functional observation.
 
-The automated layer is substantially larger and more structured than the early project proposal implied. Rather than using GUT, the project now relies on custom headless runners and dedicated suites for core systems, AI integration, prompt handling, persistence, and UI behaviour. This infrastructure is what made repeated refactoring practical late in development; full suite organisation is documented in Appendix C: GDD, Section 5.
+The automated layer is substantially larger and more structured than the early project proposal implied. Rather than using GUT, the project now relies on custom headless runners and dedicated suites for core systems, AI integration, prompt handling, persistence, and UI behaviour. The repository currently contains 63 \texttt{test\_*.gd} files, executed in CI on every push and pull request to \texttt{main}. This infrastructure is what made repeated refactoring practical late in development; full suite organisation is documented in Appendix C: GDD, Section 5.
 
 \subsection{Unit Testing Approach}
 
 I implemented these tests as standalone GDScript suites instantiated by custom runners, with small scene wrappers used only where headless scene execution is convenient. The async/await structure is deliberate because many cases require frame or timer waits to test signals, save/load cycles, audio state changes, and UI refresh behaviour without race conditions.
 
+The central runner is \texttt{all\_tests\_runner.gd}, which recursively discovers every \texttt{test\_*.gd} file under three roots: \texttt{Unit Test/}, \texttt{src/scripts/tests/}, and \texttt{src/scripts/ui/}. Five files are excluded from auto-discovery because they are runner scripts themselves or require separate standalone execution. Discovery produces approximately 58 suites; these are executed sequentially, each with a 60-second watchdog that records a timeout failure if a suite hangs. Before running the discovered suites, the runner executes a built-in inline suite of ``Quick Sanity Checks'' that verifies the four most critical autoloads: \texttt{ServiceLocator}, \texttt{ErrorReporter}, \texttt{GameState}, and \texttt{AIManager}. Two additional scripts (\texttt{test\_achievement\_system\_api.gd} and \texttt{test\_providers\_mock.gd}) are executed as standalone headless processes after the main runner finishes, giving a total of approximately 61 suites in a complete CI run.
+
 Coverage now extends well beyond the original core-state tests, including provider configuration, live voice setup, prompt assembly, context trimming, story-scene refactors, parsing logic, markdown rendering, and late-stage regression checks. Appendix C: GDD, Section 5 provides the detailed suite inventory.
+
+\subsection{Continuous Integration and Automated Test Execution}
+
+All automated tests are wired into a \texttt{run-tests.yml} GitHub Actions workflow that triggers on every push or pull request targeting \texttt{main}, as well as on manual dispatch. The workflow runs on a Ubuntu runner using Godot 4.6.1-stable in headless mode and proceeds through five distinct phases.
+
+\textbf{Asset import and sync.} The workflow runs the Godot editor headlessly twice in \texttt{--quit} mode to fully materialise \texttt{.import} and \texttt{.translation} sidecar files from source assets. If any generated sidecars are missing from the repository after import, the workflow automatically commits them back to the branch, preventing CI failures caused by out-of-date import metadata.
+
+\textbf{Coverage audit.} A Python script scans the repository for all \texttt{test\_*.gd} files and verifies that every one of them falls within a discovery root or is listed as a known standalone script. If any test file is unaccounted for, the audit step fails immediately with a list of the uncovered scripts, making it impossible to silently add a test that CI never runs.
+
+\textbf{Main test execution.} The workflow launches \texttt{all\_tests\_runner.tscn} headlessly with a 300-second global timeout. Suite output is captured to a log file. A non-zero exit code, or a timeout without a passing final summary line, marks the step as failed. A deliberate exception handles the edge case where Godot prints a clean pass summary but the process is then killed by the 300-second limit before it can exit cleanly; this is treated as a non-fatal timeout.
+
+\textbf{Standalone scripts.} Two scripts that require their own process context are executed independently with 120-second timeouts each. Their pass/fail status is tracked and merged into the overall result.
+
+\textbf{Reporting.} The workflow parses the combined log to extract suite totals, pass counts, fail counts, and pass rate, then writes a Markdown summary to the GitHub Actions job summary page. On pull requests the summary is also posted as a PR comment, and the full log is uploaded as a downloadable artefact regardless of outcome. The workflow then performs a final status check, failing the CI run if any suite recorded a failure or if the test count was zero.
+
+A separate \texttt{codeql.yml} workflow runs GitHub's CodeQL analysis against the repository's GitHub Actions YAML files on the same push/PR triggers, providing a lightweight security scan of the CI infrastructure itself.
 
 \subsection{Integration Testing Between Components}
 
