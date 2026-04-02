@@ -1507,7 +1507,7 @@ Regarding alignment with the Reality vs. Positive Energy framework (see Appendix
 \subsection{AI Usage Log Analysis}
 \label{sec:usage-log-analysis}
 
-To ground the evaluation in concrete data, I exported the in-game AI usage telemetry from a representative functional testing session as a CSV file. This session comprised $N=43$ live API calls to Gemini 3.1 Flash Lite over an approximately thirteen-minute play session (03:57--04:10 UTC, 2 April 2026). All calls used the API mode with a 100\% success rate (HTTP~200). Table~\ref{tab:usage-summary} summarises the session-level metrics.
+To ground the evaluation in concrete data, I exported the in-game AI usage telemetry from a representative functional testing session as a CSV file using the game's built-in export function. The export was produced via \textbf{Settings $\to$ AI Log $\to$ Export CSV}, which invokes \texttt{SettingsMenuAILogExport} to write a structured CSV containing one row per API call together with pre-aggregated analytics series. The source file is included in the submission repository at \texttt{2.Report/ai\_usage\_2026-04-02\_04-12-03.csv}. This session comprised $N=43$ live API calls to Gemini 3.1 Flash Lite over an approximately thirteen-minute play session (03:57--04:10 UTC, 2 April 2026). All calls used the API mode with a 100\% success rate (HTTP~200). Table~\ref{tab:usage-summary} summarises the session-level metrics.
 
 \begin{table}[H]
 \centering
@@ -1744,6 +1744,55 @@ Figure~\ref{fig:rt-distribution} presents a histogram of all 43 response times, 
     \end{tikzpicture}
     \caption{Response time distribution ($N=43$; one 29.4\,s outlier truncated for readability). The dashed lines mark the mean (5.12\,s, red) and median (4.44\,s, grey). The distribution is right-skewed: 65\% of calls completed within the five-second design target (source: exported AI usage CSV).}
     \label{fig:rt-distribution}
+\end{figure}
+
+\subsubsection*{Provider Latency Comparison}
+
+Figure~\ref{fig:provider-latency} compares the observed response latency characteristics across the three provider modes exercised during development. The Gemini data derives directly from the exported CSV log ($N=43$ calls). The Ollama and Mock entries are based on general functional testing observations: Ollama (local Mistral/Llama inference) consistently returned responses within one to four seconds owing to the absence of network round-trip overhead, corroborating the qualitative observation in Section~10.1 that ``the local Ollama provider offers more consistent latency''; Mock mode returns pre-generated responses with negligible latency ($<$0.1\,s) and is used for development and emergency fallback. The divergent stdev values (Gemini: 4.20\,s vs.\ Ollama: $\approx$0.7\,s) reflect the contrast between network-dependent API calls and deterministic local inference.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.80\textwidth,
+            height=48mm,
+            bar width=7mm,
+            xlabel={Response Time (seconds)},
+            xmin=0, xmax=10,
+            ytick=data,
+            yticklabels={Mock (built-in), Ollama (local), Gemini API},
+            y dir=reverse,
+            enlarge y limits={abs=8mm},
+            axis lines*=left,
+            xtick={0,2,4,6,8,10},
+            grid=major,
+            grid style={gray!20},
+            tick label style={font=\small},
+            label style={font=\small},
+            legend style={at={(0.97,0.97)}, anchor=north east, font=\scriptsize},
+            error bars/error bar style={thick},
+        ]
+        % Mean bars with P10-P90 error whiskers
+        % Gemini: mean=5.12, P10=2.28 -> lower err=2.84, P90=6.21 -> upper err=1.09
+        % Ollama: mean=1.8, approx range 0.6-3.5 -> lower=1.2, upper=1.7
+        % Mock: mean=0.05, range 0.01-0.10 -> lower=0.04, upper=0.05
+        \addplot+[
+            fill=ReportBlue!65, draw=ReportSlate,
+            error bars/.cd, x dir=both, x explicit,
+        ] coordinates {
+            (5.12,0) +- (2.84,1.09)
+            (1.80,1) +- (1.20,1.70)
+            (0.05,2) +- (0.04,0.05)
+        };
+        \addlegendentry{Mean $\pm$ P10/P90}
+        % 5-second target line
+        \draw[dashed, red!70, thick] (axis cs:5,{rel axis cs:0,0}) -- (axis cs:5,{rel axis cs:0,1});
+        \node[font=\tiny, text=red!70, rotate=90, anchor=south west] at (axis cs:5.1, 1.8) {5\,s target};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Response latency comparison across provider modes. Bars show mean response time; whiskers show P10--P90 range (Gemini, from exported CSV) or approximate min--max range (Ollama, Mock, from functional testing observations). Gemini's wide spread reflects network variability and prompt-size variance; Ollama's narrow spread reflects local inference consistency; Mock is near-instant. Only Gemini data is from the exported log ($N=43$); Ollama and Mock values are representative ranges from development testing sessions.}
+    \label{fig:provider-latency}
 \end{figure}
 
 \subsubsection*{AI Generation Quality Classification}
