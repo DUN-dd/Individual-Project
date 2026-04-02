@@ -2115,44 +2115,10 @@ When a player loads a saved session, \texttt{GameRecapOverlay} (\texttt{game\_re
 The project uses an extensive testing infrastructure. The repository contains 63 \texttt{test\_*.gd} files across three discovery roots: \texttt{1.Codebase/Unit Test/} (which also has an \texttt{integration/} sub-folder), \texttt{1.Codebase/src/scripts/tests/}, and \texttt{1.Codebase/src/scripts/ui/}. The project does not rely on GUT; instead it uses custom headless runners, principally \texttt{all\_tests\_runner.gd}, plus specialist runners such as \texttt{ui\_tests\_runner.gd} and \texttt{prompt\_tests\_runner.gd}. The main runner recursively discovers every \texttt{test\_*.gd} file under its three roots, skipping five files that are either runner scripts themselves or require standalone execution (\texttt{all\_tests\_runner.gd}, \texttt{ui\_tests\_runner.gd}, \texttt{quick\_verify.gd}, \texttt{test\_achievement\_system\_api.gd}, \texttt{test\_providers\_mock.gd}). Before the discovered suites, the runner executes a built-in \emph{Quick Sanity Checks} inline suite that verifies the four most critical autoloads: \texttt{ServiceLocator}, \texttt{ErrorReporter}, \texttt{GameState}, and \texttt{AIManager}. Each discovered suite runs with a 60-second watchdog timeout to prevent stalled runs. After the main runner completes, two standalone scripts (\texttt{test\_achievement\_system\_api.gd} and \texttt{test\_providers\_mock.gd}) are executed as independent headless processes, giving approximately 61 suites in a complete CI run. Per-suite pass/fail counts are recorded and aggregated into a final summary with pass rate.
 
 \subsubsection*{5.1 Unit and Component Testing}
-Individual components have been tested in isolation to verify correct functionality before integration. Implemented test suites include:
-
-\textbf{Core Systems Tests:}
-\begin{itemize}
-  \item \texttt{test\_game\_state.gd} (state management, phase transitions, stat updates)
-  \item \texttt{test\_save\_load\_system.gd} (manual slots, autosave, backup recovery, migration-safe loading)
-  \item \texttt{test\_player\_stats.gd} (stat calculation formulas, skill checks, boundary conditions for 0--100 ranges)
-  \item \texttt{test\_event\_bus.gd} (publish/subscribe flow, request handling, history/stat bookkeeping)
-  \item \texttt{test\_localization\_manager.gd} (CSV/resource loading and runtime language switching)
-\end{itemize}
-
-\textbf{AI, Voice, and UI System Tests:}
-\begin{itemize}
-  \item \texttt{test\_ai\_prompt\_builder.gd} (prompt construction, context layering, note filtering, budget-aware assembly)
-  \item \texttt{test\_ai\_context\_compression.gd} (delta compression and long-context trimming behaviour)
-  \item \texttt{test\_ai\_system.gd} and \texttt{test\_ai\_providers.gd} (provider switching, configuration access, Gemini provider structure, mocked live setup)
-  \item \texttt{test\_live\_api\_client.gd} (Gemini Live client session setup and message formatting)
-  \item \texttt{test\_story\_scene\_modules.gd} (decomposed story scene controllers and EventBus integration)
-  \item \texttt{test\_voice\_interaction\_controller.gd} (microphone pipeline, capture lifecycle, cancellation, metadata generation)
-  \item \texttt{test\_narrative\_prompt\_skill\_loading.gd}, \texttt{test\_narrative\_response\_parser.gd}, and \texttt{test\_markdown\_parser.gd} (prompt-resource loading and text-rendering paths)
-  \item \texttt{test\_polish\_regressions.gd} (late-stage persistence, UI, and logging regressions after refactors)
-  \item \texttt{test\_prayer\_sanitization.gd} and related prayer regression tests (input scrubbing, context fixes, dissonance bugs)
-\end{itemize}
-
-Testing methodology uses lightweight per-script assertion helpers (for example \texttt{\_assert} plus per-suite pass/fail counters), frame and timer awaits for asynchronous Godot flows, edge-case coverage for boundary conditions, empty inputs, and error states, and mock data injection for deterministic runs without network dependencies.
+Individual components are tested in isolation before integration. Core system suites cover game state, save/load, player stats, EventBus, and localisation. AI/voice/UI suites cover prompt construction, context compression, provider switching, live API sessions, story scene controllers, voice capture, narrative parsing, markdown rendering, and late-stage regressions. All suites use lightweight \texttt{\_assert} helpers, async frame/timer awaits, and mock data injection to run deterministically without network dependencies.
 
 \subsubsection*{5.2 System and Integration Testing}
-Integration testing has been implemented to verify that components work together correctly, ensuring smooth data flow between UI, logic, AI generation, and state management. Critical integration points tested include:
-
-\textbf{UI and Logic Flow:} Complete player interaction loops are tested using \texttt{test\_story\_scene\_modules.gd} for choice selection, stat updates via GameState delegation to PlayerStats, and UI refresh after state changes. Additional UI-facing regressions are covered by \texttt{test\_story\_ui\_controller.gd}, \texttt{test\_ui\_overlap\_checker.gd}, and \texttt{test\_markdown\_parser.gd}.
-
-\textbf{AI Context and Memory Integration:} \texttt{test\_ai\_prompt\_builder.gd}, \texttt{test\_ai\_context\_compression.gd}, and \texttt{test\_narrative\_prompt\_skill\_loading.gd} verify that AIManager receives accurate game state context (reality score, positive energy, entropy), includes filtered notes (importance $\geq 3$), loads prompt assets correctly, and trims assembled context safely when token budgets are exceeded.
-
-\textbf{Save/Load Resilience:} \texttt{test\_save\_load\_system.gd} and \texttt{test\_gamestate\_integration.gd} verify complete state persistence, including mid-mission saves (preserving current mission id and scene context), butterfly effect choice history with metadata arrays, achievement unlock timestamps, and corrupt file handling with fallback to default state.
-
-\textbf{Telemetry and Functional Evidence:} Latency, token usage, provider choice, mode, prompt text, and raw responses are captured by the AI usage logging pipeline during functional testing rather than by assertion-only unit suites. This separates deterministic automated verification from empirical observation of live model behaviour.
-
-Validation criteria verified by the automated suites include: no UI blocking during asynchronous generation flows, stats updating correctly after choices, stable parsing of malformed directive payloads, correct provider configuration switching, and complete data integrity through save/load cycles.
+Integration suites verify the architectural seams introduced by refactoring: EventBus-driven UI refresh after choice selection, AI context assembly with correct game-state injection and token-budget trimming, complete save/load round-trips including mid-mission state and butterfly-effect history, and corrupt-file recovery. Telemetry evidence (latency, token counts, provider, prompt/response text) is captured by the AI usage logging pipeline during live functional testing, separating deterministic automated verification from empirical observation of model behaviour. Validation criteria include: no UI blocking during async generation, correct stat updates after choices, stable parsing of malformed directive payloads, and full data integrity through save/load cycles.
 
 \end{multicols}
 
