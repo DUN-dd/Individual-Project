@@ -470,6 +470,7 @@ I have designed the system architecture to be modular and scalable, built around
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=8mm and 12mm]
         % --- Player ---
         \node[reportbox, fill=ReportRose!55] (player) {\textbf{Player}\\{\scriptsize Choice / Prayer}};
@@ -507,7 +508,7 @@ I have designed the system architecture to be modular and scalable, built around
         \draw[reportarrow] (parser) -- (mem);
         \draw[reportarrow] (parser.west) -| (ui.east);
         \draw[reportarrow] (gs) -- (ui);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{Data Flow Diagram. Player choices trigger \texttt{GameState} updates through \texttt{StoryFlowController}, which simultaneously invokes the \texttt{AIManager} facade. Generated content is parsed by \texttt{NarrativeResponseParser}, stored in \texttt{AIMemoryStore}, and rendered through the UI layer (source: \texttt{story\_flow\_controller.gd}, \texttt{ai\_manager.gd}, \texttt{narrative\_response\_parser.gd}).}
     \label{fig:data-flow}
 \end{figure}
@@ -591,6 +592,7 @@ I have designed the system architecture to be modular and scalable, built around
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=6mm and 8mm,
         mgr/.style={reportbox, fill=ReportTeal!45, text width=26mm, minimum height=10mm},
         prov/.style={reportsmall, fill=ReportGold!45, text width=18mm, minimum height=9mm, font=\scriptsize}]
@@ -634,13 +636,14 @@ I have designed the system architecture to be modular and scalable, built around
         \draw[reportarrow] (req) -- (mock);
         \draw[reportarrow] (ctx) -- (pb);
         \draw[reportarrow] (req) -| (rq);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{AI Subsystem Architecture. The \texttt{AIManager} facade coordinates five sub-managers: \texttt{ConfigManager} (provider enum), \texttt{ProviderManager} (Strategy pattern dispatching to 7 backends), \texttt{ContextManager}, \texttt{RequestManager} (with rate limiter and queue), and \texttt{VoiceManager}. Mock mode is handled at the request layer via \texttt{MockAIGenerator} (source: \texttt{ai\_manager.gd}, \texttt{ai\_provider\_manager.gd:75--96}).}
     \label{fig:ai-subsystem}
 \end{figure}
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=5mm and 6mm,
         layer/.style={reportwide, minimum height=11mm, text width=34mm}]
         % --- UI Layer ---
@@ -687,7 +690,7 @@ I have designed the system architecture to be modular and scalable, built around
         \draw[reportarrow] (uilayer.south) -- ++(0,-3mm) -| (corelayer.north);
         \draw[reportarrow] (corelayer.south) -- ++(0,-3mm) -| (suplayer.north);
         \draw[reportarrow] (aim.south) -- ++(0,-3mm) -- ++(0,-24mm) -| (extlayer.north);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{High-Level System Architecture. The UI Layer (\texttt{StoryScene}, Prayer System, Journal, Menus) interfaces with Core Systems (\texttt{GameState}, \texttt{AIManager}, \texttt{AssetRegistry}, \texttt{AudioManager}), which rely on Support Services (\texttt{EventBus}, Save/Load, Localisation, \texttt{FontManager}, \texttt{ErrorReporter}). The \texttt{AIManager} connects to seven external backends (source: \texttt{project.godot} autoloads, \texttt{service\_locator.gd}).}
     \label{fig:high-level-arch}
 \end{figure}
@@ -768,6 +771,7 @@ For simplifying AI integration, the AIManager presents a facade interface to the
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=6mm and 8mm,
         prov/.style={reportsmall, fill=ReportGold!45, text width=19mm, minimum height=10mm, font=\scriptsize}]
         % --- Config enum ---
@@ -793,7 +797,7 @@ For simplifying AI integration, the AIManager presents a facade interface to the
             \draw[reportarrow] (mgr) -- (\p);
         \foreach \p in {p1,p2,p3,p4,p5,p6,p7}
             \draw[reportarrow, dashed] (\p) -- (base);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{Strategy Pattern for Provider Switching. \texttt{AIConfigManager} holds the active \texttt{AIProvider} enum value; \texttt{AIProviderManager.get\_current\_provider()} uses a \texttt{match} statement to dispatch to the concrete provider. All seven providers extend \texttt{AIProviderBase} (source: \texttt{ai\_provider\_manager.gd:75--96}, \texttt{ai\_config\_manager.gd:12--21}).}
     \label{fig:strategy-pattern}
 \end{figure}
@@ -806,6 +810,7 @@ At the storage layer, older story history is compressed into representative cont
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=4mm and 6mm,
         sect/.style={draw=ReportSlate, thick, rounded corners=2pt, minimum height=8mm,
                      text width=16mm, align=center, inner sep=3pt, font=\scriptsize}]
@@ -833,7 +838,7 @@ At the storage layer, older story history is compressed into representative cont
         \draw[reportarrow] (budget.south) -- ++(0,-3mm) -| (s8.north);
         \foreach \s in {s1,s2,s3,s4,s5,s6,s7,s8}
             \draw[reportarrow, thin] (\s.south) -- ++(0,-3mm);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{Prompt Assembly Pipeline. \texttt{AIPromptBuilder.build\_prompt()} assembles eight sections incrementally under a 24\,000-token budget managed by \texttt{AIContextDelta}. Each section is fingerprinted; unchanged sections are replaced by compact markers, and oversized sections degrade to summaries (source: \texttt{ai\_prompt\_builder.gd:30--75}, \texttt{ai\_context\_delta.gd}).}
     \label{fig:prompt-assembly}
 \end{figure}
@@ -888,6 +893,7 @@ This design reflects my ethical framework discussed in Section 3: rather than re
 
 \begin{figure}[H]
     \centering
+    \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}[node distance=7mm and 12mm]
         % --- Input ---
         \node[reportbox, fill=ReportRose!50, text width=30mm]
@@ -917,7 +923,7 @@ This design reflects my ethical framework discussed in Section 3: rather than re
         \draw[reportarrow] (scrub2) -- (review);
         \draw[reportarrow] (review) -- (decision);
         \draw[reportarrow] (decision) -- (display);
-    \end{tikzpicture}
+    \end{tikzpicture}}%
     \caption{Safety Filter Pipeline. \texttt{AISafetyFilter} applies three processing stages: \texttt{scrub\_user\_text()} redacts sensitive data from player input before it reaches the LLM; \texttt{scrub\_model\_output()} removes any leaked PII from AI responses; \texttt{review\_response\_content()} checks for harmful keywords and hallucination patterns, blocking flagged content with a generic substitute (source: \texttt{ai\_safety\_filter.gd}).}
     \label{fig:safety-filter}
 \end{figure}
