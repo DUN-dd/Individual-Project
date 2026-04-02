@@ -166,7 +166,7 @@
 
     \vfill
 
-    \includegraphics[width=0.26\textwidth]{image/Interim-Report_281967.pdf-0-0.png}
+    \includegraphics[width=0.26\textwidth]{US_logo-1.png}
 
     \vfill
 \end{titlepage}
@@ -361,8 +361,39 @@ As identified in Section 2.5, effective context-management is critical for maint
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{image/Interim-Report_281967.pdf-8-0.png}
-    \caption{Three-Layer Context Management Architecture. The diagram illustrates how static context, short-term context, and long-term memory are combined into a final prompt for AI generation.}
+    \begin{tikzpicture}[node distance=6mm and 10mm]
+        % --- Layer boxes ---
+        \node[reportwide, fill=ReportBlue!60, text width=52mm]
+            (static) {\textbf{Static Context Layer}\\{\scriptsize\texttt{ai\_prompt\_builder.gd}}\\{\scriptsize World bible, persona, rules}};
+        \node[reportwide, fill=ReportTeal!60, text width=52mm, below=of static]
+            (short) {\textbf{Short-Term Memory}\\{\scriptsize\texttt{AIMemoryStore} rolling window}\\{\scriptsize Last 6 exchanges}};
+        \node[reportwide, fill=ReportGold!60, text width=52mm, below=of short]
+            (long) {\textbf{Long-Term Continuity}\\{\scriptsize Compressed summaries}\\{\scriptsize Notes register (importance $\geq 3$)}};
+        % --- Delta / Budget ---
+        \node[reportwide, fill=ReportLavender!60, text width=52mm, below=of long]
+            (delta) {\textbf{AIContextDelta}\\{\scriptsize\texttt{ai\_context\_delta.gd}}\\{\scriptsize Token budget: 24\,000 tokens}};
+        % --- Prompt builder ---
+        \node[reportwide, fill=ReportRose!60, text width=52mm, below=of delta]
+            (builder) {\textbf{AIPromptBuilder}\\{\scriptsize\texttt{ai\_prompt\_builder.gd:30--75}}\\{\scriptsize 8-section incremental assembly}};
+        % --- Final prompt ---
+        \node[reportbox, fill=white, text width=52mm, below=of builder]
+            (prompt) {\textbf{Final Prompt}\\{\scriptsize \texttt{Array[Dictionary]} sent to LLM}};
+        % --- Arrows ---
+        \draw[reportarrow] (static) -- (delta);
+        \draw[reportarrow] (short)  -- (delta);
+        \draw[reportarrow] (long)   -- (delta);
+        \draw[reportarrow] (delta)  -- node[right, font=\scriptsize, text width=28mm, align=left] {fingerprint, budget\\check, degrade if\\over budget} (builder);
+        \draw[reportarrow] (builder) -- (prompt);
+        % --- Side annotations ---
+        \node[reportnote, text width=48mm, right=14mm of delta, yshift=10mm]
+            (note) {\scriptsize\textbf{Budget Rules}\\[2pt]
+            \textbullet~Unchanged sections $\to$ single marker\\
+            \textbullet~Changed sections $\to$ full content\\
+            \textbullet~Over budget $\to$ summary placeholder\\
+            {\tiny Source: \texttt{\_append\_section\_incremental()}}};
+        \draw[reportflow, dashed] (delta.east) -- (note.west);
+    \end{tikzpicture}
+    \caption{Three-Layer Context Management Architecture. Static context, short-term memory, and long-term continuity feed into \texttt{AIContextDelta} for token-budget tracking before \texttt{AIPromptBuilder} assembles the final prompt (source: \texttt{ai\_prompt\_builder.gd}, \texttt{ai\_context\_delta.gd}).}
     \label{fig:context-management}
 \end{figure}
 
@@ -397,43 +428,270 @@ I have designed the system architecture to be modular and scalable, built around
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-10-0.png}
-    \caption{Core Managers Interaction. The Event Bus facilitates communication between the Game State subsystem (Player Stats, Event Log, Debuff System, Save/Load System) and the Tracking Systems (Butterfly Effect, Achievements, Trolley Problems, Teammate System).}
+    \begin{tikzpicture}[node distance=7mm and 8mm]
+        % --- EventBus centre ---
+        \node[reportwide, fill=ReportGold!70, minimum height=14mm, text width=38mm]
+            (bus) {\textbf{EventBus}\\{\scriptsize\texttt{event\_bus.gd}}\\{\scriptsize Publish / Subscribe}};
+        % --- Game State subsystem (left) ---
+        \node[reportbox, fill=ReportBlue!55, above left=12mm and 26mm of bus]
+            (gs) {\textbf{GameState}\\{\scriptsize\texttt{game\_state.gd}}};
+        \node[reportsmall, fill=ReportBlue!35, below=4mm of gs]
+            (ps) {\textbf{PlayerStats}\\{\scriptsize\texttt{player\_stats.gd}}};
+        \node[reportsmall, fill=ReportBlue!35, below=4mm of ps]
+            (db) {\textbf{DebuffSystem}\\{\scriptsize\texttt{debuff\_system.gd}}};
+        \node[reportsmall, fill=ReportBlue!35, below=4mm of db]
+            (sl) {\textbf{SaveLoadSystem}\\{\scriptsize\texttt{save\_load\_system.gd}}};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportBlue!12, fit=(gs)(ps)(db)(sl), label={[font=\scriptsize\bfseries]above:Game State Subsystem}] {};
+        \end{scope}
+        % --- Tracking Systems (right) ---
+        \node[reportbox, fill=ReportTeal!55, above right=12mm and 26mm of bus]
+            (bf) {\textbf{ButterflyEffect}\\{\scriptsize\texttt{butterfly\_effect\_tracker.gd}}};
+        \node[reportsmall, fill=ReportTeal!35, below=4mm of bf]
+            (ach) {\textbf{Achievements}\\{\scriptsize\texttt{achievement\_system.gd}}};
+        \node[reportsmall, fill=ReportTeal!35, below=4mm of ach]
+            (tp) {\textbf{TrolleyProblems}\\{\scriptsize\texttt{trolley\_problem\_generator.gd}}};
+        \node[reportsmall, fill=ReportTeal!35, below=4mm of tp]
+            (tm) {\textbf{TeammateSystem}\\{\scriptsize\texttt{teammate\_system.gd}}};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportTeal!12, fit=(bf)(ach)(tp)(tm), label={[font=\scriptsize\bfseries]above:Tracking Systems}] {};
+        \end{scope}
+        % --- Arrows to/from EventBus ---
+        \draw[reportarrow, <->] (gs.east |- bus) -- (bus.west);
+        \draw[reportarrow, <->] (bus.east) -- (bf.west |- bus);
+        % --- ServiceLocator ---
+        \node[reportbox, fill=ReportLavender!55, below=14mm of bus, text width=38mm]
+            (svc) {\textbf{ServiceLocator}\\{\scriptsize\texttt{service\_locator.gd}}\\{\scriptsize Decoupled access to all singletons}};
+        \draw[reportarrow, dashed] (svc) -- (bus);
+    \end{tikzpicture}
+    \caption{Core Managers Interaction. The \texttt{EventBus} facilitates pub/sub communication between the Game State subsystem (\texttt{PlayerStats}, \texttt{DebuffSystem}, \texttt{SaveLoadSystem}) and the Tracking Systems (\texttt{ButterflyEffectTracker}, \texttt{AchievementSystem}, \texttt{TrolleyProblemGenerator}, \texttt{TeammateSystem}). All global access is mediated through \texttt{ServiceLocator} (source: \texttt{event\_bus.gd}, \texttt{service\_locator.gd}).}
     \label{fig:core-managers}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-10-1.png}
-    \caption{Data Flow Diagram. Player choices trigger game state updates, which inform the AI Manager's content generation. Generated content is simultaneously stored in the memory system and displayed through the UI.}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=8mm and 12mm]
+        % --- Player ---
+        \node[reportbox, fill=ReportRose!55] (player) {\textbf{Player}\\{\scriptsize Choice / Prayer}};
+        % --- Story controllers ---
+        \node[reportwide, fill=ReportBlue!50, right=of player, text width=36mm]
+            (ctrl) {\textbf{StoryFlowController}\\{\scriptsize\texttt{story\_flow\_controller.gd}}};
+        % --- GameState ---
+        \node[reportbox, fill=ReportBlue!35, below=of ctrl]
+            (gs) {\textbf{GameState}\\{\scriptsize stat update via \texttt{PlayerStats}}};
+        % --- AI Manager ---
+        \node[reportwide, fill=ReportTeal!55, right=of ctrl, text width=36mm]
+            (ai) {\textbf{AIManager}\\{\scriptsize\texttt{ai\_manager.gd} facade}};
+        % --- PromptBuilder ---
+        \node[reportsmall, fill=ReportTeal!35, above=of ai]
+            (pb) {\textbf{PromptBuilder}\\{\scriptsize context assembly}};
+        % --- LLM ---
+        \node[reportbox, fill=ReportGold!60, right=of ai]
+            (llm) {\textbf{LLM API}\\{\scriptsize Provider layer}};
+        % --- Parser ---
+        \node[reportsmall, fill=ReportLavender!50, below=of ai]
+            (parser) {\textbf{NarrativeParser}\\{\scriptsize JSON + directives}};
+        % --- Memory ---
+        \node[reportsmall, fill=ReportTeal!35, below=of parser]
+            (mem) {\textbf{AIMemoryStore}\\{\scriptsize persist context}};
+        % --- UI ---
+        \node[reportbox, fill=ReportRose!40, below=of gs]
+            (ui) {\textbf{UI Layer}\\{\scriptsize StoryScene display}};
+        % --- Arrows ---
+        \draw[reportarrow] (player) -- (ctrl);
+        \draw[reportarrow] (ctrl) -- (gs);
+        \draw[reportarrow] (ctrl) -- (ai);
+        \draw[reportarrow] (ai) -- (pb);
+        \draw[reportarrow] (pb.east) -- ++(6mm,0) |- (llm.north);
+        \draw[reportarrow] (llm) -- ++(0,-10mm) -| (parser.east);
+        \draw[reportarrow] (parser) -- (mem);
+        \draw[reportarrow] (parser.west) -| (ui.east);
+        \draw[reportarrow] (gs) -- (ui);
+    \end{tikzpicture}}%
+    \caption{Data Flow Diagram. Player choices trigger \texttt{GameState} updates through \texttt{StoryFlowController}, which simultaneously invokes the \texttt{AIManager} facade. Generated content is parsed by \texttt{NarrativeResponseParser}, stored in \texttt{AIMemoryStore}, and rendered through the UI layer (source: \texttt{story\_flow\_controller.gd}, \texttt{ai\_manager.gd}, \texttt{narrative\_response\_parser.gd}).}
     \label{fig:data-flow}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-10-2.png}
-    \caption{Asset Management System. The AI Scene Director queries the Asset Registry to load appropriate backgrounds, character expressions, NPC portraits, and audio assets for display in the UI, with assets stored in a database and runtime cache.}
+    \begin{tikzpicture}[node distance=7mm and 10mm]
+        % --- AI directive ---
+        \node[reportwide, fill=ReportTeal!55, text width=40mm]
+            (dir) {\textbf{Scene Directives}\\{\scriptsize JSON from AI response}\\{\scriptsize background, expressions, objects}};
+        % --- Parser ---
+        \node[reportbox, fill=ReportLavender!50, below=of dir]
+            (parser) {\textbf{DirectiveApplier}\\{\scriptsize\texttt{story\_scene\_directive\_applier.gd}}};
+        % --- Asset Registry ---
+        \node[reportwide, fill=ReportGold!60, below=of parser, text width=40mm]
+            (reg) {\textbf{AssetRegistry}\\{\scriptsize\texttt{asset\_registry.gd}}\\{\scriptsize Tag-based queries, canonicalisation}};
+        % --- Asset categories ---
+        \node[reportsmall, fill=ReportBlue!35, below left=10mm and 12mm of reg]
+            (bg) {\textbf{Backgrounds}\\{\scriptsize 22 environments}};
+        \node[reportsmall, fill=ReportBlue!35, below=10mm of reg]
+            (ch) {\textbf{Characters}\\{\scriptsize 69 sprites}};
+        \node[reportsmall, fill=ReportBlue!35, below right=10mm and 12mm of reg]
+            (ic) {\textbf{Icons / Objects}\\{\scriptsize 29 symbolic items}};
+        \node[reportsmall, fill=ReportRose!40, right=14mm of reg]
+            (au) {\textbf{AudioManager}\\{\scriptsize 43 audio assets}};
+        % --- UI target ---
+        \node[reportbox, fill=ReportRose!40, below=30mm of reg]
+            (ui) {\textbf{StoryScene UI}\\{\scriptsize Render composed scene}};
+        % --- Arrows ---
+        \draw[reportarrow] (dir) -- (parser);
+        \draw[reportarrow] (parser) -- (reg);
+        \draw[reportarrow] (reg) -- (bg);
+        \draw[reportarrow] (reg) -- (ch);
+        \draw[reportarrow] (reg) -- (ic);
+        \draw[reportarrow] (reg) -- (au);
+        \draw[reportarrow] (bg) -- (ui);
+        \draw[reportarrow] (ch) -- (ui);
+        \draw[reportarrow] (ic) -- (ui);
+    \end{tikzpicture}
+    \caption{Asset Management System. AI scene directives are processed by \texttt{StorySceneDirectiveApplier}, which queries \texttt{AssetRegistry} by tags and canonical identifiers to load backgrounds (22), character sprites (69), symbolic objects (29), and audio assets (43) for display (source: \texttt{asset\_registry.gd}, \texttt{story\_scene\_directive\_applier.gd}).}
     \label{fig:asset-management}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-11-0.png}
-    \caption{Game Loop State Machine. The diagram shows the core gameplay flow from Honeymoon through Mission, Choice, AIGeneration, UpdateStats, and CheckTrigger states, with branching paths to special events (GloriaEvent, Concert, Dilemma) and scene transitions.}
+    \begin{tikzpicture}[node distance=7mm and 14mm,
+        state/.style={reportbox, fill=ReportBlue!40, text width=24mm, minimum height=11mm},
+        event/.style={reportsmall, fill=ReportRose!50, text width=22mm, minimum height=10mm}]
+        % --- Main loop states ---
+        \node[state, fill=ReportGold!55] (honey) {\textbf{Honeymoon}\\{\scriptsize Phase reset}};
+        \node[state, right=of honey] (mission) {\textbf{Mission}\\{\scriptsize AI generation}};
+        \node[state, right=of mission] (choice) {\textbf{Choice}\\{\scriptsize Player picks}};
+        \node[state, below=12mm of choice] (aigen) {\textbf{AI Generate}\\{\scriptsize Follow-up text}};
+        \node[state, left=of aigen] (update) {\textbf{Update Stats}\\{\scriptsize PlayerStats}};
+        \node[state, left=of update] (trigger) {\textbf{Check Triggers}\\{\scriptsize Thresholds}};
+        % --- Special events ---
+        \node[event, below=12mm of trigger] (gloria) {\textbf{Gloria Event}\\{\scriptsize Intervention}};
+        \node[event, right=of gloria] (concert) {\textbf{Concert}\\{\scriptsize Teacher Chan}};
+        \node[event, right=of concert] (dilemma) {\textbf{Dilemma}\\{\scriptsize Trolley Problem}};
+        \node[event, right=of dilemma] (night) {\textbf{Night Cycle}\\{\scriptsize Journal}};
+        % --- Main loop arrows ---
+        \draw[reportarrow] (honey) -- (mission);
+        \draw[reportarrow] (mission) -- (choice);
+        \draw[reportarrow] (choice) -- (aigen);
+        \draw[reportarrow] (aigen) -- (update);
+        \draw[reportarrow] (update) -- (trigger);
+        % --- Trigger branches ---
+        \draw[reportarrow] (trigger) -- (gloria);
+        \draw[reportarrow] (trigger) -- (concert);
+        \draw[reportarrow] (trigger) |- (dilemma);
+        \draw[reportarrow] (trigger) |- (night);
+        % --- Loop back ---
+        \draw[reportflow, dashed] (trigger.west) -- ++(-8mm,0) |- node[left, font=\scriptsize, pos=0.25] {next scene} (honey.west);
+        \draw[reportflow, dashed] (gloria.south) -- ++(0,-5mm) -| node[below, font=\scriptsize, pos=0.2] {return} ([xshift=-3mm]honey.south);
+        \draw[reportflow, dashed] (concert.south) -- ++(0,-5mm) -| ([xshift=3mm]honey.south);
+        \draw[reportflow, dashed] (night.south) -- ++(0,-8mm) -| (honey.south east);
+    \end{tikzpicture}
+    \caption{Game Loop State Machine. The core gameplay cycles through Honeymoon, Mission (AI-generated), Choice, AI Generation, Update Stats, and Check Triggers. Trigger thresholds branch into Gloria Intervention, Teacher Chan Concert, Trolley Problem Dilemma, or Night Cycle before looping back (source: \texttt{story\_flow\_controller.gd}, \texttt{trolley\_problem\_generator.gd}).}
     \label{fig:game-loop}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-11-1.png}
-    \caption{AI Subsystem Architecture. The AI Manager Facade coordinates Sub-Managers (Config Manager, Provider Manager, Context Manager, Request Manager, Voice Manager), which interface with the current provider layer (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router) while mock mode is handled at the request layer through a unified Prompt Builder and Request Queue.}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=6mm and 8mm,
+        mgr/.style={reportbox, fill=ReportTeal!45, text width=26mm, minimum height=10mm},
+        prov/.style={reportsmall, fill=ReportGold!45, text width=18mm, minimum height=9mm, font=\scriptsize}]
+        % --- Facade ---
+        \node[reportwide, fill=ReportTeal!65, text width=52mm, minimum height=13mm]
+            (facade) {\textbf{AIManager Facade}\\{\scriptsize\texttt{ai\_manager.gd}}\\{\scriptsize Single entry point for all AI calls}};
+        % --- Sub-managers row ---
+        \node[mgr, below left=12mm and 32mm of facade] (cfg) {\textbf{ConfigMgr}\\{\scriptsize\texttt{ai\_config\_manager.gd}}};
+        \node[mgr, right=5mm of cfg] (prov_mgr) {\textbf{ProviderMgr}\\{\scriptsize\texttt{ai\_provider\_manager.gd}}};
+        \node[mgr, right=5mm of prov_mgr] (ctx) {\textbf{ContextMgr}\\{\scriptsize\texttt{ai\_context\_manager.gd}}};
+        \node[mgr, right=5mm of ctx] (req) {\textbf{RequestMgr}\\{\scriptsize\texttt{ai\_request\_manager.gd}}};
+        \node[mgr, right=5mm of req] (voice) {\textbf{VoiceMgr}\\{\scriptsize\texttt{ai\_voice\_manager.gd}}};
+        % --- Provider layer ---
+        \node[prov, below=14mm of cfg, xshift=6mm] (gem) {Gemini};
+        \node[prov, right=3mm of gem] (or) {OpenRouter};
+        \node[prov, right=3mm of or] (oll) {Ollama};
+        \node[prov, right=3mm of oll] (oai) {OpenAI};
+        \node[prov, right=3mm of oai] (cla) {Claude};
+        \node[prov, right=3mm of cla] (lms) {LM Studio};
+        \node[prov, right=3mm of lms] (air) {AI Router};
+        % --- Mock mode ---
+        \node[reportsmall, fill=ReportRose!50, text width=22mm, below=14mm of req]
+            (mock) {\textbf{Mock Mode}\\{\scriptsize\texttt{mock\_ai\_generator.gd}}};
+        % --- Prompt + Queue ---
+        \node[reportsmall, fill=ReportLavender!45, text width=22mm, below=14mm of ctx]
+            (pb) {\textbf{PromptBuilder}\\{\scriptsize\texttt{ai\_prompt\_builder.gd}}};
+        \node[reportsmall, fill=ReportLavender!45, text width=22mm, right=4mm of mock]
+            (rq) {\textbf{RequestQueue}\\{\scriptsize\texttt{request\_queue.gd}}};
+        % --- Group boxes ---
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportGold!10, fit=(gem)(or)(oll)(oai)(cla)(lms)(air),
+                  label={[font=\scriptsize\bfseries]below:Provider Layer (Strategy Pattern)}] {};
+        \end{scope}
+        % --- Arrows ---
+        \draw[reportarrow] (facade) -| (cfg);
+        \draw[reportarrow] (facade) -- (prov_mgr);
+        \draw[reportarrow] (facade) -- (ctx);
+        \draw[reportarrow] (facade) -| (req);
+        \draw[reportarrow] (facade) -| (voice);
+        \draw[reportarrow] (prov_mgr) -- (gem.north -| prov_mgr);
+        \draw[reportarrow] (req) -- (mock);
+        \draw[reportarrow] (ctx) -- (pb);
+        \draw[reportarrow] (req) -| (rq);
+    \end{tikzpicture}}%
+    \caption{AI Subsystem Architecture. The \texttt{AIManager} facade coordinates five sub-managers: \texttt{ConfigManager} (provider enum), \texttt{ProviderManager} (Strategy pattern dispatching to 7 backends), \texttt{ContextManager}, \texttt{RequestManager} (with rate limiter and queue), and \texttt{VoiceManager}. Mock mode is handled at the request layer via \texttt{MockAIGenerator} (source: \texttt{ai\_manager.gd}, \texttt{ai\_provider\_manager.gd:75--96}).}
     \label{fig:ai-subsystem}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{image/Interim-Report_281967.pdf-12-0.png}
-    \caption{High-Level System Architecture. The UI Layer (Story Scene, Prayer System, Journal System, Menus and Settings) interfaces with Core Systems (Game State, AI Manager, Asset Registry, Audio Manager), Support Services (Event Bus, Save/Load, Localisation), and external AI backends including Gemini, OpenRouter, Ollama, OpenAI-compatible services, Claude, LM Studio, and AI Router.}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=5mm and 6mm,
+        layer/.style={reportwide, minimum height=11mm, text width=34mm}]
+        % --- UI Layer ---
+        \node[layer, fill=ReportRose!50] (story) {\textbf{StoryScene}\\{\scriptsize Narrative display}};
+        \node[layer, fill=ReportRose!50, right=5mm of story] (prayer) {\textbf{Prayer System}\\{\scriptsize Ironic inversion}};
+        \node[layer, fill=ReportRose!50, right=5mm of prayer] (journal) {\textbf{Journal System}\\{\scriptsize Diary / export}};
+        \node[layer, fill=ReportRose!50, right=5mm of journal] (menus) {\textbf{Menus / Settings}\\{\scriptsize Config UI}};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportRose!12, fit=(story)(prayer)(journal)(menus),
+                  label={[font=\small\bfseries]above:UI Layer (\texttt{src/scripts/ui/})}] (uilayer) {};
+        \end{scope}
+        % --- Core Systems ---
+        \node[layer, fill=ReportBlue!50, below=16mm of story] (gs) {\textbf{GameState}\\{\scriptsize State + PlayerStats}};
+        \node[layer, fill=ReportTeal!50, right=5mm of gs] (aim) {\textbf{AIManager}\\{\scriptsize Facade + providers}};
+        \node[layer, fill=ReportGold!50, right=5mm of aim] (areg) {\textbf{AssetRegistry}\\{\scriptsize Tag-based lookup}};
+        \node[layer, fill=ReportLavender!50, right=5mm of areg] (audio) {\textbf{AudioManager}\\{\scriptsize Entropy-scaled BGM}};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportBlue!10, fit=(gs)(aim)(areg)(audio),
+                  label={[font=\small\bfseries]above:Core Systems (\texttt{src/scripts/core/})}] (corelayer) {};
+        \end{scope}
+        % --- Support Services ---
+        \node[layer, fill=ReportGold!35, below=16mm of gs, text width=28mm] (ebus) {\textbf{EventBus}\\{\scriptsize Pub/Sub signals}};
+        \node[layer, fill=ReportGold!35, right=5mm of ebus, text width=28mm] (save) {\textbf{Save/Load}\\{\scriptsize State persistence}};
+        \node[layer, fill=ReportGold!35, right=5mm of save, text width=28mm] (loc) {\textbf{Localisation}\\{\scriptsize EN / ZH / DE}};
+        \node[layer, fill=ReportGold!35, right=5mm of loc, text width=28mm] (font) {\textbf{FontManager}\\{\scriptsize CJK + scaling}};
+        \node[layer, fill=ReportGold!35, right=5mm of font, text width=28mm] (err) {\textbf{ErrorReporter}\\{\scriptsize Centralised logs}};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=ReportGold!8, fit=(ebus)(save)(loc)(font)(err),
+                  label={[font=\small\bfseries]above:Support Services}] (suplayer) {};
+        \end{scope}
+        % --- External backends ---
+        \node[reportsmall, fill=white, below=16mm of ebus] (g) {\scriptsize Gemini};
+        \node[reportsmall, fill=white, right=3mm of g] (orr) {\scriptsize OpenRouter};
+        \node[reportsmall, fill=white, right=3mm of orr] (ol) {\scriptsize Ollama};
+        \node[reportsmall, fill=white, right=3mm of ol] (oai) {\scriptsize OpenAI};
+        \node[reportsmall, fill=white, right=3mm of oai] (cl) {\scriptsize Claude};
+        \node[reportsmall, fill=white, right=3mm of cl] (lm) {\scriptsize LM Studio};
+        \node[reportsmall, fill=white, right=3mm of lm] (ar) {\scriptsize AI Router};
+        \begin{scope}[on background layer]
+            \node[reportgroup, fill=gray!8, fit=(g)(orr)(ol)(oai)(cl)(lm)(ar),
+                  label={[font=\small\bfseries]above:External AI Backends}] (extlayer) {};
+        \end{scope}
+        % --- Inter-layer arrows ---
+        \draw[reportarrow] (uilayer.south) -- ++(0,-3mm) -| (corelayer.north);
+        \draw[reportarrow] (corelayer.south) -- ++(0,-3mm) -| (suplayer.north);
+        \draw[reportarrow] (aim.south) -- ++(0,-3mm) -- ++(0,-24mm) -| (extlayer.north);
+    \end{tikzpicture}}%
+    \caption{High-Level System Architecture. The UI Layer (\texttt{StoryScene}, Prayer System, Journal, Menus) interfaces with Core Systems (\texttt{GameState}, \texttt{AIManager}, \texttt{AssetRegistry}, \texttt{AudioManager}), which rely on Support Services (\texttt{EventBus}, Save/Load, Localisation, \texttt{FontManager}, \texttt{ErrorReporter}). The \texttt{AIManager} connects to seven external backends (source: \texttt{project.godot} autoloads, \texttt{service\_locator.gd}).}
     \label{fig:high-level-arch}
 \end{figure}
 
@@ -449,8 +707,40 @@ I also built explicit buffer time between phases; this reserve absorbed unexpect
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{image/Interim-Report_281967.pdf-13-0.png}
-    \caption{AI-Powered RPG Development Timeline (Gantt Chart). The timeline spans from Week 00 to Week 22, organised into five phases: Foundation (project inception, background research, proposal writing), Planning (literature review, methodology design, report drafting), Core Development (context-management, AI integration, gameplay loop, testing), Integration (scene and asset system, mechanics completion, extended testing), and Finalisation (bug fixes, report writing, critical analysis, user testing, submission preparation).}
+    \begin{tikzpicture}[x=5.8mm, y=7mm]
+        % --- Week axis ---
+        \foreach \w in {0,2,...,22}
+            \node[font=\tiny, above] at (\w, 6.2) {W\w};
+        \draw[thin, gray] (0,0) -- (22,0);
+        \draw[thin, gray] (0,6) -- (22,6);
+        \foreach \w in {0,2,...,22}
+            \draw[thin, gray!40] (\w,0) -- (\w,6);
+        % --- Phase bars ---
+        % Foundation (W0-W3)
+        \fill[ReportBlue!55, rounded corners=2pt] (0,5) rectangle (3,5.6);
+        \node[font=\tiny, anchor=west] at (0.1,5.3) {\textbf{Foundation}: inception, research, proposal};
+        % Planning (W3-W7)
+        \fill[ReportTeal!50, rounded corners=2pt] (3,4) rectangle (7,4.6);
+        \node[font=\tiny, anchor=west] at (3.1,4.3) {\textbf{Planning}: lit review, methodology, interim};
+        % Core Dev (W7-W14)
+        \fill[ReportGold!60, rounded corners=2pt] (7,3) rectangle (14,3.6);
+        \node[font=\tiny, anchor=west] at (7.1,3.3) {\textbf{Core Dev}: context mgmt, AI integration, gameplay loop};
+        % Integration (W14-W18)
+        \fill[ReportLavender!60, rounded corners=2pt] (14,2) rectangle (18,2.6);
+        \node[font=\tiny, anchor=west] at (14.1,2.3) {\textbf{Integration}: scenes, assets, extended testing};
+        % Finalisation (W18-W22)
+        \fill[ReportRose!55, rounded corners=2pt] (18,1) rectangle (22,1.6);
+        \node[font=\tiny, anchor=west] at (18.1,1.3) {\textbf{Finalisation}: bug fixes, report, analysis};
+        % --- Parallel track ---
+        \draw[thick, dashed, ReportSlate] (3,0.3) -- (22,0.3);
+        \node[font=\tiny, anchor=west, text=ReportSlate] at (3.1,0.6) {Prompt engineering (ongoing parallel track)};
+        % --- Milestones ---
+        \fill[red!70] (7,4) circle (2pt);
+        \node[font=\tiny, red!70, below=1mm] at (7,4) {Interim};
+        \fill[red!70] (22,1) circle (2pt);
+        \node[font=\tiny, red!70, below=1mm] at (22,1) {Submit};
+    \end{tikzpicture}
+    \caption{AI-Powered RPG Development Timeline (Gantt Chart). The project spans Weeks 0--22 across five phases: Foundation (inception, research), Planning (literature review, interim report), Core Development (context management, AI integration, gameplay loop), Integration (scene/asset system, testing), and Finalisation (bug fixes, report writing). Prompt engineering runs as a continuous parallel track from Week 3 onward.}
     \label{fig:gantt-chart}
 \end{figure}
 
@@ -479,11 +769,79 @@ For cross-module communication, I implemented a publish-subscribe EventBus to de
 
 For simplifying AI integration, the AIManager presents a facade interface to the rest of the game, hiding the complexity of provider selection, prompt construction, context-management, and response parsing. Calling code simply invokes generation methods with context dictionaries, unaware of the underlying multi-layered prompt assembly process.
 
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=6mm and 8mm,
+        prov/.style={reportsmall, fill=ReportGold!45, text width=19mm, minimum height=10mm, font=\scriptsize}]
+        % --- Config enum ---
+        \node[reportwide, fill=ReportBlue!55, text width=48mm]
+            (cfg) {\textbf{AIConfigManager}\\{\scriptsize\texttt{ai\_config\_manager.gd}}\\{\scriptsize \texttt{enum AIProvider \{ GEMINI=0 \ldots\ MOCK\_MODE=7 \}}}};
+        % --- Provider Manager ---
+        \node[reportwide, fill=ReportTeal!55, text width=48mm, below=10mm of cfg]
+            (mgr) {\textbf{AIProviderManager}\\{\scriptsize\texttt{get\_current\_provider()}}\\{\scriptsize \texttt{match} dispatches to concrete provider}};
+        % --- Providers ---
+        \node[prov, below left=12mm and 28mm of mgr] (p1) {\textbf{Gemini}\\{\scriptsize\texttt{gemini\_provider.gd}}};
+        \node[prov, right=3mm of p1] (p2) {\textbf{OpenRouter}\\{\scriptsize\texttt{openrouter\_provider.gd}}};
+        \node[prov, right=3mm of p2] (p3) {\textbf{Ollama}\\{\scriptsize\texttt{ollama\_provider.gd}}};
+        \node[prov, right=3mm of p3] (p4) {\textbf{OpenAI}\\{\scriptsize\texttt{openai\_provider.gd}}};
+        \node[prov, right=3mm of p4] (p5) {\textbf{Claude}\\{\scriptsize\texttt{claude\_provider.gd}}};
+        \node[prov, right=3mm of p5] (p6) {\textbf{LM Studio}\\{\scriptsize\texttt{lmstudio\_provider.gd}}};
+        \node[prov, right=3mm of p6] (p7) {\textbf{AI Router}\\{\scriptsize\texttt{ai\_router\_provider.gd}}};
+        % --- Base class ---
+        \node[reportbox, fill=ReportLavender!45, below=14mm of p4, text width=40mm]
+            (base) {\textbf{AIProviderBase}\\{\scriptsize\texttt{ai\_provider\_base.gd}}\\{\scriptsize Abstract: \texttt{generate()}, \texttt{cancel()}}};
+        % --- Arrows ---
+        \draw[reportarrow] (cfg) -- node[right, font=\scriptsize] {\texttt{current\_provider}} (mgr);
+        \foreach \p in {p1,p2,p3,p4,p5,p6,p7}
+            \draw[reportarrow] (mgr) -- (\p);
+        \foreach \p in {p1,p2,p3,p4,p5,p6,p7}
+            \draw[reportarrow, dashed] (\p) -- (base);
+    \end{tikzpicture}}%
+    \caption{Strategy Pattern for Provider Switching. \texttt{AIConfigManager} holds the active \texttt{AIProvider} enum value; \texttt{AIProviderManager.get\_current\_provider()} uses a \texttt{match} statement to dispatch to the concrete provider. All seven providers extend \texttt{AIProviderBase} (source: \texttt{ai\_provider\_manager.gd:75--96}, \texttt{ai\_config\_manager.gd:12--21}).}
+    \label{fig:strategy-pattern}
+\end{figure}
+
 \subsection{Context Management Architecture}
 
 The context-management system operates at two complementary layers: storage-level retention in \texttt{AIMemoryStore} and runtime budget-aware assembly in \texttt{AIPromptBuilder} with \texttt{AIContextDelta}. Conceptually, the system still groups information into three categories, short-term history, longer-term continuity, and persistent notes, but at runtime these categories are filtered, compressed, and reordered according to token budget and request priority.
 
 At the storage layer, older story history is compressed into representative continuity summaries rather than replayed in full, while persistent notes survive independently of the rolling conversation log. At the prompt-assembly layer, the builder reserves space for the player's current message, prioritises the most important control sections, reuses unchanged context through compact markers, and degrades oversized sections to summary placeholders when necessary. This approach reduced token waste whilst preserving enough continuity for the AI to maintain narrative tone and callback structure. Full implementation details are documented in Appendix C: GDD, Section 7.2.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=4mm and 6mm,
+        sect/.style={draw=ReportSlate, thick, rounded corners=2pt, minimum height=8mm,
+                     text width=16mm, align=center, inner sep=3pt, font=\scriptsize}]
+        % --- Budget bar at top ---
+        \node[reportwide, fill=ReportGold!55, text width=130mm, minimum height=10mm]
+            (budget) {\textbf{Token Budget: 24\,000} {\scriptsize (\texttt{AIContextDelta.DEFAULT\_TOKEN\_BUDGET})} --- chars $\div$ 4 estimation};
+        % --- Sections in order ---
+        \node[sect, fill=ReportBlue!45, below left=10mm and 48mm of budget] (s1) {\textbf{1. Static}\\Context};
+        \node[sect, fill=ReportBlue!35, right=3mm of s1] (s2) {\textbf{2. System}\\Persona};
+        \node[sect, fill=ReportTeal!40, right=3mm of s2] (s3) {\textbf{3. Ack}\\Message};
+        \node[sect, fill=ReportGold!45, right=3mm of s3] (s4) {\textbf{4. Entropy}\\Modifier};
+        \node[sect, fill=ReportTeal!35, right=3mm of s4] (s5) {\textbf{5. Long-Term}\\Context};
+        \node[sect, fill=ReportTeal!35, right=3mm of s5] (s6) {\textbf{6. Notes}\\Context};
+        \node[sect, fill=ReportLavender!45, right=3mm of s6] (s7) {\textbf{7. Short-Term}\\Memory};
+        \node[sect, fill=ReportRose!50, right=3mm of s7] (s8) {\textbf{8. User}\\Message};
+        % --- Delta logic ---
+        \node[reportnote, text width=130mm, below=10mm of s4.south east, anchor=north]
+            (logic) {\scriptsize\textbf{Incremental Assembly Rules} {\tiny(\texttt{\_append\_section\_incremental})}\\[2pt]
+            \textbullet~\textbf{Changed section}: full content added, fingerprint recorded\\
+            \textbullet~\textbf{Unchanged section}: single-line marker \texttt{[context:<name> unchanged]}\\
+            \textbullet~\textbf{Over budget}: degrade to lightweight summary placeholder\\
+            \textbullet~\textbf{User message}: reserved space; truncated if exceeding remaining budget};
+        % --- Arrows ---
+        \draw[reportarrow] (budget.south) -- ++(0,-3mm) -| (s1.north);
+        \draw[reportarrow] (budget.south) -- ++(0,-3mm) -| (s8.north);
+        \foreach \s in {s1,s2,s3,s4,s5,s6,s7,s8}
+            \draw[reportarrow, thin] (\s.south) -- ++(0,-3mm);
+    \end{tikzpicture}}%
+    \caption{Prompt Assembly Pipeline. \texttt{AIPromptBuilder.build\_prompt()} assembles eight sections incrementally under a 24\,000-token budget managed by \texttt{AIContextDelta}. Each section is fingerprinted; unchanged sections are replaced by compact markers, and oversized sections degrade to summaries (source: \texttt{ai\_prompt\_builder.gd:30--75}, \texttt{ai\_context\_delta.gd}).}
+    \label{fig:prompt-assembly}
+\end{figure}
 
 \subsection{Response Parsing and Validation}
 
@@ -491,11 +849,84 @@ AI responses require careful parsing because LLMs do not always produce structur
 
 The parser also implements canonicalisation for extracted values, normalising background identifiers and asset references to match the game's internal catalogues. This addresses a practical problem I encountered: the AI frequently generated semantically correct but syntactically different identifiers, such as ``Crystal Cavern'' instead of the expected ``crystal\_cavern''.
 
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=7mm and 10mm,
+        stage/.style={reportbox, fill=ReportBlue!40, text width=34mm, minimum height=12mm}]
+        % --- Raw response ---
+        \node[reportbox, fill=ReportGold!55, text width=38mm]
+            (raw) {\textbf{Raw AI Response}\\{\scriptsize Non-deterministic text from LLM}};
+        % --- Stage 1 ---
+        \node[stage, below=10mm of raw]
+            (s1) {\textbf{Stage 1: Markers}\\{\scriptsize \texttt{[SCENE\_DIRECTIVES]}\\extraction via regex}};
+        % --- Stage 2 ---
+        \node[stage, below=8mm of s1]
+            (s2) {\textbf{Stage 2: Code Blocks}\\{\scriptsize \texttt{```json```} extraction}\\{\scriptsize from markdown fences}};
+        % --- Stage 3 ---
+        \node[stage, below=8mm of s2]
+            (s3) {\textbf{Stage 3: Raw JSON}\\{\scriptsize Whole response starts\\with \texttt{\{} or \texttt{[}}};
+        % --- Canonicalise ---
+        \node[reportwide, fill=ReportTeal!50, below=10mm of s3, text width=40mm]
+            (canon) {\textbf{Canonicalise}\\{\scriptsize Normalise identifiers}\\{\scriptsize ``Crystal Cavern'' $\to$ \texttt{crystal\_cavern}}};
+        % --- Output ---
+        \node[reportbox, fill=ReportLavender!45, below=8mm of canon, text width=38mm]
+            (out) {\textbf{Parsed Directives}\\{\scriptsize \texttt{Dictionary} for game engine}};
+        % --- Fallback arrows ---
+        \draw[reportarrow] (raw) -- node[right, font=\scriptsize] {try} (s1);
+        \draw[reportarrow] (s1) -- node[right, font=\scriptsize] {fallback} (s2);
+        \draw[reportarrow] (s2) -- node[right, font=\scriptsize] {fallback} (s3);
+        \draw[reportarrow] (s3) -- (canon);
+        \draw[reportarrow] (canon) -- (out);
+        % --- Success shortcuts ---
+        \draw[reportflow, dashed, green!60!black] (s1.east) -- ++(16mm,0) |- node[right, font=\scriptsize, pos=0.25] {success} (canon.east);
+        \draw[reportflow, dashed, green!60!black] (s2.east) -- ++(10mm,0) |- (canon.east);
+    \end{tikzpicture}
+    \caption{Multi-Stage Response Parsing Pipeline. \texttt{SceneDirectivesParser} attempts extraction in three stages: explicit \texttt{[SCENE\_DIRECTIVES]} markers, markdown \texttt{```json} code blocks, and raw JSON parsing. Successful extraction at any stage proceeds directly to canonicalisation. All values are normalised to match \texttt{AssetRegistry} identifiers (source: \texttt{scene\_directives\_parser.gd:27--63}).}
+    \label{fig:parsing-pipeline}
+\end{figure}
+
 \subsection{Safety and Content Filtering}
 
 The \texttt{AISafetyFilter} class (\texttt{ai\_safety\_filter.gd}) implements pattern-based content filtering for both user inputs and model outputs. The filter scrubs sensitive data patterns such as API keys, email addresses, and credit card numbers using regex matching. It also detects harmful content using keyword groups for categories including self-harm, violence, and hate speech. When harmful content is detected, the filter blocks the response and substitutes a generic message rather than displaying potentially inappropriate content.
 
 This design reflects my ethical framework discussed in Section 3: rather than relying solely on the AI provider's content filtering, I implemented an additional application-level filter that I can tune specifically to my game's thematic requirements.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=7mm and 12mm]
+        % --- Input ---
+        \node[reportbox, fill=ReportRose!50, text width=30mm]
+            (input) {\textbf{User Input}\\{\scriptsize Player text / prayer}};
+        % --- Scrub user ---
+        \node[reportwide, fill=ReportBlue!45, right=of input, text width=36mm]
+            (scrub1) {\textbf{scrub\_user\_text()}\\{\scriptsize Redact API keys, emails,\\credit cards, credentials}};
+        % --- AI ---
+        \node[reportbox, fill=ReportTeal!50, right=of scrub1, text width=28mm]
+            (ai) {\textbf{LLM Provider}\\{\scriptsize Generate response}};
+        % --- Scrub model ---
+        \node[reportwide, fill=ReportBlue!45, below=12mm of ai, text width=36mm]
+            (scrub2) {\textbf{scrub\_model\_output()}\\{\scriptsize Redact leaked PII\\from AI response}};
+        % --- Review ---
+        \node[reportwide, fill=ReportGold!55, left=of scrub2, text width=36mm]
+            (review) {\textbf{review\_response\_content()}\\{\scriptsize Harmful keyword groups:\\self-harm, violence, hate speech\\Hallucination pattern detection}};
+        % --- Decision ---
+        \node[reportsmall, fill=ReportLavender!50, left=of review, text width=24mm]
+            (decision) {\textbf{Flagged?}\\{\scriptsize Yes $\to$ block\\No $\to$ display}};
+        % --- Output ---
+        \node[reportbox, fill=ReportTeal!35, below=10mm of decision, text width=28mm]
+            (display) {\textbf{UI Display}\\{\scriptsize Safe content only}};
+        % --- Arrows ---
+        \draw[reportarrow] (input) -- (scrub1);
+        \draw[reportarrow] (scrub1) -- (ai);
+        \draw[reportarrow] (ai) -- (scrub2);
+        \draw[reportarrow] (scrub2) -- (review);
+        \draw[reportarrow] (review) -- (decision);
+        \draw[reportarrow] (decision) -- (display);
+    \end{tikzpicture}}%
+    \caption{Safety Filter Pipeline. \texttt{AISafetyFilter} applies three processing stages: \texttt{scrub\_user\_text()} redacts sensitive data from player input before it reaches the LLM; \texttt{scrub\_model\_output()} removes any leaked PII from AI responses; \texttt{review\_response\_content()} checks for harmful keywords and hallucination patterns, blocking flagged content with a generic substitute (source: \texttt{ai\_safety\_filter.gd}).}
+    \label{fig:safety-filter}
+\end{figure}
 
 These architectural decisions translate the specifications of Section 4 into workable structures; Section 8 describes how they were built in practice.
 
@@ -533,6 +964,43 @@ The notes register implements importance scoring to preserve high-importance not
 The \texttt{ButterflyEffectTracker} (\texttt{butterfly\_effect\_tracker.gd}) implements delayed consequence tracking, recording player choices with predicted future consequences. When the player advances scenes, the tracker checks for pending consequences and notifies the AI context system to incorporate relevant callbacks.
 
 Implementing this system taught me about the challenges of managing temporal narrative state. The AI must be informed about past choices in a way that enables natural integration without forced callbacks. I addressed this through the \texttt{get\_context\_for\_ai()} method, which formats recent choices with their pending consequence counts, and the \texttt{suggest\_choice\_for\_callback()} method, which uses weighted random selection biased toward more recent choices to suggest natural callback opportunities.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=7mm and 10mm]
+        % --- Player choice ---
+        \node[reportbox, fill=ReportRose!50, text width=30mm]
+            (choice) {\textbf{Player Choice}\\{\scriptsize minor / major / critical}};
+        % --- Record ---
+        \node[reportwide, fill=ReportBlue!45, right=of choice, text width=38mm]
+            (record) {\textbf{record\_choice()}\\{\scriptsize Store: scene, entropy,\\stats snapshot, tags, text}};
+        % --- Consequences ---
+        \node[reportwide, fill=ReportGold!55, right=of record, text width=38mm]
+            (seeds) {\textbf{Consequence Seeds}\\{\scriptsize Schedule 3--20 scenes ahead\\severity, description, triggered flag}};
+        % --- Scene advance ---
+        \node[reportbox, fill=ReportTeal!45, below=14mm of record, text width=30mm]
+            (advance) {\textbf{advance\_scene()}\\{\scriptsize Check pending}};
+        % --- Weighted select ---
+        \node[reportwide, fill=ReportLavender!50, right=of advance, text width=38mm]
+            (suggest) {\textbf{suggest\_choice\_for\_callback()}\\{\scriptsize Weighted random: recent\\choices have higher priority}};
+        % --- AI context ---
+        \node[reportwide, fill=ReportTeal!45, below=14mm of advance, text width=38mm]
+            (ctx) {\textbf{get\_context\_for\_ai()}\\{\scriptsize Format past choices +\\pending consequence counts}};
+        % --- Prompt ---
+        \node[reportbox, fill=ReportGold!35, right=of ctx, text width=30mm]
+            (prompt) {\textbf{AI Prompt}\\{\scriptsize Callback integration}};
+        % --- Arrows ---
+        \draw[reportarrow] (choice) -- (record);
+        \draw[reportarrow] (record) -- (seeds);
+        \draw[reportarrow] (seeds.south) -- ++(0,-5mm) -| (advance.east);
+        \draw[reportarrow] (advance) -- (suggest);
+        \draw[reportarrow] (advance) -- (ctx);
+        \draw[reportarrow] (ctx) -- (prompt);
+        \draw[reportarrow] (suggest.south) -- ++(0,-5mm) -| (prompt.north);
+    \end{tikzpicture}
+    \caption{Butterfly Effect Data Flow. Player choices are recorded with full metadata (scene, entropy, stats, tags). Consequence seeds schedule future triggers 3--20 scenes ahead. On each scene advance, \texttt{suggest\_choice\_for\_callback()} selects a recent choice using weighted random, and \texttt{get\_context\_for\_ai()} formats all pending consequences for the AI prompt (source: \texttt{butterfly\_effect\_tracker.gd}).}
+    \label{fig:butterfly-effect-flow}
+\end{figure}
 
 \subsection{Error Handling and Graceful Degradation}
 
