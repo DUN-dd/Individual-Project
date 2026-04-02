@@ -234,6 +234,43 @@ Functional testing across approximately one hundred narrative generations achiev
 
 Traditional RPG narratives rely on pre-scripted dialogue trees and fixed storylines, limiting replayability and player agency. While LLMs offer the potential for dynamic content generation, integrating them into games presents significant challenges: maintaining narrative coherence over extended play sessions, ensuring thematic consistency with authorial intent, and managing the practical constraints of API latency and token costs. This project will explore whether a carefully structured ``bespoke pipeline'' approach, where the LLM operates within explicit developer-defined constraints, can address these challenges to produce a playable, thematically coherent RPG experience. The central research question is therefore: to what extent can a text-based LLM, integrated as a controlled component within a traditional game engine, generate coherent and thematically consistent narrative content for an interactive RPG? To answer this question, this project will develop ``Glorious Deliverance Agency 1,'' a 2D text-based RPG built in the Godot engine that uses Large Language Model (LLM) integration to generate dynamic narrative content. The game places players as a reluctant hero in a dysfunctional team whose attempts to save the world with ``positive energy'' only accelerate its destruction through a darkly comedic narrative that responds to their choices in real time.
 
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_protagonist.png}
+  \caption*{\textbf{The Protagonist}}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_gloria.png}
+  \caption*{\textbf{Saint Gloria}}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_donkey.png}
+  \caption*{\textbf{Cosplayer Donkey}}
+\end{subfigure}
+
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_ark.png}
+  \caption*{\textbf{Cosplayer ARK}}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_one.png}
+  \caption*{\textbf{One}}
+\end{subfigure}\hfill
+\begin{subfigure}[b]{0.3\linewidth}
+  \centering
+  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_teacher_chan.png}
+  \caption*{\textbf{Teacher Chan}}
+\end{subfigure}
+\caption{The GDA1 cast --- protagonist and five teammates whose AI-driven behaviour drives the game's satirical narrative (pixel art)}
+\label{fig:main-character-portraits}
+\end{figure}
+
 The primary aim is supported by three foundational pillars. The first pillar, Technical Development, involves the design and implementation of a functional AI-driven 2D RPG narrative system. The game features dynamically generated storylines and NPC dialogue, where ``dynamically'' refers to the real-time generation of narrative content based on the current game state and player choices, moving beyond traditional pre-scripted narratives. The technical focus is on enabling emergent, non-linear story paths while maintaining narrative coherence over extended gameplay sessions through a context-management architecture that began as a three-layer concept and evolved into the budget-aware pipeline detailed in Appendix C, Section 7.2.
 
 The second pillar, Thematic Execution, centres on creating a satirical allegory exploring the conflict between ``positive energy'' ideology and the concept of Void Entropy. The core gameplay mechanics, including the Reality vs. Positive Energy system and the Prayer System, deliberately subvert conventional RPG expectations (see Appendix C: GDD, Sections 4.2--4.3 for detailed mechanics). These thematic concepts will be embedded directly into the AI's prompt engineering, ensuring that generated content aligns with the project's darkly satirical tone rather than producing generic positive outcomes.
@@ -588,6 +625,13 @@ I have designed the system architecture to be modular and scalable, built around
     \end{tikzpicture}
     \caption{Game Loop State Machine. The core gameplay cycles through Honeymoon, Mission (AI-generated), Choice, AI Generation, Update Stats, and Check Triggers. Trigger thresholds branch into Gloria Intervention, Teacher Chan Concert, Trolley Problem Dilemma, or Night Cycle before looping back (source: \texttt{story\_flow\_controller.gd}, \texttt{trolley\_problem\_generator.gd}).}
     \label{fig:game-loop}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\linewidth]{../1.Codebase/src/assets/ui/miss_chan_on_stage.png}
+  \caption{Teacher Chan's Apocalypse Concert --- mandatory holographic cutscene after each mission success, delivering AI-generated lyrics that reframe disasters as spiritual triumphs}
+  \label{fig:main-teacher-chan-concert}
 \end{figure}
 
 \begin{figure}[H]
@@ -948,6 +992,13 @@ Prompt engineering required numerous iterations. Initial prompts were overly gen
 Game state must directly influence prompt parameters. The Void Entropy calculation (\texttt{player\_stats.gd:54--59}) produces a normalised value between zero and one that modifies tonal instructions. At low entropy, prompts request ``subtle irony''; at high entropy, ``absurdist chaos.''
 
 For the Prayer System, I implemented templated prompt construction that explicitly instructs the AI to ``interpret the prayer's intent and twist it toward an ironic disaster.'' This explicit ironic inversion instruction proved far more reliable than implicit contextual cues.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.40\linewidth]{../1.Codebase/src/assets/ui/praytoMonster.png}
+  \caption{The Prayer System UI --- players submit hopeful prayers that the AI's ironic inversion template transforms into mission disasters}
+  \label{fig:main-prayer-system}
+\end{figure}
 
 \subsection{Response Parsing Challenges}
 
@@ -1678,52 +1729,8 @@ Beyond its mechanical innovations, the game aspires to thematic depth by functio
 
 \subsection*{2. Characters}
 
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_protagonist.png}
-  \caption*{\textbf{The Protagonist}}
-\end{subfigure}\hfill
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_gloria.png}
-  \caption*{\textbf{Saint Gloria}}
-\end{subfigure}\hfill
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_donkey.png}
-  \caption*{\textbf{Cosplayer Donkey}}
-\end{subfigure}
-
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_ark.png}
-  \caption*{\textbf{Cosplayer ARK}}
-\end{subfigure}\hfill
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_one.png}
-  \caption*{\textbf{One}}
-\end{subfigure}\hfill
-\begin{subfigure}[b]{0.3\linewidth}
-  \centering
-  \includegraphics[width=\linewidth]{../1.Codebase/src/assets/characters/portrait_teacher_chan.png}
-  \caption*{\textbf{Teacher Chan}}
-\end{subfigure}
-\caption{Character portraits --- \textit{Glorious Deliverance Agency 1} (pixel art)}
-\label{fig:gdd-character-portraits}
-\end{figure}
-
 \subsubsection*{2.1 Player Character: The Protagonist}
 The protagonist embodies pragmatic realism, reflecting anyone worn down by repeated disappointments and betrayals. At the story's beginning, they harbour deep mistrust toward divine intervention and blind faith, preferring rational thinking over magical solutions. This worldview crumbles when Saint Gloria deploys masterful psychological manipulation, convincing the protagonist that their negativity causes all personal and interpersonal failures. Pushed to the edge of mental breakdown, the protagonist desperately accepts Gloria's salvation and adopts her simplistic positive energy creed as a last resort to avoid harming others. This forced conversion sets the stage for their tragic journey as reluctant believers who know better but feel they have no choice.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[height=3cm]{../1.Codebase/src/assets/characters/turnaround_protagonist.png}
-  \caption{The Protagonist --- full-body character design (pixel art)}
-  \label{fig:turnaround-protagonist}
-\end{figure}
 
 \begin{multicols}{2}
 \subsubsection*{2.2 Non-Player Characters: The Team}
@@ -1740,27 +1747,6 @@ The player's teammates function not as traditional allies but as the primary ant
 \textbf{Teacher Chan} is the Soul-Soothing Singer, the Apocalypse Idol, and the Harbinger of Doom. As a national-level idol singer, her image radiates pure, white-robed compassion, yet her songs about letting go, acceptance, and growth operate as a curse rather than a cure. She genuinely believes what she sings, which makes her more frightening, not less. Her performances rationalise failure as spiritual success, intensify cognitive dissonance, and function as large-scale entropy rituals that accelerate the world's collapse. She is not a healer but a world destroyer wearing the voice of comfort.
 
 \end{multicols}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_gloria.png}
-    \caption*{\textbf{Saint Gloria}}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_donkey.png}
-    \caption*{\textbf{Cosplayer Donkey}}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_ark.png}
-    \caption*{\textbf{Cosplayer ARK}}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_one.png}
-    \caption*{\textbf{One}}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.18\linewidth}\centering
-    \includegraphics[height=2.5cm]{../1.Codebase/src/assets/characters/turnaround_teacher_chan.png}
-    \caption*{\textbf{Teacher Chan}}\end{subfigure}
-  \caption{NPC full-body character designs --- Saint Gloria, Cosplayer Donkey, Cosplayer ARK, One, Teacher Chan (pixel art)}
-  \label{fig:gdd-npc-turnarounds}
-\end{figure}
 
 \begin{multicols}{2}
 \subsection*{3. Narrative and Story}
@@ -1795,22 +1781,8 @@ Positive Energy Score increases through agreeing with teammates' foolish plans, 
 \subsubsection*{4.3 The Prayer System}
 This system functions as a direct interface for players to prompt them to engineer their own doom. Before missions, a user interface appears where players must type prayers to the Flying Spaghetti Monster. The more positive and hopeful the text about cooperation and mission success, the more heavily the AI is instructed to generate ironic, disastrous outcomes that subvert those prayers. Players actively write scripts for their own failures.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.40\linewidth]{../1.Codebase/src/assets/ui/praytoMonster.png}
-  \caption{The Prayer System --- players submit hopeful prayers to the Flying Spaghetti Monster, which the AI inverts into disasters}
-  \label{fig:gdd-prayer-system}
-\end{figure}
-
 \subsubsection*{4.4 Teacher Chan's Apocalypse Concert}
 Mandatory cutscene events trigger after mission successes. Pre-rendered video of Teacher Chan plays with AI-generated lyrics appearing as subtitles. The lyrics consist of generic, feel-good platitudes that reframe preceding disasters as triumphs of spirit. After concerts, players are afflicted with Cognitive Dissonance debuffs that temporarily lower Logic and critical thinking skills, and may force positive keywords into next prayers, ensuring downward spirals continue.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.50\linewidth]{../1.Codebase/src/assets/ui/miss_chan_on_stage.png}
-  \caption{Teacher Chan's Apocalypse Concert --- mandatory holographic cutscene after each mission success}
-  \label{fig:gdd-teacher-chan-concert}
-\end{figure}
 
 \subsubsection*{4.5 Gloria's Intervention Event}
 Special triggered events occur when player complaints or negative choices reach certain thresholds. The game transitions to dedicated screens featuring Gloria's portrait, where she delivers monologues starting with lines about how player negativity has dragged her into the first emotional low of her life. The AI generates the rest of the text, personally attacking recent player choices. These events inflict massive emotional and statistical damage. To exit, players must click Continue, after which their only available action is Pray, forcing them back into toxic positivity cycles.
@@ -1838,54 +1810,6 @@ The asset libraries include:
 The system supports asset querying by tags and themes, allowing the AI to request dangerous outdoor locations or mystical indoor spaces without specifying exact file names.
 
 \end{multicols}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/backgrounds/Forest.png}
-    \caption*{Forest}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/backgrounds/Temple.png}
-    \caption*{Temple}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/backgrounds/dungeon.png}
-    \caption*{Dungeon}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.24\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/backgrounds/crystal_cavern.png}
-    \caption*{Crystal Cavern}\end{subfigure}
-  \caption{Sample background environments from the 20-scene library}
-  \label{fig:gdd-backgrounds}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/orb.png}
-    \caption*{Orb}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/portal.png}
-    \caption*{Portal}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/crystal.png}
-    \caption*{Crystal}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/chest.png}
-    \caption*{Chest}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/altar.png}
-    \caption*{Altar}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/scroll.png}
-    \caption*{Scroll}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/spirit.png}
-    \caption*{Spirit}\end{subfigure}\hfill
-  \begin{subfigure}[b]{0.11\linewidth}\centering
-    \includegraphics[width=\linewidth]{../1.Codebase/src/assets/icons/fire.png}
-    \caption*{Fire}\end{subfigure}
-  \caption{Sample symbolic gameplay objects from the 29-icon library (AI-selectable per scene)}
-  \label{fig:gdd-icons}
-\end{figure}
 
 \begin{multicols}{2}
 \subsubsection*{4.8 Core Mechanics and Formulas}
@@ -1924,13 +1848,6 @@ The system records different types of choices (minor, major, critical) with comp
 Consequence seeds are stored as arrays of potential outcomes, each with a scheduled scene number (3--20 scenes ahead), description, triggered status flag, and severity rating. The system implements weighted selection algorithms to determine when consequences trigger, with higher-severity consequences having priority. The \texttt{get\_context\_for\_ai()} function formats relevant past choices and pending consequences for inclusion in AI prompts, enabling the AI to reference earlier decisions and create narrative callbacks.
 
 \end{multicols}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.50\linewidth]{../1.Codebase/src/assets/ui/butterfly_effect.png}
-  \caption{Butterfly Effect visualisation --- cascading narrative consequences from player choices}
-  \label{fig:gdd-butterfly-effect}
-\end{figure}
 
 \begin{multicols}{2}
 \subsubsection*{4.10 The Trolley Problem Dilemma System}
