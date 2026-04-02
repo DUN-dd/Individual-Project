@@ -349,14 +349,7 @@ Finally, Juliani (2025) identifies a risk of ``infinite trash'' in unconstrained
 
 \subsection{Thematic Control and Values Based Systems}
 
-Juliani (2025) identifies ``mode collapse'' in LLM generation: models prompted for a specific genre over rely on statistically common surface markers, producing repetitive content. To avoid this, I designed an explicit values based system (see Appendix C: GDD, Section 4.2) where every player choice quantifiably impacts ``Reality'' ($R_S$) and ``Positive Energy'' ($P_E$) stats, which feed directly into AI prompts to modulate tone and direction. This transforms the theme into a measurable, directive principle rather than a static premise. For example, a ``positive'' choice applies $\Delta P_E = +15$ and $\Delta R_S = -5$, while a reckless choice applies $\Delta P_E = +10$, $\Delta R_S = -6$, and injects three additional units directly into the cumulative entropy counter.
-
-A key mechanic is the \textbf{Positive Energy Curse}: every unit increase in Positive Energy immediately adds double that amount to the cumulative entropy level $\varepsilon_\ell$:
-\begin{equation}
-\Delta\varepsilon_\ell = 2\,\Delta P_E \quad\text{whenever } \Delta P_E > 0
-\label{eq:pe-curse}
-\end{equation}
-This formula encodes the satirical premise that manufactured optimism accelerates systemic collapse.
+Juliani (2025) identifies ``mode collapse'' in LLM generation: models prompted for a specific genre over rely on statistically common surface markers, producing repetitive content. To avoid this, I designed an explicit values based system (see Appendix C: GDD, Section 4.2) where every player choice quantifiably impacts ``Reality'' ($R_S$) and ``Positive Energy'' ($P_E$) stats, which feed directly into AI prompts to modulate tone and direction. This transforms the theme into a measurable, directive principle rather than a static premise; the complete stat formulas and per-choice impact values are specified in Appendix C: GDD, Section 4.8. The central mechanic, the \textbf{Positive Energy Curse}, encodes the satirical premise that manufactured optimism accelerates systemic collapse: every increase in Positive Energy injects a proportional amount directly into the cumulative Void Entropy counter, making cheerfulness structurally self-defeating.
 
 This approach also resolved the ``infinite trash'' problem (Juliani, 2025). Rather than aiming for complete narrative freedom, I framed player agency within a core ironic loop: positive intentions systematically convert into negative outcomes. The Prayer System embodies this (Appendix C: GDD, Section 4.3), balancing dynamic generation with authorial control.
 
@@ -1096,7 +1089,7 @@ rather than performing semantic summarisation, which avoids any additional AI AP
 
 \subsection{The Butterfly Effect System}
 
-The \texttt{ButterflyEffectTracker} (\texttt{butterfly\_effect\_tracker.gd}) implements delayed consequence tracking, recording player choices with predicted future consequences. When the player advances scenes, the tracker checks for pending consequences and notifies the AI context system to incorporate relevant callbacks.
+The \texttt{ButterflyEffectTracker} (\texttt{butterfly\_effect\_tracker.gd}) implements delayed consequence tracking, recording player choices with predicted future consequences; the full system specification, including choice metadata structure and consequence seed schema, is documented in Appendix C: GDD, Section 4.9. When the player advances scenes, the tracker checks for pending consequences and notifies the AI context system to incorporate relevant callbacks.
 
 Implementing this system taught me about the challenges of managing temporal narrative state. The AI must be informed about past choices in a way that enables natural integration without forced callbacks. I addressed this through the \texttt{get\_context\_for\_ai()} method, which formats recent choices with their pending consequence counts, and the \texttt{suggest\_choice\_for\_callback()} method, which uses weighted random selection biased toward more recent choices to suggest natural callback opportunities.
 
@@ -1340,7 +1333,7 @@ Two export subsystems were implemented late in the development cycle as practica
 
 The \textbf{AI Usage Analytics Export} (\texttt{SettingsMenuAILogExport}) emerged directly from my evaluation methodology. To support functional testing, I needed auditable records of AI behaviour rather than pass/fail observations alone. The implemented telemetry pipeline records provider choice, latency, token usage, mode, prompts, and responses, then exposes both CSV and JSON export so those sessions can be reviewed outside the game. The detailed export structure is documented in Appendix C: GDD, Section 8.1.
 
-The \textbf{Story Narrative HTML Export} (\texttt{StoryExporter}) was conceived as a player facing feature that transforms the AI generated narrative into a persistent artefact. After each session, the player can export their complete story as a self contained HTML document styled with a parchment theme. The document includes a cover page summarising session statistics, a grid of final stat values, a chronological choice chronicle drawn from the \texttt{ButterflyEffectTracker}'s recorded choices (showing scene number, severity, stats at decision time, and triggered consequences), a key events log, and a closing quote calibrated to the player's Reality and Entropy scores. The HTML is entirely self contained with embedded CSS, including print friendly media queries, making it distributable without any game dependency.
+The \textbf{Story Narrative HTML Export} (\texttt{StoryExporter}) was conceived as a player facing feature that transforms the AI generated narrative into a persistent artefact. After each session, the player can export their complete story as a self contained HTML document styled with a parchment theme; the full document structure and generation procedure, including how session statistics, stat grids, choice chronicles, key events, and closing quotes are assembled, is specified in Appendix C: GDD, Section 8.2.
 
 Each implementation challenge produced an architectural decision that made the system more robust; Section 9 describes the testing strategy designed to verify these solutions.
 
