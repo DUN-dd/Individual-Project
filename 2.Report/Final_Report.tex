@@ -299,13 +299,13 @@ The memory-management literature informed the project's three-layer context mode
 
 \subsection{Runtime Constraints and Practical Considerations}
 
-Latency significantly impacts immersion in interactive narratives (Schomay, 2024; Juliani, 2025). For a project of this kind, that means the architecture must anticipate provider variability, support graceful fallback, and avoid coupling the entire game loop to a single response path.
+Research on player experience in AI-driven games identifies response latency as a significant threat to narrative immersion: even brief pauses break the sense of a living, responsive world (Schomay, 2024; Juliani, 2025). Furthermore, the literature warns against architectures that couple the entire gameplay loop to a single external call, since any network or rate-limit failure then stalls the whole experience. These findings establish that resilience and provider-agnosticism are not optional optimisations but baseline design requirements for any LLM-integrated game.
 
-Token budgets also require careful management. Rather than feeding entire conversation histories into prompts, production systems use hierarchical summarisation, Retrieval-Augmented Generation, and automated pruning (Sridi, 2025; Anthropic, 2025; DZone, 2024). This suggests that an implementation should preserve a small amount of recent detail, compress older continuity, and prioritise the most relevant state at prompt assembly time rather than replaying full transcripts.
+Token budget management is a second foundational concern identified in the literature. Production AI systems avoid replaying full conversation histories in each prompt, relying instead on hierarchical summarisation, Retrieval-Augmented Generation, and automated pruning to keep prompts within model context limits (Sridi, 2025; Anthropic, 2025; DZone, 2024). The implication is that a well-designed context pipeline must distinguish between information worth preserving in full, information worth compressing, and information that can be safely discarded, rather than treating all history as equally valuable.
 
-For content safety, prior work implies that prototypes should constrain the input space as early as possible (Buongiorno et al., 2024; O'Brien, 2024). In practical design terms, this favours structured player choices and tightly controlled text entry over unrestricted prompting.
+Content safety research suggests that constraining the input space at the earliest possible stage is more effective than attempting to filter outputs after the fact (Buongiorno et al., 2024; O'Brien, 2024). Architecturally, this points towards structured, discrete player choices rather than open-ended text fields as the primary interaction model, limiting the range of prompts the system can receive before generation occurs.
 
-Juliani's (2025) warning about ``infinite trash'' and Vidler and Walsh's (2025) findings on LLM statistical biases further suggest that a narrative system needs explicit directional constraints about thematic goals, not just content restrictions. For a project built around ironic inversion, this is especially important because the desired output is not merely relevant text, but text that preserves a very specific tonal contradiction.
+Finally, Juliani (2025) identifies a risk of ``infinite trash'' in unconstrained generative systems, where models default to statistically common outputs rather than producing content aligned with a specific artistic vision. Vidler and Walsh (2025) reinforce this by documenting how LLM outputs reflect population-level statistical biases that can undermine genre-specific or tonally precise projects. Together, these findings indicate that narrative coherence in a system requiring ironic inversion cannot be achieved through content restriction alone; it demands explicit directional constraints that define thematic goals, not merely prohibited categories.
 
 \subsection{Thematic Control and Values-Based Systems}
 
@@ -702,8 +702,29 @@ These design boundaries enabled the development workflow described in Section 6,
 %% ============ SECTION 6: PROJECT MANAGEMENT ============
 \section{Project Management and Reflection}
 
-This section reflects on how project-management decisions affected the development process and final outcome. I organised the project into five phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure~\ref{fig:gantt-chart}. The multi-provider architecture strategy, planning for Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and a built-in mock mode from the outset, proved essential as both a technical feature and a project-management strategy, enabling development to continue when I encountered API rate limiting issues. This defensive planning approach was critical for working with non-deterministic AI systems where outputs cannot be fully predicted in advance.
-I also built explicit buffer time between phases; this reserve absorbed unexpected response parsing issues during Core Development without causing a full schedule slip. In addition, I changed prompt engineering from a fixed two-week milestone into an ongoing parallel track, because output instability and rate-limit constraints required repeated template refinement across the whole implementation period.
+This section reflects on how project-management decisions affected the development process and final outcome, and evaluates honestly where the original plan held, where it required adjustment, and what those deviations revealed about the challenges of integrating AI into a live game system.
+
+\subsubsection*{Plan and Phases}
+
+The project was structured into five sequential phases: Foundation, Planning, Core Development, Integration, and Finalisation, illustrated in Figure~\ref{fig:gantt-chart}. At a high level, the project broadly followed this structure: Foundation and Planning proceeded close to schedule, and the Finalisation phase landed within the planned window. The Core Development and Integration phases, however, required significant mid-project adaptation.
+
+\subsubsection*{What Went to Plan}
+
+The multi-provider architecture strategy was one decision that proved more valuable than initially anticipated. By planning for multiple AI providers (Gemini, OpenRouter, Ollama, OpenAI, Claude, LM Studio, AI Router, and a built-in mock mode) from the outset, the project retained development continuity when API rate limiting and quota constraints became significant issues. This defensive planning approach turned out to be both a technical feature and a project-management safeguard; without it, rate-limit events that occurred in Weeks 10 and 13 would have caused full schedule slippage. The explicit buffer time built between phases similarly proved its worth, absorbing unexpected response parsing issues during Core Development without requiring a full re-plan.
+
+\subsubsection*{What Required Adjustment}
+
+The most significant deviation from the original plan was prompt engineering. It was initially scoped as a discrete two-week task within Core Development. In practice, prompt engineering could not be isolated to a single phase: every time game state variables changed, new narrative types were added, or testing revealed tonal drift, prompt templates required revision. I restructured this into an ongoing parallel track running from Week 3 through Finalisation. In retrospect, this was the correct decision, but the initial scope was too narrow; the original plan underestimated the iterative nature of aligning a general-purpose language model to a specific satirical framework.
+
+Response parsing also proved substantially more complex than anticipated. Early integration testing revealed that the AI's structured output format drifted unpredictably between valid JSON, prose-wrapped JSON, and mixed-format responses. Resolving this required building a multi-stage defensive parser that was not part of the original design specification. This consumed approximately two weeks that had been allocated to scene-level content creation during the Integration phase, which in turn compressed the time available for extended narrative testing.
+
+\subsubsection*{Was the Methodology Appropriate?}
+
+The spiral development model, returning iteratively to prompt engineering, testing, and architecture, was the right choice for a project that depended on non-deterministic outputs. A purely waterfall approach, completing each component in turn, would have deferred discovery of fundamental prompt stability issues until too late to address them. The trade-off was that scope had to be managed actively: several originally planned features were descoped to protect the core narrative pipeline.
+
+\subsubsection*{What Would Be Done Differently?}
+
+With the benefit of experience, there are three things I would approach differently. First, I would begin functional AI testing earlier, ideally in the Foundation phase, even with stub content, to surface parsing and latency issues before the architecture was committed. Second, I would allocate a formal risk budget to the Integration phase; the compression caused by parser work left less time than intended for testing the scene-asset pipeline. Third, I would version-control prompt templates from day one, as tracking which prompt changes caused which output shifts became difficult without a disciplined record.
 
 \begin{figure}[H]
     \centering
