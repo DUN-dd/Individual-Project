@@ -364,7 +364,7 @@ As identified in Section 2.5, effective context-management is critical for maint
     \begin{tikzpicture}[node distance=6mm and 10mm]
         % --- Layer boxes ---
         \node[reportwide, fill=ReportBlue!60, text width=52mm]
-            (static) {\textbf{Static Context Layer}\\{\scriptsize\texttt{ai\_context\_builder.gd}}\\{\scriptsize World bible, persona, rules}};
+            (static) {\textbf{Static Context Layer}\\{\scriptsize\texttt{ai\_prompt\_builder.gd}}\\{\scriptsize World bible, persona, rules}};
         \node[reportwide, fill=ReportTeal!60, text width=52mm, below=of static]
             (short) {\textbf{Short-Term Memory}\\{\scriptsize\texttt{AIMemoryStore} rolling window}\\{\scriptsize Last 6 exchanges}};
         \node[reportwide, fill=ReportGold!60, text width=52mm, below=of short]
@@ -440,7 +440,7 @@ I have designed the system architecture to be modular and scalable, built around
         \node[reportsmall, fill=ReportBlue!35, below=4mm of ps]
             (db) {\textbf{DebuffSystem}\\{\scriptsize\texttt{debuff\_system.gd}}};
         \node[reportsmall, fill=ReportBlue!35, below=4mm of db]
-            (sl) {\textbf{SaveLoadSystem}\\{\scriptsize\texttt{save\_load.gd}}};
+            (sl) {\textbf{SaveLoadSystem}\\{\scriptsize\texttt{save\_load\_system.gd}}};
         \begin{scope}[on background layer]
             \node[reportgroup, fill=ReportBlue!12, fit=(gs)(ps)(db)(sl), label={[font=\scriptsize\bfseries]above:Game State Subsystem}] {};
         \end{scope}
@@ -491,7 +491,7 @@ I have designed the system architecture to be modular and scalable, built around
             (llm) {\textbf{LLM API}\\{\scriptsize Provider layer}};
         % --- Parser ---
         \node[reportsmall, fill=ReportLavender!50, below=of ai]
-            (parser) {\textbf{ResponseParser}\\{\scriptsize JSON + directives}};
+            (parser) {\textbf{NarrativeParser}\\{\scriptsize JSON + directives}};
         % --- Memory ---
         \node[reportsmall, fill=ReportTeal!35, below=of parser]
             (mem) {\textbf{AIMemoryStore}\\{\scriptsize persist context}};
