@@ -295,8 +295,6 @@ func _show_chao_easter_egg() -> void:
 	var panel := Panel.new()
 	panel.custom_minimum_size = GameConstants.EasterEgg.CHAO_POPUP_SIZE
 	panel.pivot_offset = GameConstants.EasterEgg.CHAO_POPUP_SIZE / 2.0
-	panel.set_meta("chao_click_count", 0)
-	panel.set_meta("chao_scale_tween", null)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.03, 0.08, 0.98)
 	sb.corner_radius_top_left = 20
@@ -347,7 +345,7 @@ func _show_chao_easter_egg() -> void:
 	body_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	vbox.add_child(body_lbl)
 	var hint_lbl := Label.new()
-	var initial_remaining: int = _get_chao_popup_remaining_clicks(int(panel.get_meta("chao_click_count")))
+	var initial_remaining: int = _get_chao_popup_remaining_clicks(0)
 	hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": initial_remaining})
 	hint_lbl.add_theme_font_size_override("font_size", 15)
 	hint_lbl.add_theme_color_override("font_color", Color(0.95, 0.72, 0.76))
@@ -384,7 +382,7 @@ func _show_chao_easter_egg() -> void:
 		var mb := event as InputEventMouseButton
 		if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
 			return
-		var click_count := int(panel.get_meta("chao_click_count")) + 1
+		var click_count := int(panel.get_meta("chao_click_count", 0)) + 1
 		panel.set_meta("chao_click_count", click_count)
 		var remaining: int = _get_chao_popup_remaining_clicks(click_count)
 		if remaining > 0:
