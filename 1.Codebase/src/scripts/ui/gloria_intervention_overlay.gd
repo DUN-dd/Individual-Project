@@ -6,7 +6,7 @@ const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager
 const CHAO_EASTER_EGG_URL := "https://music.apple.com/tw/song/%E5%98%88/589362359"
 const CHAO_EASTER_EGG_TRIGGER_TARGET := 5
 const CHAO_EASTER_EGG_POPUP_CLICK_TARGET := 5
-const CHAO_EASTER_EGG_CLICK_TIMEOUT := 4.0
+const CHAO_EASTER_EGG_CLICK_TIMEOUT_MS := 4000
 const CHAO_EASTER_EGG_OVERLAY_Z_INDEX := 210
 const CHAO_EASTER_EGG_PANEL_SIZE := Vector2(560, 400)
 const VOICE_OPEN_IDS: Array[String] = [
@@ -268,7 +268,7 @@ func _on_subtitle_gui_input(event: InputEvent) -> void:
 	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
 		return
 	var now := Time.get_ticks_msec()
-	if _last_chao_click_time > 0 and (now - _last_chao_click_time) > int(CHAO_EASTER_EGG_CLICK_TIMEOUT * 1000.0):
+	if _last_chao_click_time > 0 and (now - _last_chao_click_time) > CHAO_EASTER_EGG_CLICK_TIMEOUT_MS:
 		_chao_click_count = 0
 	_last_chao_click_time = now
 	_chao_click_count += 1
@@ -298,6 +298,7 @@ func _show_chao_easter_egg() -> void:
 	var panel := Panel.new()
 	panel.custom_minimum_size = CHAO_EASTER_EGG_PANEL_SIZE
 	panel.pivot_offset = CHAO_EASTER_EGG_PANEL_SIZE / 2.0
+	panel.set_meta("chao_click_count", 0)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.03, 0.08, 0.98)
 	sb.corner_radius_top_left = 20
@@ -372,7 +373,6 @@ func _show_chao_easter_egg() -> void:
 	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	close_btn.pressed.connect(overlay.queue_free)
 	btn_row.add_child(close_btn)
-	var counter := [0]
 	var panel_tween: Tween = null
 	panel.gui_input.connect(func(event: InputEvent) -> void:
 		if not (event is InputEventMouseButton):
@@ -380,8 +380,9 @@ func _show_chao_easter_egg() -> void:
 		var mb := event as InputEventMouseButton
 		if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
 			return
-		counter[0] += 1
-		var remaining: int = CHAO_EASTER_EGG_POPUP_CLICK_TARGET - counter[0] as int
+		var click_count := int(panel.get_meta("chao_click_count", 0)) + 1
+		panel.set_meta("chao_click_count", click_count)
+		var remaining: int = CHAO_EASTER_EGG_POPUP_CLICK_TARGET - click_count
 		if remaining > 0:
 			hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_CLICK").format({"remaining": remaining})
 			if is_instance_valid(panel):
