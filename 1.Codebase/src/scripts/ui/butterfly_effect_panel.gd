@@ -41,6 +41,7 @@ var _game_state: Variant = null
 var _audio_manager: Variant = null
 var _secret_click_count: int = 0
 var _secret_easter_egg_unlocked: bool = false
+var _background_image_rect: TextureRect = null
 var _secret_image_container: CenterContainer = null
 var _secret_image_rect: TextureRect = null
 func _tr(key: String) -> String:
@@ -53,6 +54,7 @@ func _ready() -> void:
 	_lang = _game_state.current_language if _game_state else "en"
 	_is_ready = true
 	_apply_styles()
+	_setup_background_image()
 	_setup_secret_butterfly_image()
 	_connect_signals()
 	_refresh_ui()
@@ -100,6 +102,26 @@ func _apply_styles() -> void:
 	]
 	for i in range(_stat_cards.size()):
 		_style_stat_card(_stat_cards[i], card_colors[i % card_colors.size()])
+func _setup_background_image() -> void:
+	if not _panel or is_instance_valid(_background_image_rect):
+		return
+	var texture := _load_texture_safe(SECRET_BUTTERFLY_TEXTURE_PATH)
+	if texture == null:
+		return
+	_background_image_rect = TextureRect.new()
+	_background_image_rect.name = "ButterflyBackgroundImage"
+	_background_image_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_background_image_rect.offset_left = 2.0
+	_background_image_rect.offset_top = 2.0
+	_background_image_rect.offset_right = -2.0
+	_background_image_rect.offset_bottom = -2.0
+	_background_image_rect.texture = texture
+	_background_image_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_background_image_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_background_image_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_background_image_rect.modulate = Color(1.0, 1.0, 1.0, 0.12)
+	_panel.add_child(_background_image_rect)
+	_panel.move_child(_background_image_rect, 0)
 func _setup_secret_butterfly_image() -> void:
 	if not _header_bar or is_instance_valid(_secret_image_container):
 		return
