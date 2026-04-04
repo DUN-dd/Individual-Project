@@ -299,6 +299,7 @@ func _show_chao_easter_egg() -> void:
 	panel.custom_minimum_size = CHAO_EASTER_EGG_PANEL_SIZE
 	panel.pivot_offset = CHAO_EASTER_EGG_PANEL_SIZE / 2.0
 	panel.set_meta("chao_click_count", 0)
+	panel.set_meta("chao_scale_tween", null)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.08, 0.03, 0.08, 0.98)
 	sb.corner_radius_top_left = 20
@@ -373,7 +374,6 @@ func _show_chao_easter_egg() -> void:
 	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	close_btn.pressed.connect(overlay.queue_free)
 	btn_row.add_child(close_btn)
-	var panel_tween: Tween = null
 	panel.gui_input.connect(func(event: InputEvent) -> void:
 		if not (event is InputEventMouseButton):
 			return
@@ -384,13 +384,15 @@ func _show_chao_easter_egg() -> void:
 		panel.set_meta("chao_click_count", click_count)
 		var remaining: int = CHAO_EASTER_EGG_POPUP_CLICK_TARGET - click_count
 		if remaining > 0:
-			hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_CLICK").format({"remaining": remaining})
+			hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": remaining})
 			if is_instance_valid(panel):
-				if is_instance_valid(panel_tween):
-					panel_tween.kill()
-				panel_tween = create_tween()
-				panel_tween.tween_property(panel, "scale", Vector2(1.05, 1.05), 0.07)
-				panel_tween.tween_property(panel, "scale", Vector2.ONE, 0.07)
+				var existing_tween = panel.get_meta("chao_scale_tween", null)
+				if existing_tween is Tween and is_instance_valid(existing_tween):
+					existing_tween.kill()
+				var scale_tween := create_tween()
+				panel.set_meta("chao_scale_tween", scale_tween)
+				scale_tween.tween_property(panel, "scale", Vector2(1.05, 1.05), 0.07)
+				scale_tween.tween_property(panel, "scale", Vector2.ONE, 0.07)
 			return
 		OS.shell_open(CHAO_EASTER_EGG_URL)
 		overlay.queue_free()
