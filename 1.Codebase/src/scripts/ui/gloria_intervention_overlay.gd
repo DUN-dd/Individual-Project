@@ -262,10 +262,10 @@ func _on_subtitle_gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
 		return
-	var current_time_ms := Time.get_ticks_usec() / 1000.0
-	if _last_chao_click_time_millis > 0.0 and (current_time_ms - _last_chao_click_time_millis) > GameConstants.EasterEgg.CLICK_TIMEOUT_MS:
+	var current_time_millis := Time.get_ticks_usec() / 1000.0
+	if _last_chao_click_time_millis > 0.0 and (current_time_millis - _last_chao_click_time_millis) > GameConstants.EasterEgg.CLICK_TIMEOUT_MS:
 		_chao_click_count = 0
-	_last_chao_click_time_millis = current_time_ms
+	_last_chao_click_time_millis = current_time_millis
 	_chao_click_count += 1
 	_pulse_hidden_trigger()
 	if _chao_click_count < GameConstants.EasterEgg.HIDDEN_TRIGGER_CLICKS:
