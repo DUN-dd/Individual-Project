@@ -78,10 +78,10 @@ func _ready() -> void:
 	modulate = Color(1, 1, 1, 0)
 	_voice_rng.randomize()
 	continue_button.pressed.connect(_on_continue_pressed)
-	if subtitle_label:
-		subtitle_label.gui_input.connect(_on_subtitle_gui_input)
 	_setup_horror_background()
 	_apply_styles()
+	if subtitle_label:
+		subtitle_label.gui_input.connect(_on_subtitle_gui_input)
 	if _is_diary_judgment:
 		_apply_diary_judgment_portrait()
 	_apply_localization()
