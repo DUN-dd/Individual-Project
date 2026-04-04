@@ -8,6 +8,9 @@ const LYRICS_EASTER_EGG_URL := "https://www.youtube.com/watch?v=O7-81uAmgIw"
 const LYRICS_CLICK_TARGET := 5
 const LYRICS_CLICK_TIMEOUT := 5.0
 const LYRICS_DISCOVERY_SEQ := ["gloria", "fsm", "teacher"]
+const RELIC_EASTER_EGG_URL := "https://youtu.be/bjOAE17WajY"
+const RELIC_CLICK_TARGET := 5
+const RELIC_CLICK_TIMEOUT := 5.0
 @onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
 @onready var header_icon: TextureRect = $Root/ContentPanel/Margin/VBox/Header/HeaderIcon
 @onready var close_button: Button = $Root/ContentPanel/Margin/VBox/Header/CloseButton
@@ -78,6 +81,9 @@ var _lyrics_discovered: bool = false
 var _lyrics_discovery_index: int = 0
 var _lyrics_discovery_timer: float = 0.0
 const _LYRICS_DISCOVERY_TIMEOUT := 4.0
+var _relic_click_count: int = 0
+var _relic_click_timer: float = 0.0
+var _relic_label: Label = null
 const DAY_ACCENT_COLORS: Array = [
 	Color(1.0, 0.84, 0.0),
 	Color(0.31, 0.76, 0.97),
@@ -95,6 +101,7 @@ func _ready() -> void:
 	_connect_signals()
 	_populate_all_content()
 	_setup_lyrics_easter_egg()
+	_setup_relic_easter_egg()
 	_switch_tab(0)
 	UIStyleManager.fade_in(self, 0.5)
 	_update_layout()
@@ -120,6 +127,10 @@ func _process(delta: float) -> void:
 		_lyrics_discovery_timer -= delta
 		if _lyrics_discovery_timer <= 0.0:
 			_lyrics_discovery_index = 0
+	if _relic_click_count > 0:
+		_relic_click_timer -= delta
+		if _relic_click_timer <= 0.0:
+			_relic_click_count = 0
 func _refresh_services() -> void:
 	if ServiceLocator:
 		audio_manager = ServiceLocator.get_audio_manager()
@@ -304,6 +315,131 @@ func _show_lyrics_popup() -> void:
 	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
 	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
 	listen_btn.pressed.connect(func(): OS.shell_open(LYRICS_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_relic_easter_egg() -> void:
+	if not day_cards_container or not conc_card:
+		return
+	_relic_label = Label.new()
+	_relic_label.text = _tr("EASTER_EGG_RELIC_TEXT")
+	_relic_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_relic_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_relic_label.add_theme_font_size_override("font_size", 13)
+	_relic_label.add_theme_color_override("font_color", Color(0.72, 0.65, 0.50, 0.42))
+	_relic_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_relic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_relic_label.gui_input.connect(_on_relic_label_gui_input)
+	_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_HINT").format({"remaining": RELIC_CLICK_TARGET})
+	var idx := conc_card.get_index()
+	philosophy_section.add_child(_relic_label)
+	philosophy_section.move_child(_relic_label, idx)
+func _on_relic_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_relic_click_count += 1
+	_relic_click_timer = RELIC_CLICK_TIMEOUT
+	if _relic_label and is_instance_valid(_relic_label):
+		_relic_label.pivot_offset = _relic_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_relic_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_relic_label, "scale", Vector2.ONE, 0.10)
+	var remaining := RELIC_CLICK_TARGET - _relic_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_CLICK").format({"remaining": remaining})
+		else:
+			_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_HINT").format({"remaining": remaining})
+		return
+	_relic_click_count = 0
+	_relic_click_timer = 0.0
+	_show_relic_popup()
+func _show_relic_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(520, 340)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_RELIC_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.7, 0.6, 0.3, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_RELIC_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 18)
+	body_lbl.add_theme_color_override("default_color", Color(0.95, 0.90, 0.80))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_RELIC_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(RELIC_EASTER_EGG_URL))
 	btn_row.add_child(listen_btn)
 	var close_btn := Button.new()
 	close_btn.text = _tr("EASTER_EGG_CLOSE")

@@ -2673,3 +2673,9 @@ EASTER_EGG_PIG_SNAKE_PIGEON_BODY,你心地唔好咋嘛,你心地唔好咋嘛,你
 EASTER_EGG_PIG_SNAKE_PIGEON_OPEN,Open Wiki,打開維基,Wiki öffnen
 EASTER_EGG_PIG_SNAKE_PIGEON_HINT,"Hmm... ({remaining} clicks remaining)","嗯……（還有 {remaining} 下）","Hmm... ({remaining} Klicks verbleibend)"
 EASTER_EGG_PIG_SNAKE_PIGEON_CLICK,"Almost revealed... ({remaining} more)","快揭曉了……（還差 {remaining} 下）","Fast enthüllt... (noch {remaining} mal)"
+EASTER_EGG_RELIC_TEXT,"Give me one more moment... always missing you... then I can forget yesterday","給我多一刻　一直掛念你　我便能遺忘昨天","Gib mir noch einen Moment... dich stets vermissend... dann kann ich das Gestern vergessen"
+EASTER_EGG_RELIC_TITLE,~ ♪ Relic 遺物 ♪ ~,~ ♪ 遺物 ♪ ~,~ ♪ Relikt 遺物 ♪ ~
+EASTER_EGG_RELIC_BODY,"[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\nGive me one more moment\nAlways missing you\nThen I can forget yesterday\n\n[i]— 許廷鏗 Alfred Hui「遺物」[/i][/center]","[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\n[i]— 許廷鏗「遺物」\nTVB劇集「法外風雲」主題曲[/i][/center]","[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\nGib mir noch einen Moment\nDich stets vermissend\nDann kann ich das Gestern vergessen\n\n[i]— 許廷鏗 Alfred Hui「遺物」[/i][/center]"
+EASTER_EGG_RELIC_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_RELIC_HINT,"A faint echo... ({remaining} clicks remaining)","隱約的迴音……（還有 {remaining} 下）","Ein schwaches Echo... ({remaining} Klicks verbleibend)"
+EASTER_EGG_RELIC_CLICK,"The melody draws near... ({remaining} more)","旋律漸近……（還差 {remaining} 下）","Die Melodie kommt näher... (noch {remaining} mal)"
