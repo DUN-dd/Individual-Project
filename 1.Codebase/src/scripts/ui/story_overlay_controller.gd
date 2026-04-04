@@ -15,7 +15,6 @@ var pause_menu_scene: PackedScene
 var settings_menu_scene: PackedScene
 var journal_menu_scene: PackedScene
 var characters_page_scene: PackedScene
-var relationship_graph_scene: PackedScene
 var night_overlay_scene: PackedScene
 var gloria_overlay_scene: PackedScene
 var export_story_dialog_scene: PackedScene
@@ -25,6 +24,8 @@ var game_recap_overlay_scene: PackedScene
 var game_recap_overlay_instance: Control = null
 var achievement_viewer_scene: PackedScene
 var achievement_viewer_instance: Control = null
+var stats_viewer_scene: PackedScene
+var stats_viewer_instance: Control = null
 const GLORIA_BASE_LINE := "Always remember: the almighty deity is for your own good, and your pain is merely evidence that your thoughts aren't positive enough."
 func _tr(key: String) -> String:
 	if LocalizationManager:
@@ -35,12 +36,12 @@ func _init(p_story_scene: Control) -> void:
 	pause_menu_scene = load("res://1.Codebase/src/scenes/ui/pause_menu.tscn")
 	settings_menu_scene = load("res://1.Codebase/src/scenes/ui/settings_menu.tscn")
 	journal_menu_scene = load("res://1.Codebase/src/scenes/ui/journal_system.tscn")
-	relationship_graph_scene = load("res://1.Codebase/src/scenes/ui/relationship_graph_viewer.tscn")
 	characters_page_scene = load("res://1.Codebase/src/scenes/ui/characters_page.tscn")
 	night_overlay_scene = load("res://1.Codebase/src/scenes/ui/night_cycle_overlay.tscn")
 	gloria_overlay_scene = load("res://1.Codebase/src/scenes/ui/gloria_intervention_overlay.tscn")
 	export_story_dialog_scene = load("res://1.Codebase/src/scenes/ui/export_story_dialog.tscn")
 	achievement_viewer_scene = load("res://1.Codebase/src/scenes/ui/achievement_viewer.tscn")
+	stats_viewer_scene = load("res://1.Codebase/src/scenes/ui/gameplay_stats_viewer.tscn")
 func push_overlay_pause() -> bool:
 	overlay_pause_requests += 1
 	var tree := story_scene.get_tree()
@@ -90,6 +91,8 @@ func open_pause_menu() -> void:
 		pause_menu_instance.export_story_requested.connect(_on_pause_export_story)
 	if pause_menu_instance.has_signal("home_requested"):
 		pause_menu_instance.home_requested.connect(_on_pause_home)
+	if pause_menu_instance.has_signal("stats_requested"):
+		pause_menu_instance.stats_requested.connect(_on_pause_stats)
 	var audio_manager = get_audio_manager()
 	if audio_manager:
 		audio_manager.play_sfx("menu_click")
@@ -111,6 +114,24 @@ func _on_pause_journal() -> void:
 	open_journal_panel(false)
 func _on_pause_achievements() -> void:
 	open_achievement_viewer()
+func _on_pause_stats() -> void:
+	open_stats_viewer()
+func open_stats_viewer() -> void:
+	if stats_viewer_instance:
+		return
+	if not stats_viewer_scene:
+		_report_error("Stats viewer scene not loaded")
+		return
+	var paused_here: bool = push_overlay_pause()
+	stats_viewer_instance = stats_viewer_scene.instantiate()
+	_prepare_overlay_node(stats_viewer_instance)
+	story_scene.add_child(stats_viewer_instance)
+	if stats_viewer_instance is Control:
+		stats_viewer_instance.z_index = 200
+	stats_viewer_instance.tree_exiting.connect(_on_stats_viewer_closed.bind(paused_here))
+func _on_stats_viewer_closed(paused_here: bool) -> void:
+	stats_viewer_instance = null
+	pop_overlay_pause(paused_here)
 func open_achievement_viewer() -> void:
 	if achievement_viewer_instance:
 		return
@@ -281,30 +302,6 @@ func open_characters_page(start_in_graph_mode: bool = false) -> void:
 		audio_manager.play_sfx("menu_click")
 func _on_characters_page_closed(paused_here: bool) -> void:
 	characters_page_instance = null
-	pop_overlay_pause(paused_here)
-	var audio_manager = get_audio_manager()
-	if audio_manager:
-		audio_manager.play_sfx("menu_click")
-func open_relationship_graph(opened_from_topbar: bool = false) -> void:
-	if not relationship_graph_scene:
-		_report_error("Relationship graph scene not loaded")
-		return
-	var paused_here: bool = push_overlay_pause()
-	var graph_instance = relationship_graph_scene.instantiate()
-	_prepare_overlay_node(graph_instance)
-	story_scene.add_child(graph_instance)
-	if graph_instance is Control:
-		graph_instance.z_index = 200
-	if graph_instance.has_signal("close_requested"):
-		graph_instance.close_requested.connect(_on_relationship_graph_closed.bind(paused_here, graph_instance))
-	elif graph_instance.has_signal("hidden"):
-		graph_instance.hidden.connect(_on_relationship_graph_closed.bind(paused_here, graph_instance))
-	var audio_manager = get_audio_manager()
-	if audio_manager:
-		audio_manager.play_sfx("menu_click")
-func _on_relationship_graph_closed(paused_here: bool, instance: Node) -> void:
-	if instance and is_instance_valid(instance):
-		instance.queue_free()
 	pop_overlay_pause(paused_here)
 	var audio_manager = get_audio_manager()
 	if audio_manager:

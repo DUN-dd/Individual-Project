@@ -2,9 +2,7 @@ extends Control
 signal prayer_requested
 const ERROR_CONTEXT := "NightCycleOverlay"
 const UIStyleManager  = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
-const NIGHT_BG        = preload("res://1.Codebase/src/assets/ui/night_cycle_background.png")
 const STAGE_BG        = preload("res://1.Codebase/src/assets/ui/miss_chan_stage_background.png")
-const REFLECT_HDR     = preload("res://1.Codebase/src/assets/ui/night_reflection_header.png")
 const CHAN_HAPPY    = preload("res://1.Codebase/src/assets/characters/teacher_chan_happy.png")
 const CHAN_NEUTRAL  = preload("res://1.Codebase/src/assets/characters/teacher_chan_neutral.png")
 const CHAN_RAISED   = preload("res://1.Codebase/src/assets/characters/teacher_chan_arms_raised.png")
@@ -47,6 +45,12 @@ var _port_timer: float  = 0.0
 var _port_index: int    = 0
 const PORT_INTERVAL: float = 3.5
 var _portraits: Array   = []
+const THREE_AM_EASTER_EGG_URL := "https://music.apple.com/gb/song/3am/1393902364"
+const THREE_AM_CLICK_TARGET := 5
+const THREE_AM_CLICK_TIMEOUT := 5.0
+var _3am_click_count: int = 0
+var _3am_click_timer: float = 0.0
+var _3am_label: Label = null
 func _ready() -> void:
 	for child in get_children(): child.queue_free()
 	var gs = ServiceLocator.get_game_state() if ServiceLocator else null
@@ -54,6 +58,7 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	z_index = 100
 	_build_ui()
+	_setup_3am_easter_egg()
 	_start_failsafe_timer()
 	if get_parent() == get_tree().root:
 		get_tree().create_timer(0.5).timeout.connect(_on_failsafe_timeout)
@@ -62,6 +67,11 @@ func _ready() -> void:
 	t.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	t.tween_property(self, "modulate:a", 1.0, 0.7)
 func _process(delta: float) -> void:
+	if _3am_click_count > 0:
+		_3am_click_timer += delta
+		if _3am_click_timer >= THREE_AM_CLICK_TIMEOUT:
+			_3am_click_count = 0
+			_3am_click_timer = 0.0
 	if current_lyrics.size() > 0 and lyrics_line_index < current_lyrics.size():
 		lyrics_animation_time += delta
 		if lyrics_animation_time >= LYRICS_LINE_DURATION:
@@ -92,12 +102,9 @@ func _exit_tree() -> void:
 	var audio = _get_audio()
 	if audio and audio.has_method("stop_music"): audio.stop_music(0.5)
 func _build_ui() -> void:
-	var bg = TextureRect.new()
-	bg.texture = NIGHT_BG
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	var bg = ColorRect.new()
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.modulate = Color(0.50, 0.50, 0.72, 1.0)
+	bg.color = Color(0.09, 0.07, 0.18, 1.0)
 	add_child(bg)
 	var overlay = ColorRect.new()
 	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -734,3 +741,86 @@ func _add_stage_lights(panel: PanelContainer) -> void:
 		tw.tween_property(light, "color:a", 0.30, 1.6 + i * 0.45).set_trans(Tween.TRANS_SINE)
 		tw.tween_property(light, "color:a", 0.05, 1.6 + i * 0.45).set_trans(Tween.TRANS_SINE)
 		_concert_tweens.append(tw)
+func _setup_3am_easter_egg() -> void:
+	if not _title_label:
+		return
+	var parent_container = _title_label.get_parent()
+	if not parent_container:
+		return
+	_3am_label = Label.new()
+	_3am_label.text = _tr("EASTER_EGG_3AM_TEXT")
+	_3am_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_3am_label.add_theme_font_size_override("font_size", 11)
+	_3am_label.add_theme_color_override("font_color", Color(0.68, 0.60, 0.88, 0.28))
+	_3am_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_3am_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_3am_label.tooltip_text = _tr("EASTER_EGG_3AM_HINT").replace("{remaining}", str(THREE_AM_CLICK_TARGET))
+	_3am_label.gui_input.connect(_on_3am_label_gui_input)
+	parent_container.add_child(_3am_label)
+func _on_3am_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_3am_click_count += 1
+	_3am_click_timer = 0.0
+	var remaining := THREE_AM_CLICK_TARGET - _3am_click_count
+	if _3am_label and remaining > 0:
+		_3am_label.tooltip_text = _tr("EASTER_EGG_3AM_CLICK").replace("{remaining}", str(remaining))
+	if _3am_click_count >= THREE_AM_CLICK_TARGET:
+		_3am_click_count = 0
+		_3am_click_timer = 0.0
+		_show_3am_popup()
+func _show_3am_popup() -> void:
+	var overlay = ColorRect.new()
+	overlay.color = Color(0.0, 0.0, 0.0, 0.65)
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 210
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	var popup_panel = PanelContainer.new()
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.06, 0.04, 0.16, 0.97)
+	panel_style.border_color = Color(0.55, 0.45, 0.82, 0.60)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(12)
+	popup_panel.add_theme_stylebox_override("panel", panel_style)
+	popup_panel.set_anchors_preset(Control.PRESET_CENTER)
+	popup_panel.custom_minimum_size = Vector2(420, 0)
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 28)
+	margin.add_theme_constant_override("margin_top", 28)
+	margin.add_theme_constant_override("margin_right", 28)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	popup_panel.add_child(margin)
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 14)
+	margin.add_child(vbox)
+	var title_lbl = Label.new()
+	title_lbl.text = _tr("EASTER_EGG_3AM_TITLE")
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_font_size_override("font_size", 17)
+	title_lbl.add_theme_color_override("font_color", Color(0.78, 0.72, 1.00))
+	title_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	vbox.add_child(title_lbl)
+	var body_lbl = RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.fit_content = true
+	body_lbl.custom_minimum_size = Vector2(364, 0)
+	body_lbl.text = _tr("EASTER_EGG_3AM_BODY")
+	body_lbl.add_theme_font_size_override("normal_font_size", 14)
+	body_lbl.add_theme_color_override("default_color", Color(0.88, 0.87, 0.96))
+	vbox.add_child(body_lbl)
+	var listen_btn = Button.new()
+	listen_btn.text = _tr("EASTER_EGG_3AM_LISTEN")
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	listen_btn.pressed.connect(func(): OS.shell_open(THREE_AM_EASTER_EGG_URL))
+	vbox.add_child(listen_btn)
+	var close_btn = Button.new()
+	close_btn.text = _tr("EASTER_EGG_3AM_CLICK").replace("{remaining}", "0")
+	UIStyleManager.apply_button_style(close_btn, "secondary", "medium")
+	close_btn.pressed.connect(func(): overlay.queue_free())
+	vbox.add_child(close_btn)
+	overlay.add_child(popup_panel)
+	add_child(overlay)
+	UIStyleManager.fade_in(overlay, 0.3)

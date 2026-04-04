@@ -205,6 +205,15 @@ var save_detailed_ai_call_logs: bool:
 	set(value):
 		if _config_manager:
 			_config_manager.save_detailed_ai_call_logs = value
+var request_timeout: float:
+	get:
+		return _config_manager.request_timeout if _config_manager else GameConstants.AI.DEFAULT_REQUEST_TIMEOUT
+	set(value):
+		var clamped := clampf(value, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
+		if _config_manager:
+			_config_manager.request_timeout = clamped
+		if _request_manager and _request_manager.has_method("set_request_timeout"):
+			_request_manager.set_request_timeout(clamped)
 var pending_callback: Callable:
 	get:
 		return _request_manager.pending_callback if _request_manager else Callable()
@@ -529,6 +538,10 @@ func get_token_usage_history() -> Array:
 	if _request_manager:
 		return _request_manager.get_token_usage_history()
 	return []
+func get_last_actual_model() -> String:
+	if _request_manager:
+		return _request_manager.get_last_actual_model()
+	return ""
 func get_call_log() -> Array:
 	if _request_manager:
 		return _request_manager.get_call_log()

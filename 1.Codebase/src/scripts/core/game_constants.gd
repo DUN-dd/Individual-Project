@@ -81,6 +81,12 @@ class UI:
 	const COLOR_STAT_HIGH := Color(0.2, 0.8, 0.2)
 	const COLOR_STAT_MEDIUM := Color(0.8, 0.8, 0.2)
 	const COLOR_STAT_LOW := Color(0.8, 0.2, 0.2)
+class EasterEgg:
+	const HIDDEN_TRIGGER_CLICKS := 5
+	const POPUP_UNLOCK_CLICKS := 5
+	const CLICK_TIMEOUT_MS := 4000
+	const POPUP_OVERLAY_Z_INDEX := 210
+	const CHAO_POPUP_SIZE := Vector2(560, 400)
 class Achievements:
 	const SKILL_CHECK_SUCCESS_THRESHOLD := 10
 	const MISSION_COMPLETION_THRESHOLD := 5
@@ -99,7 +105,9 @@ class AI:
 	const MIN_REQUEST_INTERVAL_MSEC := 1500
 	const MAX_REQUESTS_PER_MINUTE := 10
 	const RATE_LIMIT_COOLDOWN_MSEC := 5000
-	const DEFAULT_REQUEST_TIMEOUT := 24.0
+	const DEFAULT_REQUEST_TIMEOUT := 60.0
+	const MIN_REQUEST_TIMEOUT := 10.0
+	const MAX_REQUEST_TIMEOUT := 300.0
 	const DEFAULT_MAX_RETRIES := 2
 	const MAX_HISTORY_SIZE := 20
 	const DEFAULT_INPUT_SAMPLE_RATE := 16000
@@ -110,7 +118,7 @@ class AI:
 	const MEMORY_SUMMARY_THRESHOLD := 10
 	const MAX_MEMORY_ITEMS := 20
 	const PROMPT_MIN_LENGTH := 1
-	const PROMPT_MAX_LENGTH := 16000
+	const PROMPT_MAX_LENGTH := 65536  # Safety guard before token-budget truncation in ai_prompt_builder.gd
 	const PROMPT_FORBIDDEN_PATTERN := "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]"
 class Choice:
 	const SKILL_SUCCESS_REALITY_BONUS := 5

@@ -25,6 +25,12 @@ var ai_error_home_button: Button
 var loading_animation_time: float = 0.0
 var loading_start_time: float = 0.0
 var current_loading_context: String = "default"
+var _sequel_click_count: int = 0
+var _sequel_click_timer: float = 0.0
+var _sequel_label: Label = null
+var _active_egg: String = ""
+var _serial_line_index: int = 0
+var _serial_line_timer: float = 0.0
 var _story_typewriter_tween: Tween = null
 var _current_story_index: int = -1  
 var _is_viewing_history: bool = false
@@ -35,6 +41,12 @@ const MarkdownParser = preload("res://1.Codebase/src/scripts/ui/markdown_parser.
 const StoryUIHelper = preload("res://1.Codebase/src/scripts/ui/story_ui_helper.gd")
 const LoadingDisplay = preload("res://1.Codebase/src/scripts/ui/loading_display.gd")
 const GameConstants = preload("res://1.Codebase/src/scripts/core/game_constants.gd")
+const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const SEQUEL_EASTER_EGG_URL := "https://music.apple.com/us/song/%E7%BA%8C%E9%9B%86-%E5%8A%87%E9%9B%86-on-call-36-%E5%B0%8F%E6%99%82-ii-%E4%B8%BB%E9%A1%8C%E6%9B%B2/1842800665"
+const SERIAL_EASTER_EGG_URL := "https://music.apple.com/us/song/%E9%80%A3%E7%BA%8C%E5%8A%87-%E5%8A%87%E9%9B%86-on-call-36-%E5%B0%8F%E6%99%82-%E4%B8%BB%E9%A1%8C%E6%9B%B2/1845271247"
+const SEQUEL_CLICK_TARGET := 5
+const SEQUEL_CLICK_TIMEOUT := 5.0
+const SERIAL_CYCLE_INTERVAL := 3.0
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -81,6 +93,7 @@ func _setup_ui_references() -> void:
 		setup_story_navigation_buttons(p_btn, n_btn, n_lbl)
 	else:
 		_report_warning("Story navigation buttons not found, nav bar will not be functional")
+	_setup_sequel_easter_egg()
 func _resolve_ui_bindings() -> StorySceneUIBindings:
 	if not story_scene:
 		return null
@@ -221,9 +234,27 @@ func _start_loading(context: String) -> void:
 			loading_model_label.text = ""
 	if loading_timer_label:
 		loading_timer_label.text = "00:00"
+	_active_egg = "sequel" if randf() < 0.5 else "serial"
+	_serial_line_index = 0
+	_serial_line_timer = 0.0
+	_sequel_click_count = 0
+	_sequel_click_timer = 0.0
+	if _sequel_label and is_instance_valid(_sequel_label):
+		_sequel_label.modulate.a = 1.0
+		if _active_egg == "sequel":
+			_sequel_label.text = _tr("EASTER_EGG_SEQUEL_TEXT")
+			_sequel_label.tooltip_text = _tr("EASTER_EGG_SEQUEL_HINT").format({"remaining": SEQUEL_CLICK_TARGET})
+		else:
+			_sequel_label.text = _tr("EASTER_EGG_SERIAL_LINE_1")
+			_sequel_label.tooltip_text = _tr("EASTER_EGG_SERIAL_HINT").format({"remaining": SEQUEL_CLICK_TARGET})
 func _stop_loading() -> void:
 	if loading_overlay:
 		loading_overlay.visible = false
+	_sequel_click_count = 0
+	_sequel_click_timer = 0.0
+	_serial_line_index = 0
+	_serial_line_timer = 0.0
+	_active_egg = ""
 func update_loading_progress(progress_info: Dictionary) -> void:
 	if not loading_overlay or not loading_overlay.visible:
 		return
@@ -241,6 +272,20 @@ func process_loading_animation(delta: float) -> void:
 	if loading_timer_label:
 		var elapsed := (Time.get_ticks_msec() / 1000.0) - loading_start_time
 		loading_timer_label.text = LoadingDisplay.format_elapsed_time(elapsed)
+	if _sequel_click_count > 0:
+		_sequel_click_timer -= delta
+		if _sequel_click_timer <= 0.0:
+			_sequel_click_count = 0
+	if _active_egg == "serial" and _sequel_label and is_instance_valid(_sequel_label):
+		_serial_line_timer += delta
+		if _serial_line_timer >= SERIAL_CYCLE_INTERVAL:
+			_serial_line_timer = 0.0
+			_serial_line_index = (_serial_line_index + 1) % 4
+			var next_line := _get_serial_line(_serial_line_index)
+			var fade_tw := story_scene.create_tween()
+			fade_tw.tween_property(_sequel_label, "modulate:a", 0.0, 0.3)
+			fade_tw.tween_callback(func(): _sequel_label.text = next_line)
+			fade_tw.tween_property(_sequel_label, "modulate:a", 1.0, 0.3)
 func show_ai_error_overlay(title: String, message: String, details: String = "", offline_enabled: bool = true) -> void:
 	if not ai_error_overlay:
 		return
@@ -299,6 +344,231 @@ func hide_ai_error_overlay() -> void:
 		ai_error_offline_button.visible = false
 	if ai_error_home_button:
 		ai_error_home_button.visible = false
+func _setup_sequel_easter_egg() -> void:
+	if _sequel_label and is_instance_valid(_sequel_label):
+		return
+	if not loading_overlay:
+		return
+	var vbox := loading_overlay.get_node_or_null("CenterContainer/VBoxContainer")
+	if not vbox:
+		return
+	_sequel_label = Label.new()
+	_sequel_label.text = _tr("EASTER_EGG_SEQUEL_TEXT")
+	_sequel_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_sequel_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_sequel_label.add_theme_font_size_override("font_size", 13)
+	_sequel_label.add_theme_color_override("font_color", Color(0.72, 0.65, 0.50, 0.80))
+	_sequel_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_sequel_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_sequel_label.gui_input.connect(_on_sequel_label_gui_input)
+	_sequel_label.tooltip_text = _tr("EASTER_EGG_SEQUEL_HINT").format({"remaining": SEQUEL_CLICK_TARGET})
+	vbox.add_child(_sequel_label)
+	vbox.move_child(_sequel_label, vbox.get_child_count() - 1)
+func _on_sequel_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_sequel_click_count += 1
+	_sequel_click_timer = SEQUEL_CLICK_TIMEOUT
+	if _sequel_label and is_instance_valid(_sequel_label):
+		_sequel_label.pivot_offset = _sequel_label.size * 0.5
+		var tween := story_scene.create_tween()
+		tween.tween_property(_sequel_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_sequel_label, "scale", Vector2.ONE, 0.10)
+	var remaining := SEQUEL_CLICK_TARGET - _sequel_click_count
+	if remaining > 0:
+		if _sequel_label and is_instance_valid(_sequel_label):
+			var hint_key := "EASTER_EGG_SEQUEL_HINT" if _active_egg == "sequel" else "EASTER_EGG_SERIAL_HINT"
+			var click_key := "EASTER_EGG_SEQUEL_CLICK" if _active_egg == "sequel" else "EASTER_EGG_SERIAL_CLICK"
+			if remaining <= 2:
+				_sequel_label.tooltip_text = _tr(click_key).format({"remaining": remaining})
+			else:
+				_sequel_label.tooltip_text = _tr(hint_key).format({"remaining": remaining})
+		return
+	_sequel_click_count = 0
+	_sequel_click_timer = 0.0
+	if _active_egg == "serial":
+		_show_serial_popup()
+	else:
+		_show_sequel_popup()
+func _show_sequel_popup() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center_c := CenterContainer.new()
+	center_c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center_c)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center_c.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_SEQUEL_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.72, 0.60, 0.35, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_SEQUEL_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_SEQUEL_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(160, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(SEQUEL_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	story_scene.get_tree().root.add_child(overlay)
+	var fade_tw := story_scene.create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _get_serial_line(index: int) -> String:
+	var keys := [
+		"EASTER_EGG_SERIAL_LINE_1",
+		"EASTER_EGG_SERIAL_LINE_2",
+		"EASTER_EGG_SERIAL_LINE_3",
+		"EASTER_EGG_SERIAL_LINE_4",
+	]
+	return _tr(keys[index])
+func _show_serial_popup() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center_c := CenterContainer.new()
+	center_c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center_c)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center_c.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_SERIAL_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.72, 0.60, 0.35, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_SERIAL_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_SERIAL_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(160, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(SERIAL_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	story_scene.get_tree().root.add_child(overlay)
+	var fade_tw := story_scene.create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
 func _get_current_model_name(ai_manager: Node) -> String:
 	if not ai_manager:
 		return "Unknown"

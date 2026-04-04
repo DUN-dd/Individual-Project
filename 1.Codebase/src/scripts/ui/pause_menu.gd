@@ -13,6 +13,7 @@ signal achievements_requested
 signal characters_requested
 signal home_requested
 signal export_story_requested
+signal stats_requested
 @onready var resume_button: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonsContainer/ResumeButton
 @onready var settings_button: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonsContainer/SettingsButton
 @onready var journal_button: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonsContainer/JournalButton
@@ -24,6 +25,7 @@ signal export_story_requested
 var title_label: Label
 var token_header_label: Label
 var _audio_manager: Node = null
+var stats_button: Button = null
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_locate_labels()
@@ -51,6 +53,16 @@ func _ready():
 		export_story_button.pressed.connect(_on_export_story_pressed)
 	if home_button and not home_button.pressed.is_connected(_on_home_pressed):
 		home_button.pressed.connect(_on_home_pressed)
+	var buttons_container = $CenterContainer/Panel/MarginContainer/VBoxContainer/ButtonsContainer
+	if buttons_container:
+		stats_button = Button.new()
+		stats_button.pressed.connect(_on_stats_pressed)
+		if home_button:
+			buttons_container.add_child(stats_button)
+			buttons_container.move_child(stats_button, home_button.get_index())
+		else:
+			buttons_container.add_child(stats_button)
+		_style_stats_button()
 func _exit_tree():
 	if LocalizationManager and LocalizationManager.language_changed.is_connected(_update_text):
 		LocalizationManager.language_changed.disconnect(_update_text)
@@ -121,6 +133,8 @@ func _update_text(lang: String = "") -> void:
 		characters_button.text = get_text.call("PAUSE_MENU_CHARACTERS")
 	if export_story_button:
 		export_story_button.text = get_text.call("PAUSE_MENU_EXPORT_STORY")
+	if stats_button:
+		stats_button.text = get_text.call("PAUSE_MENU_STATS")
 	if title_label:
 		title_label.text = get_text.call("PAUSE_TITLE")
 	if token_header_label:
@@ -146,6 +160,24 @@ func _on_export_story_pressed():
 func _on_home_pressed():
 	_play_sfx("menu_click")
 	emit_signal("home_requested")
+func _on_stats_pressed():
+	_play_sfx("menu_click")
+	emit_signal("stats_requested")
+func _style_stats_button() -> void:
+	if not stats_button:
+		return
+	stats_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	stats_button.custom_minimum_size = Vector2(400, 55)
+	if LocalizationManager:
+		stats_button.text = LocalizationManager.get_translation("PAUSE_MENU_STATS")
+	else:
+		stats_button.text = "Stats"
+	UIStyleManager.apply_button_style(stats_button, "primary", "medium")
+	stats_button.icon = ICON_ACHIEVEMENTS
+	stats_button.expand_icon = true
+	UIStyleManager.add_hover_scale_effect(stats_button, 1.05)
+	UIStyleManager.add_press_feedback(stats_button)
+	stats_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 func _refresh_token_report() -> void:
 	var ai_manager = ServiceLocator.get_ai_manager() if ServiceLocator else null
 	if ai_manager == null:
@@ -175,6 +207,19 @@ func _refresh_token_report() -> void:
 			model_name = ai_manager.openrouter_model
 		AIConfigManager.AIProvider.OLLAMA:
 			model_name = ai_manager.ollama_model
+		AIConfigManager.AIProvider.OPENAI:
+			model_name = ai_manager.openai_model
+		AIConfigManager.AIProvider.CLAUDE:
+			model_name = ai_manager.claude_model
+		AIConfigManager.AIProvider.LMSTUDIO:
+			model_name = ai_manager.lmstudio_model
+		AIConfigManager.AIProvider.AI_ROUTER:
+			model_name = ai_manager.ai_router_model
+	var actual_model: String = ai_manager.get_last_actual_model()
+	if not actual_model.is_empty() and actual_model != model_name:
+		model_name = model_name + " (" + actual_model + ")"
+	elif not actual_model.is_empty() and model_name == "Unknown":
+		model_name = actual_model
 	var provider_label = LocalizationManager.get_translation("PAUSE_AI_PROVIDER") if LocalizationManager else "AI Provider"
 	var model_label = LocalizationManager.get_translation("PAUSE_AI_MODEL") if LocalizationManager else "Active Model"
 	report_text += "[b]%s[/b]: %s\n" % [provider_label, provider_name]

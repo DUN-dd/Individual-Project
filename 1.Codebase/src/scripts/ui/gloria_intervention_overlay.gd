@@ -3,6 +3,7 @@ signal continue_requested
 const ErrorReporterBridge = preload("res://1.Codebase/src/scripts/core/error_reporter_bridge.gd")
 const ERROR_CONTEXT := "GloriaInterventionOverlay"
 const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const CHAO_EASTER_EGG_URL := "https://music.apple.com/tw/song/%E5%98%88/589362359"
 const VOICE_OPEN_IDS: Array[String] = [
 	"gloria_open_01",
 	"gloria_open_02",
@@ -38,14 +39,17 @@ const VOICE_ACCEPT_IDS: Array[String] = [
 @onready var content_panel: Panel = $ContentPanel
 @onready var body_text: RichTextLabel = $ContentPanel/Margin/VBox/BodyText
 @onready var continue_button: Button = $ContentPanel/Margin/VBox/ContinueButton
-@onready var name_label: Label = $ContentPanel/Margin/VBox/PortraitRow/TitleBox/Name
-@onready var subtitle_label: Label = $ContentPanel/Margin/VBox/PortraitRow/TitleBox/Subtitle
-@onready var portrait: TextureRect = $ContentPanel/Margin/VBox/PortraitRow/Portrait
+@onready var name_label: Label = $ContentPanel/Margin/VBox/TitleBox/Name
+@onready var subtitle_label: Label = $ContentPanel/Margin/VBox/TitleBox/Subtitle
+@onready var portrait: TextureRect = $ContentPanel/Margin/VBox/Portrait
 @onready var dim_background: ColorRect = $Dim
 const CRYING_FACE_PATH = "res://1.Codebase/src/assets/characters/gloria_protagonis_sad.png"
 const ANGRY_FACE_TEXTURE = preload("res://1.Codebase/src/assets/characters/gloria_protagonis_angry.png")
+const JUDGE_COURT_TEXTURE = preload("res://1.Codebase/src/assets/characters/gloria_judge_court.png")
 @onready var ai_guilt_text: RichTextLabel = $ContentPanel/Margin/VBox/AIGuiltText
 @onready var horror_bg_container: Control = $HorrorBackground
+@onready var intervention_counter: Label = $ContentPanel/Margin/VBox/InterventionCounter
+@onready var rebirth_suggestion_label: Label = $ContentPanel/Margin/VBox/RebirthSuggestionLabel
 var is_generating_guilt: bool = false
 var _voice_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _has_played_main_voice: bool = false
@@ -54,6 +58,9 @@ var _sound_catalog_reloaded: bool = false
 var _playlist_was_active: bool = false
 var _is_diary_judgment: bool = false
 var _current_voice_key: String = ""
+var _chao_click_count: int = 0
+var _last_chao_click_time_millis: float = 0.0
+var _gloria_trigger_count: int = 0
 func _report_info(message: String, details: Dictionary = {}) -> void:
 	ErrorReporterBridge.report_info(ERROR_CONTEXT, message, details)
 func _report_warning(message: String, details: Dictionary = {}) -> void:
@@ -72,9 +79,11 @@ func _ready() -> void:
 	continue_button.pressed.connect(_on_continue_pressed)
 	_setup_horror_background()
 	_apply_styles()
-	if _is_diary_judgment:
-		_apply_diary_judgment_portrait()
+	if subtitle_label:
+		subtitle_label.gui_input.connect(_on_subtitle_gui_input)
+	_apply_diary_judgment_portrait()
 	_apply_localization()
+	_setup_intervention_counter()
 	_start_bgm()
 	await get_tree().process_frame
 	if body_text.get_parsed_text().is_empty() and (not ai_guilt_text or ai_guilt_text.text.is_empty()):
@@ -251,6 +260,263 @@ func _animate_in() -> void:
 		pulse_tween.set_trans(Tween.TRANS_SINE)
 		pulse_tween.tween_property(portrait, "scale", Vector2(1.2, 1.2), 0.8)
 		pulse_tween.tween_property(portrait, "scale", Vector2.ONE, 0.8)
+	await get_tree().create_timer(0.8).timeout
+	_slam_guilty_stamp()
+
+func _get_gloria_trigger_count() -> int:
+	if AchievementSystem and AchievementSystem.get("_progress_counters") is Dictionary:
+		return int(AchievementSystem._progress_counters.get("gloria_triggers", 0))
+	return 0
+
+func _setup_intervention_counter() -> void:
+	if not intervention_counter:
+		return
+	_gloria_trigger_count = _get_gloria_trigger_count()
+	if _gloria_trigger_count <= 0:
+		intervention_counter.visible = false
+		return
+	var count_text: String = ""
+	match _gloria_trigger_count:
+		1:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_1")
+		2:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_2")
+		3:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_3")
+		_:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_MANY").format({"count": _gloria_trigger_count})
+	intervention_counter.text = count_text
+	intervention_counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intervention_counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if FontManager:
+		FontManager.apply_to_label(intervention_counter, 22)
+	var severity_color: Color
+	if _gloria_trigger_count == 1:
+		severity_color = Color(0.85, 0.65, 0.65)
+	elif _gloria_trigger_count == 2:
+		severity_color = Color(1.0, 0.5, 0.4)
+	else:
+		severity_color = Color(1.0, 0.25, 0.2)
+	intervention_counter.add_theme_color_override("font_color", severity_color)
+	intervention_counter.modulate.a = 0.0
+	intervention_counter.visible = true
+	var fade_tween := intervention_counter.create_tween()
+	fade_tween.set_ease(Tween.EASE_OUT)
+	fade_tween.set_trans(Tween.TRANS_CUBIC)
+	fade_tween.tween_property(intervention_counter, "modulate:a", 1.0, 0.8)
+
+func _slam_guilty_stamp() -> void:
+	if not is_inside_tree() or not is_instance_valid(content_panel):
+		return
+	var stamp_text: String
+	if _is_diary_judgment:
+		stamp_text = _tr("GLORIA_STAMP_VERDICT_CONFIRMED")
+	else:
+		stamp_text = _tr("GLORIA_STAMP_GUILTY")
+	var stamp := Label.new()
+	stamp.text = stamp_text
+	stamp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stamp.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	stamp.anchor_left = 0.70
+	stamp.anchor_top = 0.42
+	stamp.anchor_right = 0.70
+	stamp.anchor_bottom = 0.42
+	stamp.offset_left = 0
+	stamp.offset_top = 0
+	stamp.offset_right = 0
+	stamp.offset_bottom = 0
+	stamp.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	stamp.grow_vertical = Control.GROW_DIRECTION_BOTH
+	stamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stamp.add_theme_font_size_override("font_size", 140)
+	stamp.add_theme_color_override("font_color", Color(0.85, 0.1, 0.1, 0.85))
+	stamp.add_theme_color_override("font_shadow_color", Color(0.3, 0.0, 0.0, 0.6))
+	stamp.add_theme_constant_override("shadow_offset_x", 4)
+	stamp.add_theme_constant_override("shadow_offset_y", 4)
+	stamp.add_theme_color_override("font_outline_color", Color(0.5, 0.0, 0.0, 0.9))
+	stamp.add_theme_constant_override("outline_size", 6)
+	stamp.rotation_degrees = -18.0
+	stamp.pivot_offset = stamp.size / 2.0
+	stamp.scale = Vector2(4.0, 4.0)
+	stamp.modulate.a = 0.0
+	content_panel.add_child(stamp)
+	await get_tree().process_frame
+	stamp.pivot_offset = stamp.size / 2.0
+	var slam_tween := stamp.create_tween()
+	slam_tween.set_parallel(true)
+	slam_tween.tween_property(stamp, "scale", Vector2.ONE, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	slam_tween.tween_property(stamp, "modulate:a", 1.0, 0.15).set_ease(Tween.EASE_OUT)
+	await slam_tween.finished
+	_shake_screen(8.0, 0.2)
+	if AudioManager:
+		AudioManager.play_sfx("menu_click", 0.9)
+	var pulse_tween := stamp.create_tween()
+	pulse_tween.set_loops()
+	pulse_tween.set_ease(Tween.EASE_IN_OUT)
+	pulse_tween.set_trans(Tween.TRANS_SINE)
+	pulse_tween.tween_property(stamp, "modulate:a", 0.55, 1.5)
+	pulse_tween.tween_property(stamp, "modulate:a", 0.85, 1.5)
+
+func _shake_screen(intensity: float, duration: float) -> void:
+	if not is_inside_tree() or not is_instance_valid(content_panel):
+		return
+	var original_pos := content_panel.position
+	var shake_tween := content_panel.create_tween()
+	var steps: int = int(duration / 0.03)
+	for i in range(steps):
+		var offset := Vector2(
+			randf_range(-intensity, intensity),
+			randf_range(-intensity, intensity)
+		)
+		shake_tween.tween_property(content_panel, "position", original_pos + offset, 0.03)
+	shake_tween.tween_property(content_panel, "position", original_pos, 0.03)
+
+func _on_subtitle_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	var current_time_millis := Time.get_ticks_usec() / 1000.0
+	if _last_chao_click_time_millis > 0.0 and (current_time_millis - _last_chao_click_time_millis) > GameConstants.EasterEgg.CLICK_TIMEOUT_MS:
+		_chao_click_count = 0
+	_last_chao_click_time_millis = current_time_millis
+	_chao_click_count += 1
+	_pulse_hidden_trigger()
+	if _chao_click_count < GameConstants.EasterEgg.HIDDEN_TRIGGER_CLICKS:
+		return
+	_chao_click_count = 0
+	_show_chao_easter_egg()
+func _get_chao_popup_remaining_clicks(click_count: int) -> int:
+	return GameConstants.EasterEgg.POPUP_UNLOCK_CLICKS - click_count
+func _pulse_hidden_trigger() -> void:
+	if not is_instance_valid(subtitle_label):
+		return
+	var tween := create_tween()
+	tween.tween_property(subtitle_label, "scale", Vector2(1.03, 1.03), 0.08)
+	tween.tween_property(subtitle_label, "scale", Vector2.ONE, 0.08)
+func _show_chao_easter_egg() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = GameConstants.EasterEgg.POPUP_OVERLAY_Z_INDEX
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.02, 0.0, 0.04, 0.94)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = GameConstants.EasterEgg.CHAO_POPUP_SIZE
+	panel.pivot_offset = GameConstants.EasterEgg.CHAO_POPUP_SIZE / 2.0
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.03, 0.08, 0.98)
+	sb.corner_radius_top_left = 20
+	sb.corner_radius_top_right = 20
+	sb.corner_radius_bottom_left = 20
+	sb.corner_radius_bottom_right = 20
+	sb.border_width_left = 2
+	sb.border_width_right = 2
+	sb.border_width_top = 2
+	sb.border_width_bottom = 2
+	sb.border_color = Color(0.95, 0.35, 0.55, 0.72)
+	sb.shadow_size = 20
+	sb.shadow_color = Color(0.0, 0.0, 0.0, 0.7)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 28)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.78, 0.82))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.95, 0.35, 0.55, 0.45)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_BODY")
+	body_lbl.fit_content = true
+	body_lbl.scroll_active = false
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 20)
+	body_lbl.add_theme_color_override("default_color", Color(0.98, 0.90, 0.92))
+	body_lbl.add_theme_constant_override("line_separation", 10)
+	body_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(body_lbl)
+	var hint_lbl := Label.new()
+	var initial_remaining: int = _get_chao_popup_remaining_clicks(0)
+	hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": initial_remaining})
+	hint_lbl.add_theme_font_size_override("font_size", 15)
+	hint_lbl.add_theme_color_override("font_color", Color(0.95, 0.72, 0.76))
+	hint_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(hint_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 12)
+	btn_row.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_child(btn_row)
+	var cleanup_overlay := func() -> void:
+		var existing_scale_tween: Variant = panel.get_meta("chao_scale_tween", null)
+		if existing_scale_tween is Tween and is_instance_valid(existing_scale_tween):
+			existing_scale_tween.kill()
+		panel.set_meta("chao_scale_tween", null)
+		overlay.queue_free()
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(150, 44)
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn.pressed.connect(cleanup_overlay)
+	btn_row.add_child(close_btn)
+	panel.gui_input.connect(func(event: InputEvent) -> void:
+		if not (event is InputEventMouseButton):
+			return
+		var mb := event as InputEventMouseButton
+		if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+			return
+		var click_count := int(panel.get_meta("chao_click_count", 0)) + 1
+		panel.set_meta("chao_click_count", click_count)
+		var remaining: int = _get_chao_popup_remaining_clicks(click_count)
+		if remaining > 0:
+			hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": remaining})
+			if is_instance_valid(panel):
+				var existing_scale_tween: Variant = panel.get_meta("chao_scale_tween", null)
+				if existing_scale_tween is Tween and is_instance_valid(existing_scale_tween):
+					existing_scale_tween.kill()
+				var scale_tween := create_tween()
+				panel.set_meta("chao_scale_tween", scale_tween)
+				scale_tween.tween_property(panel, "scale", Vector2(1.05, 1.05), 0.07)
+				scale_tween.tween_property(panel, "scale", Vector2.ONE, 0.07)
+			return
+		OS.shell_open(CHAO_EASTER_EGG_URL)
+		cleanup_overlay.call()
+	)
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+	UIStyleManager.fade_in(overlay, 0.25)
 func _input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
@@ -312,13 +578,20 @@ func _apply_styles() -> void:
 		name_label.add_theme_color_override("font_shadow_color", Color(0.5, 0.0, 0.0, 1.0))
 		name_label.add_theme_constant_override("shadow_offset_x", 4)
 		name_label.add_theme_constant_override("shadow_offset_y", 4)
+		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if subtitle_label:
 		subtitle_label.add_theme_color_override("font_color", Color(0.9, 0.6, 0.6))
+		subtitle_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		subtitle_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if body_text:
 		body_text.add_theme_color_override("default_color", Color(1.0, 0.9, 0.9))
 	if portrait:
+		portrait.texture = JUDGE_COURT_TEXTURE
 		portrait.modulate = Color(1.2, 0.8, 0.8)
-		portrait.custom_minimum_size = Vector2(300, 300)
+		portrait.custom_minimum_size = Vector2(0, 300)
+		portrait.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 func setup_diary_judgment_mode() -> void:
 	_is_diary_judgment = true
 	if is_inside_tree():
@@ -327,8 +600,30 @@ func setup_diary_judgment_mode() -> void:
 func _apply_diary_judgment_portrait() -> void:
 	if not portrait:
 		return
-	portrait.texture = ANGRY_FACE_TEXTURE
-	portrait.modulate = Color(1.3, 0.7, 0.7)
+	portrait.texture = JUDGE_COURT_TEXTURE
+	if _is_diary_judgment:
+		portrait.modulate = Color(1.0, 1.0, 1.0)
+	var portrait_parent := portrait.get_parent()
+	if portrait_parent and not portrait_parent.has_node("CourtLabel"):
+		var portrait_idx := portrait.get_index()
+		portrait_parent.remove_child(portrait)
+		var portrait_vbox := VBoxContainer.new()
+		portrait_vbox.name = "PortraitVBox"
+		portrait_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		portrait_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		portrait_parent.add_child(portrait_vbox)
+		portrait_parent.move_child(portrait_vbox, portrait_idx)
+		portrait_vbox.add_child(portrait)
+		var court_label := Label.new()
+		court_label.name = "CourtLabel"
+		court_label.text = _tr("GLORIA_COURT_TITLE")
+		court_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		court_label.add_theme_font_size_override("font_size", 14)
+		court_label.add_theme_color_override("font_color", Color(0.85, 0.72, 0.30))
+		court_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+		court_label.add_theme_constant_override("shadow_offset_x", 1)
+		court_label.add_theme_constant_override("shadow_offset_y", 1)
+		portrait_vbox.add_child(court_label)
 func _request_ai_guilt_trip() -> void:
 	if not AIManager:
 		return
@@ -419,3 +714,25 @@ func _apply_localization() -> void:
 		name_label.text = " " + _tr("GLORIA_WATCHING_NAME")
 		subtitle_label.text = _tr("GLORIA_NEGATIVITY_SUBTITLE")
 		continue_button.text = _tr("GLORIA_ACCEPT_GUILT_BUTTON")
+	_update_rebirth_suggestion()
+
+func _update_rebirth_suggestion() -> void:
+	if not rebirth_suggestion_label:
+		return
+	var challenge_completed := false
+	var game_state: Node = null
+	if ServiceLocator and ServiceLocator.has_method("get_game_state"):
+		game_state = ServiceLocator.get_game_state()
+	if game_state == null:
+		game_state = GameState
+	if game_state and game_state.has_method("get_fsm_challenge_module"):
+		var fsm_module: RefCounted = game_state.get_fsm_challenge_module()
+		if fsm_module != null:
+			challenge_completed = bool(fsm_module.get("challenge_completed"))
+	if challenge_completed:
+		rebirth_suggestion_label.visible = false
+		return
+	rebirth_suggestion_label.text = _tr("GLORIA_REBIRTH_SUGGESTION")
+	rebirth_suggestion_label.add_theme_color_override("font_color", Color(0.9, 0.75, 0.75, 0.8))
+	rebirth_suggestion_label.add_theme_font_size_override("font_size", 18)
+	rebirth_suggestion_label.visible = true

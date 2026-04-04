@@ -8,11 +8,18 @@ const ICON_ACHIEVEMENTS = preload("res://1.Codebase/src/assets/ui/icon_achieveme
 @onready var title_label: Label = $CenterContainer/Panel/MarginContainer/VBoxContainer/Header/TitleContainer/TitleLabel
 @onready var close_button: Button = $CenterContainer/Panel/MarginContainer/VBoxContainer/Footer/CloseButton
 var _audio_manager: Node = null
+const AKIBA_EASTER_EGG_URL := "https://music.apple.com/jp/song/%E6%98%8E%E6%97%A5%E3%81%AF%E3%82%A2%E3%82%AD%E3%83%90%E3%81%AE%E9%A2%A8%E3%81%8C%E5%90%B9%E3%81%8F-%E3%83%A1%E3%83%AD%E3%82%AA%E3%82%B1/666133516"
+const AKIBA_CLICK_TARGET := 5
+const AKIBA_CLICK_TIMEOUT := 5.0
+var _akiba_click_count: int = 0
+var _akiba_click_timer: float = 0.0
+var _akiba_label: Label = null
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_apply_modern_styling()
 	refresh_achievements()
 	update_ui_language()
+	_setup_akiba_easter_egg()
 	if close_button:
 		close_button.pressed.connect(_on_close_pressed)
 	var panel = $CenterContainer/Panel
@@ -258,6 +265,97 @@ func get_progress_hint(achievement_id: String, achievement_system) -> String:
 		_:
 			return ""
 	return ""
+func _process(delta: float) -> void:
+	if _akiba_click_count > 0:
+		_akiba_click_timer += delta
+		if _akiba_click_timer >= AKIBA_CLICK_TIMEOUT:
+			_akiba_click_count = 0
+			_akiba_click_timer = 0.0
+func _setup_akiba_easter_egg() -> void:
+	var header = $CenterContainer/Panel/MarginContainer/VBoxContainer/Header
+	if not header:
+		return
+	var lang = _get_current_language()
+	_akiba_label = Label.new()
+	_akiba_label.text = _tr_key("EASTER_EGG_AKIBA_TEXT", lang)
+	_akiba_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_akiba_label.add_theme_font_size_override("font_size", 11)
+	_akiba_label.add_theme_color_override("font_color", Color(0.85, 0.65, 0.30, 0.28))
+	_akiba_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_akiba_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_akiba_label.tooltip_text = _tr_key("EASTER_EGG_AKIBA_HINT", lang).replace("{remaining}", str(AKIBA_CLICK_TARGET))
+	_akiba_label.gui_input.connect(_on_akiba_label_gui_input)
+	header.add_child(_akiba_label)
+func _on_akiba_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_akiba_click_count += 1
+	_akiba_click_timer = 0.0
+	var remaining := AKIBA_CLICK_TARGET - _akiba_click_count
+	if _akiba_label:
+		var lang = _get_current_language()
+		if remaining > 0:
+			_akiba_label.tooltip_text = _tr_key("EASTER_EGG_AKIBA_CLICK", lang).replace("{remaining}", str(remaining))
+	if _akiba_click_count >= AKIBA_CLICK_TARGET:
+		_akiba_click_count = 0
+		_akiba_click_timer = 0.0
+		_show_akiba_popup()
+func _show_akiba_popup() -> void:
+	var lang = _get_current_language()
+	var overlay = ColorRect.new()
+	overlay.color = Color(0.0, 0.0, 0.0, 0.55)
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 210
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	var panel = PanelContainer.new()
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	panel_style.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(12)
+	panel.add_theme_stylebox_override("panel", panel_style)
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(400, 0)
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 28)
+	margin.add_theme_constant_override("margin_top", 28)
+	margin.add_theme_constant_override("margin_right", 28)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 14)
+	margin.add_child(vbox)
+	var title_lbl = Label.new()
+	title_lbl.text = _tr_key("EASTER_EGG_AKIBA_TITLE", lang)
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_font_size_override("font_size", 17)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	vbox.add_child(title_lbl)
+	var body_lbl = RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.fit_content = true
+	body_lbl.custom_minimum_size = Vector2(344, 0)
+	body_lbl.text = _tr_key("EASTER_EGG_AKIBA_BODY", lang)
+	body_lbl.add_theme_font_size_override("normal_font_size", 14)
+	body_lbl.add_theme_color_override("default_color", Color(0.88, 0.84, 0.76))
+	vbox.add_child(body_lbl)
+	var listen_btn = Button.new()
+	listen_btn.text = _tr_key("EASTER_EGG_AKIBA_LISTEN", lang)
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	listen_btn.pressed.connect(func(): OS.shell_open(AKIBA_EASTER_EGG_URL))
+	vbox.add_child(listen_btn)
+	var close_btn = Button.new()
+	close_btn.text = _tr_key("EASTER_EGG_AKIBA_CLICK", lang).replace("{remaining}", "0")
+	UIStyleManager.apply_button_style(close_btn, "secondary", "medium")
+	close_btn.pressed.connect(func(): overlay.queue_free())
+	vbox.add_child(close_btn)
+	overlay.add_child(panel)
+	add_child(overlay)
+	UIStyleManager.fade_in(overlay, 0.3)
 func _on_close_pressed():
 	var audio := _get_audio_manager()
 	if audio and audio.has_method("play_sfx"):

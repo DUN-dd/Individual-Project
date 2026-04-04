@@ -115,6 +115,9 @@ var max_tokens_container: HBoxContainer
 var max_tokens_label: Label
 var max_tokens_spin: SpinBox
 var max_tokens_hint_label: Label
+var request_timeout_container: HBoxContainer
+var request_timeout_spin: SpinBox
+var request_timeout_hint_label: Label
 var tab_container: TabContainer
 var tab_online_providers: VBoxContainer
 var tab_gemini: VBoxContainer

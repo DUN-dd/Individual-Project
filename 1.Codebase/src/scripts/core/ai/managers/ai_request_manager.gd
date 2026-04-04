@@ -61,6 +61,7 @@ class RequestParameters extends RefCounted:
 	var force_mock: bool = false
 	var bypass_rate_limit: bool = false
 var _call_log: Array[Dictionary] = []
+var _last_actual_model: String = ""
 var _prompt_guard_regex: RegEx = null
 var _config_manager: AIConfigManager = null
 var _provider_manager: RefCounted = null
@@ -78,6 +79,10 @@ signal request_error(message: String)
 signal response_received(response: Dictionary)
 func set_config_manager(config_mgr: AIConfigManager) -> void:
 	_config_manager = config_mgr
+func set_request_timeout(timeout: float) -> void:
+	_request_timeout = clampf(timeout, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
+	if _timeout_timer:
+		_timeout_timer.wait_time = _request_timeout
 func set_provider_manager(provider_mgr) -> void:
 	_provider_manager = provider_mgr
 func set_context_manager(context_mgr) -> void:
@@ -90,6 +95,8 @@ func initialize_request_system(parent_node: Node, http_req: HTTPRequest) -> void
 	http_request.process_mode = Node.PROCESS_MODE_ALWAYS
 	if not http_request.request_completed.is_connected(_on_request_completed):
 		http_request.request_completed.connect(_on_request_completed)
+	if _config_manager:
+		_request_timeout = clampf(_config_manager.request_timeout, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
 	_timeout_timer = Timer.new()
 	_timeout_timer.one_shot = true
 	_timeout_timer.wait_time = _request_timeout
@@ -561,6 +568,10 @@ func _handle_provider_response(response: Dictionary) -> void:
 			)
 	if response.has("metadata") and response["metadata"] is Dictionary:
 		final_response["metadata"] = (response["metadata"] as Dictionary).duplicate(true)
+	if response.has("actual_model") and not str(response["actual_model"]).is_empty():
+		_last_actual_model = str(response["actual_model"])
+	else:
+		_last_actual_model = ""
 	_record_call_log(true, str(last_prompt_metrics.get("mode", "live")), int(response.get("status_code", 200)), input_tokens, output_tokens, _last_response_time)
 	_retry_count = 0
 	_clear_active_request_payload()
@@ -1123,6 +1134,8 @@ func get_response_time_history() -> Array:
 	return _response_time_history.duplicate()
 func get_token_usage_history() -> Array:
 	return _token_usage_history.duplicate()
+func get_last_actual_model() -> String:
+	return _last_actual_model
 func is_requesting() -> bool:
 	return _is_requesting
 func reset_metrics() -> void:
@@ -1230,6 +1243,7 @@ func _record_call_log(
 		"request_timestamp": request_timestamp,
 		"provider": provider_name,
 		"model": model_name,
+		"actual_model": _last_actual_model,
 		"status_code": status_code,
 		"input_tokens": input_tokens,
 		"output_tokens": output_tokens,
@@ -1240,6 +1254,7 @@ func _record_call_log(
 		"success": success,
 		"error": error_msg,
 	}
+	_last_actual_model = ""
 	var detail: Dictionary = _build_call_log_detail()
 	for key in detail.keys():
 		entry[key] = detail[key]

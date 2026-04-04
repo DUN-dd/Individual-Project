@@ -3,17 +3,22 @@ const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager
 const CreditsContent = preload("res://1.Codebase/src/scripts/core/credits_content.gd")
 const ICON_INFO = preload("res://1.Codebase/src/assets/ui/icon_info.svg")
 const ICON_HOME = preload("res://1.Codebase/src/assets/ui/icon_home.svg")
-const GODOT_LOGO = preload("res://1.Codebase/src/assets/Engine Logo.png")
-const US_LOGO = preload("res://1.Codebase/src/assets/US_logo-1.png")
+const GODOT_LOGO = preload("res://1.Codebase/src/assets/engine_logo.png")
+const US_LOGO = preload("res://1.Codebase/src/assets/us_logo_1.png")
 const STATS_ILLUSTRATION = preload("res://1.Codebase/src/assets/ui/intro/intro_stats_illustration.png")
 const INTRO_IMAGE_WIDTH_RATIO := 0.56
 const INTRO_IMAGE_HEIGHT_RATIO := 0.24
-const HIDDEN_CREDITS_MUSIC := "hidden_credits-backup"
+const HIDDEN_CREDITS_MUSIC := "hidden_credits_backup"
+const RELIC_STATS_EASTER_EGG_URL := "https://youtu.be/bjOAE17WajY"
+const RELIC_STATS_CLICK_TARGET := 5
 var current_language: String = "en"
 var _audio_manager: Node = null
 var _credits_click_count: int = 0
 var _hidden_credits_popup: Control = null
 var _previous_music: String = ""
+var _relic_stats_click_count: int = 0
+var _relic_stats_popup: Control = null
+var _relic_stats_label: Label = null
 func _ready():
 	current_language = GameState.current_language if GameState else "en"
 	_create_stats_tab()
@@ -170,6 +175,116 @@ func _create_stats_tab():
 	tab_container.add_child(scroll)
 	tab_container.move_child(scroll, 3)
 	tab_container.set_tab_title(3, _tr("INTRO_TAB_STATS_TITLE"))
+	_setup_relic_stats_easter_egg(vbox)
+func _setup_relic_stats_easter_egg(vbox: VBoxContainer) -> void:
+	var label = Label.new()
+	label.name = "RelicStatsEasterEgg"
+	label.text = _tr("EASTER_EGG_RELIC_STATS_TEXT")
+	label.add_theme_font_size_override("font_size", 13)
+	label.add_theme_color_override("font_color", Color(0.72, 0.65, 0.50, 0.42))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.mouse_filter = Control.MOUSE_FILTER_STOP
+	label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	label.tooltip_text = _tr("EASTER_EGG_RELIC_STATS_HINT").replace("{remaining}", str(RELIC_STATS_CLICK_TARGET))
+	label.gui_input.connect(_on_relic_stats_label_gui_input)
+	_relic_stats_label = label
+	vbox.add_child(label)
+func _on_relic_stats_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed):
+		return
+	_relic_stats_click_count += 1
+	var remaining := RELIC_STATS_CLICK_TARGET - _relic_stats_click_count
+	if remaining <= 2 and is_instance_valid(_relic_stats_label):
+		_relic_stats_label.tooltip_text = _tr("EASTER_EGG_RELIC_STATS_CLICK").replace("{remaining}", str(remaining))
+	if _relic_stats_click_count >= RELIC_STATS_CLICK_TARGET:
+		_relic_stats_click_count = 0
+		_show_relic_stats_popup()
+func _show_relic_stats_popup() -> void:
+	if is_instance_valid(_relic_stats_popup):
+		_relic_stats_popup.visible = true
+		return
+	_relic_stats_popup = _create_relic_stats_popup()
+	add_child(_relic_stats_popup)
+func _create_relic_stats_popup() -> Control:
+	var overlay = Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg = ColorRect.new()
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(bg)
+	var margin_outer = MarginContainer.new()
+	margin_outer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin_outer.add_theme_constant_override("margin_left", 80)
+	margin_outer.add_theme_constant_override("margin_right", 80)
+	margin_outer.add_theme_constant_override("margin_top", 60)
+	margin_outer.add_theme_constant_override("margin_bottom", 60)
+	overlay.add_child(margin_outer)
+	var panel = PanelContainer.new()
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	panel_style.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	panel_style.border_width_left = 1
+	panel_style.border_width_top = 1
+	panel_style.border_width_right = 1
+	panel_style.border_width_bottom = 1
+	panel_style.corner_radius_top_left = 12
+	panel_style.corner_radius_top_right = 12
+	panel_style.corner_radius_bottom_left = 12
+	panel_style.corner_radius_bottom_right = 12
+	panel.add_theme_stylebox_override("panel", panel_style)
+	margin_outer.add_child(panel)
+	var margin_inner = MarginContainer.new()
+	margin_inner.add_theme_constant_override("margin_left", 40)
+	margin_inner.add_theme_constant_override("margin_right", 40)
+	margin_inner.add_theme_constant_override("margin_top", 32)
+	margin_inner.add_theme_constant_override("margin_bottom", 32)
+	panel.add_child(margin_inner)
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 16)
+	margin_inner.add_child(vbox)
+	var title_lbl = Label.new()
+	title_lbl.text = _tr("EASTER_EGG_RELIC_STATS_TITLE")
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_font_size_override("font_size", 22)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	vbox.add_child(title_lbl)
+	var sep1 = HSeparator.new()
+	sep1.modulate = Color(0.72, 0.60, 0.35, 0.5)
+	vbox.add_child(sep1)
+	var body_lbl = RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_color_override("default_color", Color(0.95, 0.90, 0.80))
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.text = _tr("EASTER_EGG_RELIC_STATS_BODY")
+	vbox.add_child(body_lbl)
+	var sep2 = HSeparator.new()
+	sep2.modulate = Color(0.72, 0.60, 0.35, 0.5)
+	vbox.add_child(sep2)
+	var buttons_hbox = HBoxContainer.new()
+	buttons_hbox.add_theme_constant_override("separation", 12)
+	buttons_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	vbox.add_child(buttons_hbox)
+	var listen_btn = Button.new()
+	listen_btn.text = _tr("EASTER_EGG_RELIC_STATS_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(160, 48)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	listen_btn.pressed.connect(func(): OS.shell_open(RELIC_STATS_EASTER_EGG_URL))
+	buttons_hbox.add_child(listen_btn)
+	var close_btn = Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(160, 48)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn.pressed.connect(func(): overlay.visible = false)
+	buttons_hbox.add_child(close_btn)
+	return overlay
 func _create_voice_script_tab() -> void:
 	var tab_container = $MenuContainer/Panel/VBoxContainer/TabContainer
 	if not tab_container:
@@ -366,6 +481,7 @@ func _create_hidden_credits_popup() -> Control:
 	content.add_theme_color_override("default_color", Color(0.9, 0.9, 0.9, 1.0))
 	content.add_theme_font_size_override("normal_font_size", 15)
 	content.text = CreditsContent.get_hidden_credits_text()
+	content.meta_clicked.connect(_on_credits_meta_clicked)
 	scroll.add_child(content)
 	var sep2 = HSeparator.new()
 	sep2.modulate = Color(1.0, 0.85, 0.3, 0.5)
@@ -383,6 +499,10 @@ func _create_hidden_credits_popup() -> Control:
 	)
 	vbox.add_child(close_btn)
 	return overlay
+func _on_credits_meta_clicked(meta: Variant) -> void:
+	var url := str(meta)
+	if url.begins_with("http://") or url.begins_with("https://"):
+		OS.shell_open(url)
 func _play_hidden_credits_music() -> void:
 	var audio := _get_audio_manager()
 	if not audio:

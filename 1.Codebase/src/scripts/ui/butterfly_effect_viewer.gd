@@ -19,6 +19,7 @@ func _ready():
 	_apply_styles()
 	_connect_signals()
 	_populate_timeline()
+
 	if panel:
 		UIStyleManager.fade_in(panel, 0.25)
 	if close_button:
