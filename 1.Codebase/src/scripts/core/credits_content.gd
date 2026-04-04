@@ -5,7 +5,7 @@ const NIETZSCHE_LIBRARY_URL := "https://sussex.primo.exlibrisgroup.com/permalink
 const IMG_ALL_THE_BEST_SITA := "res://1.Codebase/src/assets/ui/all_the_best_sita_chan.png"
 const IMG_ITUNES_STORE_SITA := "res://1.Codebase/src/assets/ui/itunes_store_backup_sita_chan.png"
 const IMG_BORROW_NIETZSCHE := "res://1.Codebase/src/assets/ui/borrow_nietzsche_sussex_library.png"
-const IMG_SUSSEX_LIBRARY := "res://1.Codebase/src/assets/ui/sussex_university_library.png"
+const IMG_ANTI_CHRIST := "res://1.Codebase/src/assets/ui/the_anti_christ.jpg"
 static func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -45,8 +45,7 @@ static func _get_sita_images_bbcode() -> String:
 static func _get_nietzsche_images_bbcode() -> String:
 	var bbcode := ""
 	bbcode += "[center]"
-	if ResourceLoader.exists(IMG_SUSSEX_LIBRARY):
-		bbcode += "[url=" + NIETZSCHE_LIBRARY_URL + "][img width=300]" + IMG_SUSSEX_LIBRARY + "[/img][/url]\n"
+	bbcode += "[url=" + NIETZSCHE_LIBRARY_URL + "][img width=300]" + IMG_ANTI_CHRIST + "[/img][/url]\n"
 	bbcode += "[url=" + NIETZSCHE_LIBRARY_URL + "][img width=300]" + IMG_BORROW_NIETZSCHE + "[/img][/url]\n"
 	bbcode += "[/center]"
 	bbcode += "[i]" + _tr("CREDITS_NIETZSCHE_LIBRARY_NOTE") + "[/i]\n"
