@@ -8,6 +8,7 @@ const SECRET_BUTTERFLY_TEXTURE_PATH := "res://1.Codebase/src/assets/ui/butterfly
 const LEGAL_MAVERICKS_URL := "https://en.wikipedia.org/wiki/Legal_Mavericks"
 const LEGAL_MAVERICKS_CLICKS_NEEDED := 5
 @onready var _panel: Panel = $MainMargin/Panel
+@onready var _header_bar: HBoxContainer = $MainMargin/Panel/VBoxMain/HeaderBar
 @onready var _title_block: VBoxContainer = $MainMargin/Panel/VBoxMain/HeaderBar/TitleBlock
 @onready var _title_label: Label = $MainMargin/Panel/VBoxMain/HeaderBar/TitleBlock/TitleLabel
 @onready var _subtitle_label: Label = $MainMargin/Panel/VBoxMain/HeaderBar/TitleBlock/SubtitleLabel
@@ -100,43 +101,45 @@ func _apply_styles() -> void:
 	for i in range(_stat_cards.size()):
 		_style_stat_card(_stat_cards[i], card_colors[i % card_colors.size()])
 func _setup_secret_butterfly_image() -> void:
-	if not _title_block or is_instance_valid(_secret_image_container):
+	if not _header_bar or is_instance_valid(_secret_image_container):
 		return
 	var texture := _load_texture_safe(SECRET_BUTTERFLY_TEXTURE_PATH)
 	if texture == null:
 		return
+	var icon_size := Vector2(52, 52)
 	_secret_image_container = CenterContainer.new()
 	_secret_image_container.name = "SecretButterflyImage"
 	_secret_image_container.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_secret_image_container.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_secret_image_container.mouse_filter = Control.MOUSE_FILTER_STOP
 	_secret_image_container.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	_secret_image_container.custom_minimum_size = Vector2(112, 112)
+	_secret_image_container.custom_minimum_size = icon_size
 	_secret_image_container.tooltip_text = _tr("EASTER_EGG_LEGAL_MAVERICKS_HINT").format({"remaining": LEGAL_MAVERICKS_CLICKS_NEEDED})
 	var frame := PanelContainer.new()
 	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	frame.custom_minimum_size = Vector2(112, 112)
+	frame.custom_minimum_size = icon_size
 	var frame_style := StyleBoxFlat.new()
-	frame_style.bg_color = Color(0.12, 0.15, 0.24, 0.96)
-	frame_style.border_color = Color(0.62, 0.76, 0.94, 0.4)
+	frame_style.bg_color = Color(0.1, 0.12, 0.2, 0.8)
+	frame_style.border_color = Color(0.5, 0.65, 0.85, 0.35)
 	frame_style.border_width_left = 1
 	frame_style.border_width_top = 1
 	frame_style.border_width_right = 1
 	frame_style.border_width_bottom = 1
-	frame_style.corner_radius_top_left = 14
-	frame_style.corner_radius_top_right = 14
-	frame_style.corner_radius_bottom_left = 14
-	frame_style.corner_radius_bottom_right = 14
-	frame_style.shadow_color = Color(0.0, 0.0, 0.0, 0.32)
-	frame_style.shadow_size = 10
+	frame_style.corner_radius_top_left = 10
+	frame_style.corner_radius_top_right = 10
+	frame_style.corner_radius_bottom_left = 10
+	frame_style.corner_radius_bottom_right = 10
+	frame_style.shadow_color = Color(0.0, 0.0, 0.0, 0.2)
+	frame_style.shadow_size = 4
 	frame.add_theme_stylebox_override("panel", frame_style)
 	_secret_image_container.add_child(frame)
 	var margin := MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	margin.add_theme_constant_override("margin_left", 8)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_right", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
+	margin.add_theme_constant_override("margin_left", 4)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_right", 4)
+	margin.add_theme_constant_override("margin_bottom", 4)
 	frame.add_child(margin)
 	_secret_image_rect = TextureRect.new()
 	_secret_image_rect.texture = texture
@@ -146,7 +149,9 @@ func _setup_secret_butterfly_image() -> void:
 	_secret_image_rect.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_secret_image_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(_secret_image_rect)
-	_title_block.add_child(_secret_image_container)
+	# Add to HeaderBar (HBox) between TitleBlock and buttons, not inside TitleBlock (VBox)
+	_header_bar.add_child(_secret_image_container)
+	_header_bar.move_child(_secret_image_container, 1)
 	if not _secret_image_container.gui_input.is_connected(_on_secret_image_gui_input):
 		_secret_image_container.gui_input.connect(_on_secret_image_gui_input)
 func _set_badge_text(badge: Label, en_text: String, zh_text: String, tint: Color) -> void:
