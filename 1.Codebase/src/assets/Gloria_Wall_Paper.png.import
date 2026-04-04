@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c26jbvxnoidgc"
-path="res://.godot/imported/Gloria_Wall_Paper.png-d1fe506d2ddfd1760b83b6f703c3b9ae.ctex"
+uid="uid://ok445u5aqbl"
+path="res://.godot/imported/gloria_wall_paper.png-1caef3cbed7a82b5840d56c987a0548f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/Gloria_Wall_Paper.png"
-dest_files=["res://.godot/imported/Gloria_Wall_Paper.png-d1fe506d2ddfd1760b83b6f703c3b9ae.ctex"]
+source_file="res://1.Codebase/src/assets/gloria_wall_paper.png"
+dest_files=["res://.godot/imported/gloria_wall_paper.png-1caef3cbed7a82b5840d56c987a0548f.ctex"]
 
 [params]
 

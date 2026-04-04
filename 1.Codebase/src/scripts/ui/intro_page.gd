@@ -3,12 +3,12 @@ const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager
 const CreditsContent = preload("res://1.Codebase/src/scripts/core/credits_content.gd")
 const ICON_INFO = preload("res://1.Codebase/src/assets/ui/icon_info.svg")
 const ICON_HOME = preload("res://1.Codebase/src/assets/ui/icon_home.svg")
-const GODOT_LOGO = preload("res://1.Codebase/src/assets/Engine Logo.png")
-const US_LOGO = preload("res://1.Codebase/src/assets/US_logo-1.png")
+const GODOT_LOGO = preload("res://1.Codebase/src/assets/engine_logo.png")
+const US_LOGO = preload("res://1.Codebase/src/assets/us_logo_1.png")
 const STATS_ILLUSTRATION = preload("res://1.Codebase/src/assets/ui/intro/intro_stats_illustration.png")
 const INTRO_IMAGE_WIDTH_RATIO := 0.56
 const INTRO_IMAGE_HEIGHT_RATIO := 0.24
-const HIDDEN_CREDITS_MUSIC := "hidden_credits-backup"
+const HIDDEN_CREDITS_MUSIC := "hidden_credits_backup"
 var current_language: String = "en"
 var _audio_manager: Node = null
 var _credits_click_count: int = 0
@@ -366,6 +366,7 @@ func _create_hidden_credits_popup() -> Control:
 	content.add_theme_color_override("default_color", Color(0.9, 0.9, 0.9, 1.0))
 	content.add_theme_font_size_override("normal_font_size", 15)
 	content.text = CreditsContent.get_hidden_credits_text()
+	content.meta_clicked.connect(_on_credits_meta_clicked)
 	scroll.add_child(content)
 	var sep2 = HSeparator.new()
 	sep2.modulate = Color(1.0, 0.85, 0.3, 0.5)
@@ -383,6 +384,10 @@ func _create_hidden_credits_popup() -> Control:
 	)
 	vbox.add_child(close_btn)
 	return overlay
+func _on_credits_meta_clicked(meta: Variant) -> void:
+	var url := str(meta)
+	if url.begins_with("http://") or url.begins_with("https://"):
+		OS.shell_open(url)
 func _play_hidden_credits_music() -> void:
 	var audio := _get_audio_manager()
 	if not audio:

@@ -3,6 +3,7 @@ signal continue_requested
 const ErrorReporterBridge = preload("res://1.Codebase/src/scripts/core/error_reporter_bridge.gd")
 const ERROR_CONTEXT := "GloriaInterventionOverlay"
 const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const CHAO_EASTER_EGG_URL := "https://music.apple.com/tw/song/%E5%98%88/589362359"
 const VOICE_OPEN_IDS: Array[String] = [
 	"gloria_open_01",
 	"gloria_open_02",
@@ -54,6 +55,8 @@ var _sound_catalog_reloaded: bool = false
 var _playlist_was_active: bool = false
 var _is_diary_judgment: bool = false
 var _current_voice_key: String = ""
+var _chao_click_count: int = 0
+var _last_chao_click_time_millis: float = 0.0
 func _report_info(message: String, details: Dictionary = {}) -> void:
 	ErrorReporterBridge.report_info(ERROR_CONTEXT, message, details)
 func _report_warning(message: String, details: Dictionary = {}) -> void:
@@ -72,6 +75,8 @@ func _ready() -> void:
 	continue_button.pressed.connect(_on_continue_pressed)
 	_setup_horror_background()
 	_apply_styles()
+	if subtitle_label:
+		subtitle_label.gui_input.connect(_on_subtitle_gui_input)
 	if _is_diary_judgment:
 		_apply_diary_judgment_portrait()
 	_apply_localization()
@@ -251,6 +256,152 @@ func _animate_in() -> void:
 		pulse_tween.set_trans(Tween.TRANS_SINE)
 		pulse_tween.tween_property(portrait, "scale", Vector2(1.2, 1.2), 0.8)
 		pulse_tween.tween_property(portrait, "scale", Vector2.ONE, 0.8)
+func _on_subtitle_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	var current_time_millis := Time.get_ticks_usec() / 1000.0
+	if _last_chao_click_time_millis > 0.0 and (current_time_millis - _last_chao_click_time_millis) > GameConstants.EasterEgg.CLICK_TIMEOUT_MS:
+		_chao_click_count = 0
+	_last_chao_click_time_millis = current_time_millis
+	_chao_click_count += 1
+	_pulse_hidden_trigger()
+	if _chao_click_count < GameConstants.EasterEgg.HIDDEN_TRIGGER_CLICKS:
+		return
+	_chao_click_count = 0
+	_show_chao_easter_egg()
+func _get_chao_popup_remaining_clicks(click_count: int) -> int:
+	return GameConstants.EasterEgg.POPUP_UNLOCK_CLICKS - click_count
+func _pulse_hidden_trigger() -> void:
+	if not is_instance_valid(subtitle_label):
+		return
+	var tween := create_tween()
+	tween.tween_property(subtitle_label, "scale", Vector2(1.03, 1.03), 0.08)
+	tween.tween_property(subtitle_label, "scale", Vector2.ONE, 0.08)
+func _show_chao_easter_egg() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = GameConstants.EasterEgg.POPUP_OVERLAY_Z_INDEX
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.02, 0.0, 0.04, 0.94)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = GameConstants.EasterEgg.CHAO_POPUP_SIZE
+	panel.pivot_offset = GameConstants.EasterEgg.CHAO_POPUP_SIZE / 2.0
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.03, 0.08, 0.98)
+	sb.corner_radius_top_left = 20
+	sb.corner_radius_top_right = 20
+	sb.corner_radius_bottom_left = 20
+	sb.corner_radius_bottom_right = 20
+	sb.border_width_left = 2
+	sb.border_width_right = 2
+	sb.border_width_top = 2
+	sb.border_width_bottom = 2
+	sb.border_color = Color(0.95, 0.35, 0.55, 0.72)
+	sb.shadow_size = 20
+	sb.shadow_color = Color(0.0, 0.0, 0.0, 0.7)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 28)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.78, 0.82))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.95, 0.35, 0.55, 0.45)
+	sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_BODY")
+	body_lbl.fit_content = true
+	body_lbl.scroll_active = false
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 20)
+	body_lbl.add_theme_color_override("default_color", Color(0.98, 0.90, 0.92))
+	body_lbl.add_theme_constant_override("line_separation", 10)
+	body_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(body_lbl)
+	var hint_lbl := Label.new()
+	var initial_remaining: int = _get_chao_popup_remaining_clicks(0)
+	hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": initial_remaining})
+	hint_lbl.add_theme_font_size_override("font_size", 15)
+	hint_lbl.add_theme_color_override("font_color", Color(0.95, 0.72, 0.76))
+	hint_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(hint_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 12)
+	btn_row.mouse_filter = Control.MOUSE_FILTER_PASS
+	vbox.add_child(btn_row)
+	var cleanup_overlay := func() -> void:
+		var existing_scale_tween: Variant = panel.get_meta("chao_scale_tween", null)
+		if existing_scale_tween is Tween and is_instance_valid(existing_scale_tween):
+			existing_scale_tween.kill()
+		panel.set_meta("chao_scale_tween", null)
+		overlay.queue_free()
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(150, 44)
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn.pressed.connect(cleanup_overlay)
+	btn_row.add_child(close_btn)
+	panel.gui_input.connect(func(event: InputEvent) -> void:
+		if not (event is InputEventMouseButton):
+			return
+		var mb := event as InputEventMouseButton
+		if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+			return
+		var click_count := int(panel.get_meta("chao_click_count", 0)) + 1
+		panel.set_meta("chao_click_count", click_count)
+		var remaining: int = _get_chao_popup_remaining_clicks(click_count)
+		if remaining > 0:
+			hint_lbl.text = _tr("EASTER_EGG_GLORIA_CHAO_HINT").format({"remaining": remaining})
+			if is_instance_valid(panel):
+				var existing_scale_tween: Variant = panel.get_meta("chao_scale_tween", null)
+				if existing_scale_tween is Tween and is_instance_valid(existing_scale_tween):
+					existing_scale_tween.kill()
+				var scale_tween := create_tween()
+				panel.set_meta("chao_scale_tween", scale_tween)
+				scale_tween.tween_property(panel, "scale", Vector2(1.05, 1.05), 0.07)
+				scale_tween.tween_property(panel, "scale", Vector2.ONE, 0.07)
+			return
+		OS.shell_open(CHAO_EASTER_EGG_URL)
+		cleanup_overlay.call()
+	)
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+	UIStyleManager.fade_in(overlay, 0.25)
 func _input(event: InputEvent) -> void:
 	if not (event is InputEventKey) or not event.pressed or event.echo:
 		return
@@ -314,6 +465,7 @@ func _apply_styles() -> void:
 		name_label.add_theme_constant_override("shadow_offset_y", 4)
 	if subtitle_label:
 		subtitle_label.add_theme_color_override("font_color", Color(0.9, 0.6, 0.6))
+		subtitle_label.mouse_filter = Control.MOUSE_FILTER_STOP
 	if body_text:
 		body_text.add_theme_color_override("default_color", Color(1.0, 0.9, 0.9))
 	if portrait:
