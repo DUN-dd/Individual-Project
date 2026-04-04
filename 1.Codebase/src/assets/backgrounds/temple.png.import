@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://br3x533a0o001"
-path="res://.godot/imported/US_logo-1.png-095b614d2bf25ac2c842d00a206414c7.ctex"
+uid="uid://dw7k32312vp5j"
+path="res://.godot/imported/temple.png-7e35ea2e9ce57b0c0f0e9a71bef4f7a7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/US_logo-1.png"
-dest_files=["res://.godot/imported/US_logo-1.png-095b614d2bf25ac2c842d00a206414c7.ctex"]
+source_file="res://1.Codebase/src/assets/backgrounds/temple.png"
+dest_files=["res://.godot/imported/temple.png-7e35ea2e9ce57b0c0f0e9a71bef4f7a7.ctex"]
 
 [params]
 

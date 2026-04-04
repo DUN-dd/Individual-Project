@@ -6,6 +6,11 @@ const IMG_ALL_THE_BEST_SITA := "res://1.Codebase/src/assets/ui/all_the_best_sita
 const IMG_ITUNES_STORE_SITA := "res://1.Codebase/src/assets/ui/itunes_store_backup_sita_chan.png"
 const IMG_BORROW_NIETZSCHE := "res://1.Codebase/src/assets/ui/borrow_nietzsche_sussex_library.png"
 const IMG_ANTI_CHRIST := "res://1.Codebase/src/assets/ui/the_anti_christ.jpg"
+const IMAGE_PAIR_GAP := "    "
+const SITA_ALBUM_COVER_WIDTH := 220
+const SITA_ITUNES_WIDTH := 480
+const NIETZSCHE_BOOK_COVER_WIDTH := 220
+const NIETZSCHE_BORROW_WIDTH := 520
 static func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -36,8 +41,10 @@ static func get_hidden_credits_text() -> String:
 static func _get_sita_images_bbcode() -> String:
 	var bbcode := ""
 	bbcode += "[center]"
-	bbcode += "[url=" + SITA_ALBUM_URL + "][img width=300]" + IMG_ALL_THE_BEST_SITA + "[/img][/url]\n"
-	bbcode += "[url=" + SITA_ALBUM_URL + "][img width=300]" + IMG_ITUNES_STORE_SITA + "[/img][/url]\n"
+	bbcode += _get_linked_image_bbcode(SITA_ALBUM_URL, IMG_ALL_THE_BEST_SITA, SITA_ALBUM_COVER_WIDTH)
+	bbcode += IMAGE_PAIR_GAP
+	bbcode += _get_linked_image_bbcode(SITA_ALBUM_URL, IMG_ITUNES_STORE_SITA, SITA_ITUNES_WIDTH)
+	bbcode += "\n"
 	bbcode += "[/center]"
 	bbcode += "[i]" + _tr("CREDITS_SITA_ITUNES_NOTE") + "[/i]\n"
 	bbcode += "[color=#aaaaaa](" + _tr("CREDITS_SITA_CLICK_HINT") + ")[/color]"
@@ -45,12 +52,16 @@ static func _get_sita_images_bbcode() -> String:
 static func _get_nietzsche_images_bbcode() -> String:
 	var bbcode := ""
 	bbcode += "[center]"
-	bbcode += "[url=" + NIETZSCHE_LIBRARY_URL + "][img width=300]" + IMG_ANTI_CHRIST + "[/img][/url]\n"
-	bbcode += "[url=" + NIETZSCHE_LIBRARY_URL + "][img width=300]" + IMG_BORROW_NIETZSCHE + "[/img][/url]\n"
+	bbcode += _get_linked_image_bbcode(NIETZSCHE_LIBRARY_URL, IMG_ANTI_CHRIST, NIETZSCHE_BOOK_COVER_WIDTH)
+	bbcode += IMAGE_PAIR_GAP
+	bbcode += _get_linked_image_bbcode(NIETZSCHE_LIBRARY_URL, IMG_BORROW_NIETZSCHE, NIETZSCHE_BORROW_WIDTH)
+	bbcode += "\n"
 	bbcode += "[/center]"
 	bbcode += "[i]" + _tr("CREDITS_NIETZSCHE_LIBRARY_NOTE") + "[/i]\n"
 	bbcode += "[color=#aaaaaa](" + _tr("CREDITS_NIETZSCHE_CLICK_HINT") + ")[/color]"
 	return bbcode
+static func _get_linked_image_bbcode(url: String, image_path: String, width: int) -> String:
+	return "[url=%s][img width=%d]%s[/img][/url]" % [url, width, image_path]
 static func get_credits_text_plain(_lang: String) -> String:
 	var text := get_hidden_credits_text()
 	var regex = RegEx.new()

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c26jbvxnoidgc"
-path="res://.godot/imported/Gloria_Wall_Paper.png-d1fe506d2ddfd1760b83b6f703c3b9ae.ctex"
+uid="uid://cy8l66js1shh6"
+path="res://.godot/imported/bridge.png-4fac09dfaf4da56f549a269fc891dbbb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/Gloria_Wall_Paper.png"
-dest_files=["res://.godot/imported/Gloria_Wall_Paper.png-d1fe506d2ddfd1760b83b6f703c3b9ae.ctex"]
+source_file="res://1.Codebase/src/assets/backgrounds/bridge.png"
+dest_files=["res://.godot/imported/bridge.png-4fac09dfaf4da56f549a269fc891dbbb.ctex"]
 
 [params]
 

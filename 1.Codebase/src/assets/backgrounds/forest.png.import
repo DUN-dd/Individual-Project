@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dswi7ji448hag"
-path="res://.godot/imported/teacher_chan_sad (1).png-6024935553d95fa56c479a62def0f007.ctex"
+uid="uid://dp6242jkmuvai"
+path="res://.godot/imported/forest.png-4418d15628bdba75a80d89e1ba30ec6c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/characters/teacher_chan_sad (1).png"
-dest_files=["res://.godot/imported/teacher_chan_sad (1).png-6024935553d95fa56c479a62def0f007.ctex"]
+source_file="res://1.Codebase/src/assets/backgrounds/forest.png"
+dest_files=["res://.godot/imported/forest.png-4418d15628bdba75a80d89e1ba30ec6c.ctex"]
 
 [params]
 

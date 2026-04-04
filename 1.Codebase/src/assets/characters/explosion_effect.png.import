@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dfj3ucug853bk"
-path="res://.godot/imported/The Anti-Christ.jpg-cf9d11fa34c5fdc115c86288307d5b9a.ctex"
+uid="uid://eo6qs5yswr3t"
+path="res://.godot/imported/explosion_effect.png-3ef5b2bdd38e06bb2866a31fec32d7ba.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/ui/The Anti-Christ.jpg"
-dest_files=["res://.godot/imported/The Anti-Christ.jpg-cf9d11fa34c5fdc115c86288307d5b9a.ctex"]
+source_file="res://1.Codebase/src/assets/characters/explosion_effect.png"
+dest_files=["res://.godot/imported/explosion_effect.png-3ef5b2bdd38e06bb2866a31fec32d7ba.ctex"]
 
 [params]
 

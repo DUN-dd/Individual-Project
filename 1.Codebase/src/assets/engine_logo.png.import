@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bwwlkd6eaygd6"
-path="res://.godot/imported/Explosion Effect.png-55d238ca3718f4963c15bfa75ba5c494.ctex"
+uid="uid://b48lk8redt43p"
+path="res://.godot/imported/engine_logo.png-dff7c6cf712b6abcd37615950d2e12be.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/characters/Explosion Effect.png"
-dest_files=["res://.godot/imported/Explosion Effect.png-55d238ca3718f4963c15bfa75ba5c494.ctex"]
+source_file="res://1.Codebase/src/assets/engine_logo.png"
+dest_files=["res://.godot/imported/engine_logo.png-dff7c6cf712b6abcd37615950d2e12be.ctex"]
 
 [params]
 

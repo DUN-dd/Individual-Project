@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bwqmmgih3215q"
-path="res://.godot/imported/iTunes Store backup Sita Chan.png-f9f633cf0ffb7f578d4e1d4cb3d7d59a.ctex"
+uid="uid://jyajlb2an3bi"
+path="res://.godot/imported/artificial_smiles.png-df974855cad7a693c1f08ee0a7c70ad9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/ui/iTunes Store backup Sita Chan.png"
-dest_files=["res://.godot/imported/iTunes Store backup Sita Chan.png-f9f633cf0ffb7f578d4e1d4cb3d7d59a.ctex"]
+source_file="res://1.Codebase/src/assets/artificial_smiles.png"
+dest_files=["res://.godot/imported/artificial_smiles.png-df974855cad7a693c1f08ee0a7c70ad9.ctex"]
 
 [params]
 

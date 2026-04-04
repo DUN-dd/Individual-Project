@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cne0f7h4gcc41"
-path="res://.godot/imported/game name.png-62b9d1d7423de86a859d5a1c3cac7bef.ctex"
+uid="uid://cmi6q35cswj8c"
+path="res://.godot/imported/trolley_problem_bg.png-96f3b6a13cb06426493e357c7f124ce6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/game name.png"
-dest_files=["res://.godot/imported/game name.png-62b9d1d7423de86a859d5a1c3cac7bef.ctex"]
+source_file="res://1.Codebase/src/assets/backgrounds/trolley_problem_bg.png"
+dest_files=["res://.godot/imported/trolley_problem_bg.png-96f3b6a13cb06426493e357c7f124ce6.ctex"]
 
 [params]
 

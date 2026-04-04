@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cymgl5gxas0qn"
-path="res://.godot/imported/Borrow Nietzsche in University of Sussex Library.png-6f2c7e2a6351ae1dcb9d42af5bd1d283.ctex"
+uid="uid://d00aqvj53c6co"
+path="res://.godot/imported/us_logo_1.png-b185a755ea01e3b87399fd719847585a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/ui/Borrow Nietzsche in University of Sussex Library.png"
-dest_files=["res://.godot/imported/Borrow Nietzsche in University of Sussex Library.png-6f2c7e2a6351ae1dcb9d42af5bd1d283.ctex"]
+source_file="res://1.Codebase/src/assets/us_logo_1.png"
+dest_files=["res://.godot/imported/us_logo_1.png-b185a755ea01e3b87399fd719847585a.ctex"]
 
 [params]
 

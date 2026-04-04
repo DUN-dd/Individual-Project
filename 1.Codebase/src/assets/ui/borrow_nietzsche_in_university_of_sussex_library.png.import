@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkfd8ilhm8f3s"
-path="res://.godot/imported/Library.png-c2587d1cc28f860c198cbbc5f2849015.ctex"
+uid="uid://dtw65x3njovei"
+path="res://.godot/imported/borrow_nietzsche_in_university_of_sussex_library.png-3bc8da93bccda90c88fc0c4fa4405a8d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/backgrounds/Library.png"
-dest_files=["res://.godot/imported/Library.png-c2587d1cc28f860c198cbbc5f2849015.ctex"]
+source_file="res://1.Codebase/src/assets/ui/borrow_nietzsche_in_university_of_sussex_library.png"
+dest_files=["res://.godot/imported/borrow_nietzsche_in_university_of_sussex_library.png-3bc8da93bccda90c88fc0c4fa4405a8d.ctex"]
 
 [params]
 

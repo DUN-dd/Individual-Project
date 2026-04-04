@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blyhudtvxmqj7"
-path="res://.godot/imported/blank background.png-6456f9f0b1631f598c616f0f33ae615e.ctex"
+uid="uid://crm16thf8bhjt"
+path="res://.godot/imported/pray_to_monster.png-0b452acbedb66a7e6c4294f4f24b07db.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/blank background.png"
-dest_files=["res://.godot/imported/blank background.png-6456f9f0b1631f598c616f0f33ae615e.ctex"]
+source_file="res://1.Codebase/src/assets/ui/pray_to_monster.png"
+dest_files=["res://.godot/imported/pray_to_monster.png-0b452acbedb66a7e6c4294f4f24b07db.ctex"]
 
 [params]
 

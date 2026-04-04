@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6ig7edg6u4vs"
-path="res://.godot/imported/Engine Logo.png-30dd7f58295d19390430e510202e4057.ctex"
+uid="uid://ygntifugw2a6"
+path="res://.godot/imported/teacher_chan_sad_1.png-5eef2a9e13d8b651d33aa3d63435c035.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://1.Codebase/src/assets/Engine Logo.png"
-dest_files=["res://.godot/imported/Engine Logo.png-30dd7f58295d19390430e510202e4057.ctex"]
+source_file="res://1.Codebase/src/assets/characters/teacher_chan_sad_1.png"
+dest_files=["res://.godot/imported/teacher_chan_sad_1.png-5eef2a9e13d8b651d33aa3d63435c035.ctex"]
 
 [params]
 
