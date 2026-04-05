@@ -92,11 +92,8 @@ jobs:
               "all_tests_runner.gd",
               "ui_tests_runner.gd",
               "quick_verify.gd",
-              "test_providers_mock.gd",
           }
-          standalone = {
-              "1.Codebase/src/scripts/tests/test_providers_mock.gd",
-          }
+          standalone = set()
 
           discovered = sorted(
               path for path in all_tests
@@ -175,8 +172,6 @@ jobs:
               echo ">> FAIL standalone: $script_path (exit $exit_code)" | tee -a test-results/test-output.log
             fi
           }
-
-          run_standalone_test "res://1.Codebase/src/scripts/tests/test_providers_mock.gd"
 
           echo "" | tee -a test-results/test-output.log
           echo "STANDALONE TEST SUMMARY" | tee -a test-results/test-output.log
