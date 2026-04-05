@@ -48,6 +48,7 @@ const ANGRY_FACE_TEXTURE = preload("res://1.Codebase/src/assets/characters/glori
 @onready var ai_guilt_text: RichTextLabel = $ContentPanel/Margin/VBox/AIGuiltText
 @onready var horror_bg_container: Control = $HorrorBackground
 @onready var intervention_counter: Label = $ContentPanel/Margin/VBox/InterventionCounter
+@onready var rebirth_suggestion_label: Label = $ContentPanel/Margin/VBox/RebirthSuggestionLabel
 var is_generating_guilt: bool = false
 var _voice_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _has_played_main_voice: bool = false
@@ -678,3 +679,20 @@ func _apply_localization() -> void:
 		name_label.text = " " + _tr("GLORIA_WATCHING_NAME")
 		subtitle_label.text = _tr("GLORIA_NEGATIVITY_SUBTITLE")
 		continue_button.text = _tr("GLORIA_ACCEPT_GUILT_BUTTON")
+	_update_rebirth_suggestion()
+
+func _update_rebirth_suggestion() -> void:
+	if not rebirth_suggestion_label:
+		return
+	var challenge_completed := false
+	if GameState and GameState.has_method("get_fsm_challenge_module"):
+		var fsm_module: RefCounted = GameState.get_fsm_challenge_module()
+		if fsm_module != null:
+			challenge_completed = bool(fsm_module.get("challenge_completed"))
+	if challenge_completed:
+		rebirth_suggestion_label.visible = false
+		return
+	rebirth_suggestion_label.text = _tr("GLORIA_REBIRTH_SUGGESTION")
+	rebirth_suggestion_label.add_theme_color_override("font_color", Color(0.9, 0.75, 0.75, 0.8))
+	rebirth_suggestion_label.add_theme_font_size_override("font_size", 18)
+	rebirth_suggestion_label.visible = true
