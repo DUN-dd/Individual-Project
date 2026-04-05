@@ -61,7 +61,7 @@ Individual-Project/
 ├── 1.Codebase/                       # Main game source code and assets
 │   ├── src/                          # Source code and game assets
 │   │   ├── scripts/                  # All GDScript code
-│   │   │   ├── core/                 # Core autoload systems and managers (53 scripts)
+│   │   │   ├── core/                 # Core autoload systems and managers (50 scripts)
 │   │   │   │   ├── ai/               # AI system architecture
 │   │   │   │   │   └── managers/     # AI managers (config, context, provider, request, usage stats, voice)
 │   │   │   │   ├── agent/            # MCP agent server implementation
@@ -79,7 +79,7 @@ Individual-Project/
 │   │   │   │   ├── ai_memory_store.gd            # Persistent AI conversation memory
 │   │   │   │   ├── ai_safety_filter.gd           # AI output safety and content filtering
 │   │   │   │   ├── application_lifecycle_module.gd # App startup/shutdown lifecycle
-│   │   │   │   ├── asset_database.gd             # Asset metadata database
+│   │   │   │   ├── analytics_module.gd           # Analytics and telemetry tracking
 │   │   │   │   ├── asset_interaction_system.gd   # Runtime asset interaction handling
 │   │   │   │   ├── asset_registry.gd             # Asset cataloging and preloading
 │   │   │   │   ├── audio_manager.gd              # Sound and music system
@@ -99,6 +99,7 @@ Individual-Project/
 │   │   │   │   ├── fsm_challenge_module.gd       # FSM 30-day challenge logic and progress tracking
 │   │   │   │   ├── fsm_daily_content_data.gd     # Daily content data for FSM challenge (themes, images)
 │   │   │   │   ├── game_constants.gd             # Game-wide constants
+│   │   │   │   ├── game_save.gd                  # Game save data model
 │   │   │   │   ├── live_api_client.gd            # Live/streaming AI API client
 │   │   │   │   ├── localization_manager.gd       # I18n translation system
 │   │   │   │   ├── lru_cache.gd                  # Generic LRU cache utility
@@ -115,7 +116,6 @@ Individual-Project/
 │   │   │   │   ├── save_version_migrator.gd      # Save file version migration
 │   │   │   │   ├── service_locator.gd            # Service registry pattern
 │   │   │   │   ├── session_progress_tracker.gd   # Per-session progress tracking
-│   │   │   │   ├── session_subsystem_registry.gd # Session subsystem registration
 │   │   │   │   ├── skill_manager.gd              # MCP skill system integration
 │   │   │   │   ├── story_exporter.gd             # Story export/serialization
 │   │   │   │   ├── teammate_system.gd            # Teammate AI and behaviors
@@ -124,7 +124,7 @@ Individual-Project/
 │   │   │   │   ├── tutorial_system.gd            # Tutorial and onboarding
 │   │   │   │   ├── ui_debug_overlay.gd           # Developer debug overlay
 │   │   │   │   └── voice_interaction_controller.gd # Voice synthesis controller
-│   │   │   ├── ui/                   # UI controllers and components (86 scripts)
+│   │   │   ├── ui/                   # UI controllers and components (82 scripts)
 │   │   │   │   ├── fsm_challenge_overlay.gd      # FSM 30-day challenge overlay controller
 │   │   │   │   ├── fsm_rebirth_explanation.gd    # FSM rebirth mechanic explanation UI controller
 │   │   │   │   ├── story_scene.gd                # Main story scene controller
@@ -222,7 +222,7 @@ Individual-Project/
 ## Key Directories Explained
 
 ### Core Systems (`1.Codebase/src/scripts/core/`)
-Contains 53 root-level autoload scripts plus subdirectories (`ai/`, `agent/`, `cli/`) that form the game's backbone:
+Contains 50 root-level autoload scripts plus subdirectories (`ai/`, `agent/`, `cli/`) that form the game's backbone:
 - **AI System**: Multi-provider AI integration (OpenAI, Anthropic, Ollama, live streaming) with request management, context building, safety filtering, memory store, and voice synthesis
 - **Agent System**: MCP (Model Context Protocol) server for external AI agent interaction
 - **CLI System**: In-game developer command-line interface for debug, AI, save, and game state commands
@@ -234,7 +234,7 @@ Contains 53 root-level autoload scripts plus subdirectories (`ai/`, `agent/`, `c
 - **Audio**: Music and sound effect management with pooling
 
 ### UI Controllers (`1.Codebase/src/scripts/ui/`)
-86 UI controller scripts following the controller pattern:
+82 UI controller scripts following the controller pattern:
 - **Story Scene**: Main story scene with 8 sub-controllers (narrative, choice, flow, state, overlay, assets, UI, coordinator)
 - **Menu Systems**: Start menu, pause menu, settings menu, save/load menu
 - **Overlays**: Choice selection, Gloria intervention, night cycle, trolley problem
