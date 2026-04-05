@@ -26,6 +26,12 @@ const TRAFFIC_CLICK_TIMEOUT := 5.0
 var _traffic_click_count: int = 0
 var _traffic_click_timer: float = 0.0
 var _traffic_label: Label = null
+const ISOLATION_EASTER_EGG_URL := "https://music.apple.com/gb/album/%E9%9A%94%E9%9B%A2-single/1526264711"
+const ISOLATION_CLICK_TARGET := 5
+const ISOLATION_CLICK_TIMEOUT := 5.0
+var _isolation_click_count: int = 0
+var _isolation_click_timer: float = 0.0
+var _isolation_label: Label = null
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
@@ -48,6 +54,10 @@ func _process(delta: float) -> void:
 		_traffic_click_timer -= delta
 		if _traffic_click_timer <= 0.0:
 			_traffic_click_count = 0
+	if _isolation_click_count > 0:
+		_isolation_click_timer -= delta
+		if _isolation_click_timer <= 0.0:
+			_isolation_click_count = 0
 func _on_relationship_updated(_source_id: String, _target_id: String) -> void:
 	if is_visible_in_tree() and current_mode == "team":
 		_render_team_graph()
@@ -93,6 +103,7 @@ func _render_current_mode() -> void:
 	for child in graph_container.get_children():
 		child.queue_free()
 	_traffic_label = null
+	_isolation_label = null
 	connection_lines.clear()
 	if current_mode == "team":
 		_render_team_graph()
@@ -315,6 +326,21 @@ func _draw_connections() -> void:
 				_traffic_label.tooltip_text = _tr("EASTER_EGG_TRAFFIC_HINT").format({"remaining": TRAFFIC_CLICK_TARGET})
 				_traffic_label.gui_input.connect(_on_traffic_label_gui_input)
 				graph_container.add_child(_traffic_label)
+			var is_player_teacher_chan_connection = (fid == "player" and tid == "teacher_chan") or (fid == "teacher_chan" and tid == "player")
+			if is_player_teacher_chan_connection:
+				_isolation_label = Label.new()
+				_isolation_label.text = _tr("EASTER_EGG_ISOLATION_TEXT")
+				_isolation_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				_isolation_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				_isolation_label.add_theme_font_size_override("font_size", 13)
+				_isolation_label.add_theme_color_override("font_color", Color(0.55, 0.72, 0.95, 0.38))
+				_isolation_label.mouse_filter = Control.MOUSE_FILTER_STOP
+				_isolation_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+				_isolation_label.custom_minimum_size = Vector2(120, 24)
+				_isolation_label.position = (from_pos + to_pos) / 2 - Vector2(60, 12)
+				_isolation_label.tooltip_text = _tr("EASTER_EGG_ISOLATION_HINT").format({"remaining": ISOLATION_CLICK_TARGET})
+				_isolation_label.gui_input.connect(_on_isolation_label_gui_input)
+				graph_container.add_child(_isolation_label)
 func _show_empty_state(msg_override: String = "") -> void:
 	var lang = GameState.current_language if GameState else "en"
 	var text = ""
@@ -574,6 +600,31 @@ func _on_traffic_label_gui_input(event: InputEvent) -> void:
 	_traffic_click_count = 0
 	_traffic_click_timer = 0.0
 	_show_traffic_easter_egg()
+func _on_isolation_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_isolation_click_count += 1
+	_isolation_click_timer = ISOLATION_CLICK_TIMEOUT
+	if _isolation_label and is_instance_valid(_isolation_label):
+		_isolation_label.pivot_offset = _isolation_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_isolation_label, "scale", Vector2(1.08, 1.08), 0.10)
+		tween.tween_property(_isolation_label, "scale", Vector2.ONE, 0.10)
+	var remaining := ISOLATION_CLICK_TARGET - _isolation_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			if _isolation_label and is_instance_valid(_isolation_label):
+				_isolation_label.tooltip_text = _tr("EASTER_EGG_ISOLATION_CLICK").format({"remaining": remaining})
+		else:
+			if _isolation_label and is_instance_valid(_isolation_label):
+				_isolation_label.tooltip_text = _tr("EASTER_EGG_ISOLATION_HINT").format({"remaining": remaining})
+		return
+	_isolation_click_count = 0
+	_isolation_click_timer = 0.0
+	_show_isolation_easter_egg()
 func _show_traffic_easter_egg() -> void:
 	var audio_manager = ServiceLocator.get_audio_manager() if ServiceLocator else null
 	if audio_manager:
@@ -648,6 +699,93 @@ func _show_traffic_easter_egg() -> void:
 	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
 	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
 	listen_btn.pressed.connect(func(): OS.shell_open(TRAFFIC_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _show_isolation_easter_egg() -> void:
+	var audio_manager = ServiceLocator.get_audio_manager() if ServiceLocator else null
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.02, 0.08, 0.92)
+	overlay.add_child(bg)
+	var center_c := CenterContainer.new()
+	center_c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center_c)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(540, 360)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.04, 0.07, 0.14, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.30, 0.52, 0.82, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center_c.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_ISOLATION_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.65, 0.82, 1.0))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.30, 0.52, 0.82, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_ISOLATION_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.90, 0.93, 0.98))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_ISOLATION_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(160, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(ISOLATION_EASTER_EGG_URL))
 	btn_row.add_child(listen_btn)
 	var close_btn := Button.new()
 	close_btn.text = _tr("EASTER_EGG_CLOSE")

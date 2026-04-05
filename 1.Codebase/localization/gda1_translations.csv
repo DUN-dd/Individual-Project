@@ -2716,3 +2716,24 @@ EASTER_EGG_TRAFFIC_BODY,"[center]明明綠燈　轉眼變成紅燈\n來又去　
 EASTER_EGG_TRAFFIC_HINT,Something flickers between them... ({remaining} clicks remaining),兩人之間有些什麼在閃爍……（還有 {remaining} 下）,Etwas flackert zwischen ihnen... ({remaining} Klicks verbleibend)
 EASTER_EGG_TRAFFIC_CLICK,Almost there... ({remaining} more),快了……（還差 {remaining} 下）,Fast geschafft... (noch {remaining} mal)
 EASTER_EGG_TRAFFIC_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
+EASTER_EGG_ISOLATION_TEXT,No longer spoken of...,不再說起……,Nicht mehr erwähnt...
+EASTER_EGG_ISOLATION_TITLE,~ ♪ 隔離 ♪ ~,~ ♪ 隔離 ♪ ~,~ ♪ 隔離 ♪ ~
+EASTER_EGG_ISOLATION_BODY,"[center]Fourteen days — quite enough to prove
+he had long heartlessly abandoned.
+
+I know clearly — ending it
+has made him happier.
+
+[i]— Jace Chan「隔離」[/i][/center]","[center]十四天　大概足以證實　他已狠心離棄
+但我清清楚楚　終止交往他更快樂過
+
+[i]— Jace Chan「隔離」[/i][/center]","[center]Vierzehn Tage — genug um zu beweisen
+dass er mich längst herzlos verlassen.
+
+Ich weiß es klar — das Ende
+hat ihn glücklicher gemacht.
+
+[i]— Jace Chan「隔離」[/i][/center]"
+EASTER_EGG_ISOLATION_HINT,A message left on read... ({remaining} clicks remaining),藍剔在等……（還有 {remaining} 下）,Eine Nachricht gelesen und ignoriert... ({remaining} Klicks verbleibend)
+EASTER_EGG_ISOLATION_CLICK,Almost answered... ({remaining} more),快了……（還差 {remaining} 下）,Fast beantwortet... (noch {remaining} mal)
+EASTER_EGG_ISOLATION_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
