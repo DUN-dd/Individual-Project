@@ -18,8 +18,6 @@ const SKIP_FILES: Array[String] = [
 	"all_tests_runner.gd",
 	"ui_tests_runner.gd",
 	"quick_verify.gd",
-	"test_achievement_system_api.gd",
-	"test_providers_mock.gd",
 ]
 const SUITE_TIMEOUT_SEC: float = 60.0
 func _ready() -> void:
