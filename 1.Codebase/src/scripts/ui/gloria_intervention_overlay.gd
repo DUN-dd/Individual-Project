@@ -47,6 +47,7 @@ const CRYING_FACE_PATH = "res://1.Codebase/src/assets/characters/gloria_protagon
 const ANGRY_FACE_TEXTURE = preload("res://1.Codebase/src/assets/characters/gloria_protagonis_angry.png")
 @onready var ai_guilt_text: RichTextLabel = $ContentPanel/Margin/VBox/AIGuiltText
 @onready var horror_bg_container: Control = $HorrorBackground
+@onready var intervention_counter: Label = $ContentPanel/Margin/VBox/InterventionCounter
 var is_generating_guilt: bool = false
 var _voice_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 var _has_played_main_voice: bool = false
@@ -57,6 +58,7 @@ var _is_diary_judgment: bool = false
 var _current_voice_key: String = ""
 var _chao_click_count: int = 0
 var _last_chao_click_time_millis: float = 0.0
+var _gloria_trigger_count: int = 0
 func _report_info(message: String, details: Dictionary = {}) -> void:
 	ErrorReporterBridge.report_info(ERROR_CONTEXT, message, details)
 func _report_warning(message: String, details: Dictionary = {}) -> void:
@@ -80,6 +82,7 @@ func _ready() -> void:
 	if _is_diary_judgment:
 		_apply_diary_judgment_portrait()
 	_apply_localization()
+	_setup_intervention_counter()
 	_start_bgm()
 	await get_tree().process_frame
 	if body_text.get_parsed_text().is_empty() and (not ai_guilt_text or ai_guilt_text.text.is_empty()):
@@ -256,6 +259,110 @@ func _animate_in() -> void:
 		pulse_tween.set_trans(Tween.TRANS_SINE)
 		pulse_tween.tween_property(portrait, "scale", Vector2(1.2, 1.2), 0.8)
 		pulse_tween.tween_property(portrait, "scale", Vector2.ONE, 0.8)
+	await get_tree().create_timer(0.8).timeout
+	_slam_guilty_stamp()
+
+func _get_gloria_trigger_count() -> int:
+	if AchievementSystem and AchievementSystem.get("_progress_counters") is Dictionary:
+		return int(AchievementSystem._progress_counters.get("gloria_triggers", 0))
+	return 0
+
+func _setup_intervention_counter() -> void:
+	if not intervention_counter:
+		return
+	_gloria_trigger_count = _get_gloria_trigger_count()
+	if _gloria_trigger_count <= 0:
+		intervention_counter.visible = false
+		return
+	var count_text: String = ""
+	match _gloria_trigger_count:
+		1:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_1")
+		2:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_2")
+		3:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_3")
+		_:
+			count_text = _tr("GLORIA_INTERVENTION_COUNT_MANY").format({"count": _gloria_trigger_count})
+	intervention_counter.text = count_text
+	intervention_counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intervention_counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if FontManager:
+		FontManager.apply_to_label(intervention_counter, 22)
+	var severity_color: Color
+	if _gloria_trigger_count == 1:
+		severity_color = Color(0.85, 0.65, 0.65)
+	elif _gloria_trigger_count == 2:
+		severity_color = Color(1.0, 0.5, 0.4)
+	else:
+		severity_color = Color(1.0, 0.25, 0.2)
+	intervention_counter.add_theme_color_override("font_color", severity_color)
+	intervention_counter.modulate.a = 0.0
+	intervention_counter.visible = true
+	var fade_tween := intervention_counter.create_tween()
+	fade_tween.set_ease(Tween.EASE_OUT)
+	fade_tween.set_trans(Tween.TRANS_CUBIC)
+	fade_tween.tween_property(intervention_counter, "modulate:a", 1.0, 0.8)
+
+func _slam_guilty_stamp() -> void:
+	if not is_inside_tree() or not is_instance_valid(content_panel):
+		return
+	var stamp_text: String
+	if _is_diary_judgment:
+		stamp_text = _tr("GLORIA_STAMP_VERDICT_CONFIRMED")
+	else:
+		stamp_text = _tr("GLORIA_STAMP_GUILTY")
+	var stamp := Label.new()
+	stamp.text = stamp_text
+	stamp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	stamp.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	stamp.set_anchors_preset(Control.PRESET_CENTER)
+	stamp.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	stamp.grow_vertical = Control.GROW_DIRECTION_BOTH
+	stamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stamp.add_theme_font_size_override("font_size", 96)
+	stamp.add_theme_color_override("font_color", Color(0.85, 0.1, 0.1, 0.85))
+	stamp.add_theme_color_override("font_shadow_color", Color(0.3, 0.0, 0.0, 0.6))
+	stamp.add_theme_constant_override("shadow_offset_x", 4)
+	stamp.add_theme_constant_override("shadow_offset_y", 4)
+	stamp.add_theme_color_override("font_outline_color", Color(0.5, 0.0, 0.0, 0.9))
+	stamp.add_theme_constant_override("outline_size", 6)
+	stamp.rotation_degrees = -18.0
+	stamp.pivot_offset = stamp.size / 2.0
+	stamp.scale = Vector2(4.0, 4.0)
+	stamp.modulate.a = 0.0
+	content_panel.add_child(stamp)
+	await get_tree().process_frame
+	stamp.pivot_offset = stamp.size / 2.0
+	var slam_tween := stamp.create_tween()
+	slam_tween.set_parallel(true)
+	slam_tween.tween_property(stamp, "scale", Vector2.ONE, 0.25).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+	slam_tween.tween_property(stamp, "modulate:a", 1.0, 0.15).set_ease(Tween.EASE_OUT)
+	await slam_tween.finished
+	_shake_screen(8.0, 0.2)
+	if AudioManager:
+		AudioManager.play_sfx("menu_click", 0.9)
+	var pulse_tween := stamp.create_tween()
+	pulse_tween.set_loops()
+	pulse_tween.set_ease(Tween.EASE_IN_OUT)
+	pulse_tween.set_trans(Tween.TRANS_SINE)
+	pulse_tween.tween_property(stamp, "modulate:a", 0.55, 1.5)
+	pulse_tween.tween_property(stamp, "modulate:a", 0.85, 1.5)
+
+func _shake_screen(intensity: float, duration: float) -> void:
+	if not is_inside_tree() or not is_instance_valid(content_panel):
+		return
+	var original_pos := content_panel.position
+	var shake_tween := content_panel.create_tween()
+	var steps: int = int(duration / 0.03)
+	for i in range(steps):
+		var offset := Vector2(
+			randf_range(-intensity, intensity),
+			randf_range(-intensity, intensity)
+		)
+		shake_tween.tween_property(content_panel, "position", original_pos + offset, 0.03)
+	shake_tween.tween_property(content_panel, "position", original_pos, 0.03)
+
 func _on_subtitle_gui_input(event: InputEvent) -> void:
 	if not (event is InputEventMouseButton):
 		return

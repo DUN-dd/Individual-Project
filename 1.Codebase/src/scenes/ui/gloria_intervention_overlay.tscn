@@ -91,6 +91,11 @@ layout_mode = 2
 text = "你真是太負面了..."
 vertical_alignment = 1
 
+[node name="InterventionCounter" type="Label" parent="ContentPanel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="BodyText" type="RichTextLabel" parent="ContentPanel/Margin/VBox"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
