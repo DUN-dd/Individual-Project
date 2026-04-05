@@ -1439,6 +1439,10 @@ AI_PROMPT_REFLECTION_PREFIX, | Reflection: , | 內省：,| Spiegelung:
 AI_REQUEST_FALLBACK_MSG,%s. Switching to offline story generator.,%s。改用離線劇情產生器。,%S. Wechsel zum Offline-Story-Generator.
 AI_MEMORY_LONG_TERM_HEADER,Long-term continuity memos (oldest to newest):,長期連續性備忘（由舊到新）：,Langfristige Kontinuitätsnotizen (vom ältesten zum neuesten):
 AI_MEMORY_NOTES_HEADER,Persistent memos and restrictions:,持久備忘與限制：,Dauerhafte Notizen und Einschränkungen:
+# AI Memory Store strip phrases - ai_memory_store.gd,,,
+MEMORY_STRIP_MISSION_COMPLETE_ZH1,,只有在任務真正結束時，才將 mission_status 設為 complete,
+MEMORY_STRIP_MISSION_COMPLETE_ZH2,,"只有在任務真正結束時，才將 `mission_status` 設為 `complete`",
+MEMORY_STRIP_MISSION_COMPLETE_DE,,,Setzen Sie mission_status nur dann auf ""complete"" wenn die Mission wirklich abgeschlossen ist.
 BUTTERFLY_TRACKER_CONTEXT,The player's recent choices may have consequences:\n,玩家最近的選擇可能產生後果：\n,Die jüngsten Entscheidungen des Spielers können Konsequenzen haben:\n
 BUTTERFLY_TRACKER_PENDING,- [%d scenes ago] %s (pending consequences: %d)\n,- [%d場景前] %s（待觸發後果：%d）\n,- [vor %d Szenen] %s (ausstehende Konsequenzen: %d)\n
 AI_CHART_NO_DATA,No data yet,No data yet / 尚無資料,Noch keine Daten
@@ -2296,6 +2300,31 @@ AI_I18N_STATS_REALITY,Reality %d/%d,現實值 %d/%d,Realität %d/%d
 AI_I18N_STATS_POSITIVE,Positive %d/%d,正能量 %d/%d,Positiv %d/%d
 AI_I18N_STATS_ENTROPY,Entropy %d,熵值 %d,Entropie %d
 AI_I18N_STATS_LABEL,Stats: %s,數值：%s,Statistiken: %s
+# AI Prompts I18n - German-specific lookup keys (used when de is treated like zh via _tr),,,
+AI_I18N_LANG_INSTRUCTION_DE,,,WICHTIG: Antworte auf Deutsch. Alle Erzählungen, Dialoge und Beschreibungen müssen auf Deutsch sein.
+AI_I18N_SECTION_SESSION_DATA_DE,,,=== SITZUNGSDATEN ===
+AI_I18N_SECTION_RECENT_EVENTS_DE,,,=== LETZTE EREIGNISSE ===
+AI_I18N_SECTION_BUTTERFLY_EFFECT_DE,,,=== SCHMETTERLINGSEFFEKT: VERGANGENE ENTSCHEIDUNGEN ===
+AI_I18N_SECTION_PLAYER_REFLECTIONS_DE,,,=== SPIELERREFLEXIONEN ===
+AI_I18N_SECTION_AVAILABLE_ASSETS_DE,,,=== VERFÜGBARE RESSOURCEN ===
+AI_I18N_SECTION_PROMPT_DE,,,=== EINGABE ===
+AI_I18N_SECTION_MISSION_GENERATION_DE,,,=== Missionsgenerierung ===
+AI_I18N_SECTION_CONSEQUENCE_GENERATION_DE,,,=== Folgengenerierung ===
+AI_I18N_SECTION_TEAMMATE_INTERFERENCE_DE,,,=== Teammitglied-Einmischung ===
+AI_I18N_BUTTERFLY_REFERENCE_PAST_DE,,,Erwäge eine dieser vergangenen Entscheidungen in deiner Antwort zu referenzieren wenn es narrativ passend ist.
+AI_I18N_BUTTERFLY_TRIGGER_CALLBACK_DE,,,Verwende butterfly_tracker.trigger_consequence_for_choice() wenn eine vergangene Entscheidung nachhallen soll.
+AI_I18N_BUTTERFLY_SUGGESTED_CALLBACK_DE,,,"\n VORGESCHLAGENER RÜCKRUF: Erwäge ""%s"" (von vor %d Szenen, ID: %s) die aktuelle Situation beeinflussen zu lassen."
+AI_I18N_ASSET_FRESHEST_CONTEXT_DE,,,Neueste Asset-IDs erscheinen zuletzt; behandle sie als den aktuellsten Kontext.
+AI_I18N_META_PURPOSE_DE,,,Zweck: %s
+AI_I18N_META_PLAYER_CHOICE_DE,,,Spielerwahl: %s
+AI_I18N_META_SUCCESS_CHECK_DE,,,Erfolgsprüfung: %s
+AI_I18N_META_PLAYER_PRAYER_DE,,,Spielergebet: %s
+AI_I18N_META_PLAYER_ACTION_DE,,,Spieleraktion: %s
+AI_I18N_META_CURRENT_TEAMMATE_DE,,,Aktueller Teamkollege: %s
+AI_I18N_STATS_REALITY_DE,,,Realität %d/%d
+AI_I18N_STATS_POSITIVE_DE,,,Positiv %d/%d
+AI_I18N_STATS_ENTROPY_DE,,,Entropie %d
+AI_I18N_STATS_LABEL_DE,,,Statistiken: %s
 # AI Context Builder,,,
 AI_CTX_STATIC_CONTEXT,"GDA1 operates in a world cursed by ""Positive Energy"" - every forced smile feeds cosmic Void Entropy.\nGloria leads; Donkey, ARK, One are unreliable teammates whose optimism accelerates collapse.\nThe player is the lone rational agent who must surface contradictions and treat ""success"" as failure in disguise.",GDA1 運作於被「正能量」詛咒的世界，每個被迫的笑容都在餵養虛空熵。\nGloria 領導機構；Donkey、ARK、One 是不可靠的隊友，樂觀加速崩潰。\n玩家是唯一理性的人，必須揭露矛盾，將「成功」視為偽裝的失敗。,"GDA1 operiert in einer Welt, die von „positiver Energie“ verflucht ist – jedes erzwungene Lächeln nährt die kosmische Leerentropie.\nGloria führt; Donkey, ARK und One sind unzuverlässige Teamkollegen, deren Optimismus den Zusammenbruch beschleunigt.\nDer Spieler ist der einsame rationale Agent, der Widersprüche ans Licht bringen und „Erfolg“ als verkappten Misserfolg behandeln muss."
 AI_CTX_NON_NEGOTIABLE_RULES,Immutable directives:\n1. Positive Energy always increases entropy - victories hide damage.\n2. Maintain dark humor and irony. Never reward blind optimism.\n3. Obey the notes register. Do not contradict recorded facts.,不可更改的指令：\n1. 正能量必然增加熵，勝利隱藏傷害。\n2. 維持黑色幽默與諷刺。絕不獎勵盲目樂觀。\n3. 遵守記錄，不得違背已記錄的事實。,Unveränderliche Anweisungen:\n1. Positive Energie erhöht immer die Entropie – Siege verbergen Schaden.\n2. Behalten Sie schwarzen Humor und Ironie bei. Belohnen Sie niemals blinden Optimismus.\n3. Befolgen Sie das Notizenregister. Widersprechen Sie nicht den aufgezeichneten Tatsachen.

@@ -65,24 +65,24 @@ const BUTTERFLY_EFFECT_INSTRUCTIONS := {
 	"reference_past": {
 		"en": "Consider referencing one of these past choices in your response if narratively appropriate.",
 		"zh": "AI_I18N_BUTTERFLY_REFERENCE_PAST",
-		"de": "Erwäge, eine dieser vergangenen Entscheidungen in deiner Antwort zu referenzieren, wenn es narrativ passend ist.",
+		"de": "AI_I18N_BUTTERFLY_REFERENCE_PAST_DE",
 	},
 	"trigger_callback": {
 		"en": "Use butterfly_tracker.trigger_consequence_for_choice() when a past choice should echo forward.",
 		"zh": "AI_I18N_BUTTERFLY_TRIGGER_CALLBACK",
-		"de": "Verwende butterfly_tracker.trigger_consequence_for_choice(), wenn eine vergangene Entscheidung nachhallen soll.",
+		"de": "AI_I18N_BUTTERFLY_TRIGGER_CALLBACK_DE",
 	},
 	"suggested_callback": {
 		"en": "\n SUGGESTED CALLBACK: Consider having \"%s\" (from %d scenes ago, ID: %s) affect the current situation.",
 		"zh": "AI_I18N_BUTTERFLY_SUGGESTED_CALLBACK",
-		"de": "\n VORGESCHLAGENER RÜCKRUF: Erwäge, \"%s\" (von vor %d Szenen, ID: %s) die aktuelle Situation beeinflussen zu lassen.",
+		"de": "AI_I18N_BUTTERFLY_SUGGESTED_CALLBACK_DE",
 	},
 }
 const ASSET_CONTEXT_INSTRUCTIONS := {
 	"freshest_context": {
 		"en": "Newest asset IDs appear last; treat them as the freshest context.",
 		"zh": "AI_I18N_ASSET_FRESHEST_CONTEXT",
-		"de": "Neueste Asset-IDs erscheinen zuletzt; behandle sie als den aktuellsten Kontext.",
+		"de": "AI_I18N_ASSET_FRESHEST_CONTEXT_DE",
 	},
 }
 const METADATA_LABELS := {
@@ -142,7 +142,7 @@ const STATS_FORMAT := {
 static func get_text(category: Dictionary, key: String, language: String = "en") -> String:
 	if category.has(key) and category[key] is Dictionary:
 		var text_dict: Dictionary = category[key]
-		if language == "en" or language == "de":
+		if language == "en":
 			var direct: String = text_dict.get(language, "")
 			if direct.is_empty():
 				return text_dict.get("en", "")
@@ -153,7 +153,7 @@ static func get_text(category: Dictionary, key: String, language: String = "en")
 		return _tr(tr_key, language)
 	return ""
 static func get_language_instruction(language: String = "en") -> String:
-	if language == "en" or language == "de":
+	if language == "en":
 		return LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["en"])
 	var tr_key: String = LANGUAGE_INSTRUCTIONS.get(language, "")
 	if tr_key.is_empty():

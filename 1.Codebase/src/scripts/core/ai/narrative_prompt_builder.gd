@@ -91,28 +91,12 @@ static func _build_stats_snapshot(game_state: Variant) -> String:
 	]
 static func _build_json_schema(lang: String) -> String:
 	var preview_labels := {
-		"cautious": "[Cautious]",
-		"balanced": "[Balanced]",
-		"reckless": "[Reckless]",
-		"positive": "[Positive]",
-		"complain": "[Complain]",
+		"cautious": _s_tr("ARCHETYPE_LABEL_CAUTIOUS", lang),
+		"balanced": _s_tr("ARCHETYPE_LABEL_BALANCED", lang),
+		"reckless": _s_tr("ARCHETYPE_LABEL_RECKLESS", lang),
+		"positive": _s_tr("ARCHETYPE_LABEL_POSITIVE", lang),
+		"complain": _s_tr("ARCHETYPE_LABEL_COMPLAIN", lang),
 	}
-	if lang == "de":
-		preview_labels = {
-			"cautious": "[Vorsichtig]",
-			"balanced": "[Ausgewogen]",
-			"reckless": "[Ruecksichtslos]",
-			"positive": "[Positiv]",
-			"complain": "[Beschweren]",
-		}
-	elif lang == "zh":
-		preview_labels = {
-			"cautious": "[謹慎]",
-			"balanced": "[平衡]",
-			"reckless": "[魯莽]",
-			"positive": "[正能量]",
-			"complain": "[抱怨]",
-		}
 	return """{
   "mission_title": "<title>",
   "scene": {"background": "<background_id>"},
