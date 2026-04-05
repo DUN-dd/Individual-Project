@@ -104,6 +104,8 @@ func parse_response(result: int, response_code: int, body: PackedByteArray) -> D
 		var usage = response_data["usage"]
 		response["input_tokens"] = usage.get("input_tokens", 0)
 		response["output_tokens"] = usage.get("output_tokens", 0)
+	if response_data is Dictionary and response_data.has("model"):
+		response["actual_model"] = str(response_data["model"])
 	return response
 func _extract_system_prompt(messages: Array) -> String:
 	for msg in messages:
