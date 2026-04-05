@@ -685,8 +685,13 @@ func _update_rebirth_suggestion() -> void:
 	if not rebirth_suggestion_label:
 		return
 	var challenge_completed := false
-	if GameState and GameState.has_method("get_fsm_challenge_module"):
-		var fsm_module: RefCounted = GameState.get_fsm_challenge_module()
+	var game_state: Node = null
+	if ServiceLocator and ServiceLocator.has_method("get_game_state"):
+		game_state = ServiceLocator.get_game_state()
+	if game_state == null:
+		game_state = GameState
+	if game_state and game_state.has_method("get_fsm_challenge_module"):
+		var fsm_module: RefCounted = game_state.get_fsm_challenge_module()
 		if fsm_module != null:
 			challenge_completed = bool(fsm_module.get("challenge_completed"))
 	if challenge_completed:
