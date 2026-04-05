@@ -12,53 +12,53 @@ static func _tr(key: String, lang: String = "") -> String:
 const LANGUAGE_INSTRUCTIONS := {
 	"en": "IMPORTANT: Respond in English. All narrative, dialogue, and descriptions must be in English.",
 	"zh": "AI_I18N_LANG_INSTRUCTION",
-	"de": "WICHTIG: Antworte auf Deutsch. Alle Erzählungen, Dialoge und Beschreibungen müssen auf Deutsch sein.",
+	"de": "AI_I18N_LANG_INSTRUCTION_DE",
 }
 const SECTION_HEADERS := {
 	"session_data": {
 		"en": "=== SESSION DATA ===",
 		"zh": "AI_I18N_SECTION_SESSION_DATA",
-		"de": "=== SITZUNGSDATEN ===",
+		"de": "AI_I18N_SECTION_SESSION_DATA_DE",
 	},
 	"recent_events": {
 		"en": "=== RECENT EVENTS ===",
 		"zh": "AI_I18N_SECTION_RECENT_EVENTS",
-		"de": "=== LETZTE EREIGNISSE ===",
+		"de": "AI_I18N_SECTION_RECENT_EVENTS_DE",
 	},
 	"butterfly_effect": {
 		"en": "=== BUTTERFLY EFFECT: PAST CHOICES ===",
 		"zh": "AI_I18N_SECTION_BUTTERFLY_EFFECT",
-		"de": "=== SCHMETTERLINGSEFFEKT: VERGANGENE ENTSCHEIDUNGEN ===",
+		"de": "AI_I18N_SECTION_BUTTERFLY_EFFECT_DE",
 	},
 	"player_reflections": {
 		"en": "=== PLAYER REFLECTIONS ===",
 		"zh": "AI_I18N_SECTION_PLAYER_REFLECTIONS",
-		"de": "=== SPIELERREFLEXIONEN ===",
+		"de": "AI_I18N_SECTION_PLAYER_REFLECTIONS_DE",
 	},
 	"available_assets": {
 		"en": "=== AVAILABLE ASSETS ===",
 		"zh": "AI_I18N_SECTION_AVAILABLE_ASSETS",
-		"de": "=== VERFÜGBARE RESSOURCEN ===",
+		"de": "AI_I18N_SECTION_AVAILABLE_ASSETS_DE",
 	},
 	"prompt": {
 		"en": "=== PROMPT ===",
 		"zh": "AI_I18N_SECTION_PROMPT",
-		"de": "=== EINGABE ===",
+		"de": "AI_I18N_SECTION_PROMPT_DE",
 	},
 	"mission_generation": {
 		"en": "=== Mission Generation ===",
 		"zh": "AI_I18N_SECTION_MISSION_GENERATION",
-		"de": "=== Missionsgenerierung ===",
+		"de": "AI_I18N_SECTION_MISSION_GENERATION_DE",
 	},
 	"consequence_generation": {
 		"en": "=== Consequence Generation ===",
 		"zh": "AI_I18N_SECTION_CONSEQUENCE_GENERATION",
-		"de": "=== Folgengenerierung ===",
+		"de": "AI_I18N_SECTION_CONSEQUENCE_GENERATION_DE",
 	},
 	"teammate_interference": {
 		"en": "=== Teammate Interference ===",
 		"zh": "AI_I18N_SECTION_TEAMMATE_INTERFERENCE",
-		"de": "=== Teammitglied-Einmischung ===",
+		"de": "AI_I18N_SECTION_TEAMMATE_INTERFERENCE_DE",
 	},
 }
 const BUTTERFLY_EFFECT_INSTRUCTIONS := {
