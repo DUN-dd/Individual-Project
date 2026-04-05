@@ -8,6 +8,7 @@ const ICON_REFRESH = preload("res://1.Codebase/src/assets/ui/icon_refresh.svg")
 const ICON_CHECK = preload("res://1.Codebase/src/assets/ui/icon_check.svg")
 const FSMRebirthExplanationScene = preload("res://1.Codebase/src/scenes/ui/fsm_rebirth_explanation.tscn")
 const INVITE_METADATA_KEY := "fsm_challenge_invite_seen"
+const DIALECTIC_VIDEO_URL := "https://youtu.be/XXK5wOWh7vM?si=uoM1ZUjTfWIOju5F"
 const PIG_SNAKE_PIGEON_URL := "https://en.wikipedia.org/wiki/The_Pig,_the_Snake_and_the_Pigeon"
 const PIG_SNAKE_PIGEON_CLICKS_NEEDED := 5
 const TIMER_FONT_SIZE_DEFAULT := 16
@@ -56,6 +57,7 @@ const TIMER_FONT_SIZE_LARGE := 26
 @onready var crash_back_button: Button = $CrashPanel/MarginContainer/VBoxContainer/BackButton
 @onready var crash_icon: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashIcon
 @onready var crash_footer: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashFooter
+@onready var crash_video_btn: TextureButton = $CrashPanel/VideoIconBtn
 var current_day: int = 1
 var click_count: int = 0
 var required_clicks: int = GameConstants.FSMChallenge.REQUIRED_REPETITIONS
@@ -259,6 +261,10 @@ func _connect_signals() -> void:
 		content_label.gui_input.connect(_on_content_clicked)
 	if crash_back_button:
 		crash_back_button.pressed.connect(_on_crash_back_pressed)
+	if crash_video_btn:
+		crash_video_btn.tooltip_text = _tr("DIALECTIC_VIDEO_CHANNEL") + " — " + _tr("DIALECTIC_VIDEO_TOOLTIP")
+		UIStyleManager.add_hover_scale_effect(crash_video_btn, 1.12)
+		crash_video_btn.pressed.connect(_show_dialectic_video_popup)
 	if invitation_accept:
 		invitation_accept.pressed.connect(_on_invitation_accept)
 	if invitation_decline:
@@ -1229,3 +1235,95 @@ func _show_pig_snake_pigeon_easter_egg() -> void:
 	overlay.modulate.a = 0.0
 	add_child(overlay)
 	UIStyleManager.fade_in(overlay, 0.25)
+func _show_dialectic_video_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.04, 0.93)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 360)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.05, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 2
+	sb.border_width_right = 2
+	sb.border_width_top = 2
+	sb.border_width_bottom = 2
+	sb.border_color = Color(0.85, 0.30, 0.30, 0.75)
+	sb.shadow_size = 20
+	sb.shadow_color = Color(0, 0, 0, 0.65)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var channel_lbl := Label.new()
+	channel_lbl.text = _tr("DIALECTIC_VIDEO_CHANNEL")
+	channel_lbl.add_theme_font_size_override("font_size", 14)
+	channel_lbl.add_theme_color_override("font_color", Color(0.80, 0.50, 0.50, 0.85))
+	channel_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(channel_lbl)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("DIALECTIC_VIDEO_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 22)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.85, 0.30, 0.30, 0.45)
+	vbox.add_child(sep)
+	var desc_lbl := RichTextLabel.new()
+	desc_lbl.bbcode_enabled = true
+	desc_lbl.text = "[center][color=#C8C0D8]" + _tr("DIALECTIC_VIDEO_DESC") + "[/color][/center]"
+	desc_lbl.fit_content = true
+	desc_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	desc_lbl.add_theme_font_size_override("normal_font_size", 16)
+	vbox.add_child(desc_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var open_btn := Button.new()
+	open_btn.text = _tr("DIALECTIC_VIDEO_OPEN")
+	open_btn.custom_minimum_size = Vector2(160, 48)
+	open_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(open_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(open_btn, 1.06)
+	open_btn.pressed.connect(func(): OS.shell_open(DIALECTIC_VIDEO_URL))
+	btn_row.add_child(open_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("UI_CLOSE_BUTTON")
+	close_btn.custom_minimum_size = Vector2(120, 48)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)

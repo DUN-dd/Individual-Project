@@ -17,7 +17,6 @@ const KITE_CLICK_TIMEOUT := 5.0
 const HFGS_EASTER_EGG_URL := "https://www.youtube.com/results?search_query=%E9%84%A7%E5%81%A5%E6%B3%93+%E6%81%8D%E5%A6%82%E9%9A%94%E4%B8%96"
 const HFGS_CLICK_TARGET := 5
 const HFGS_CLICK_TIMEOUT := 5.0
-const DIALECTIC_VIDEO_URL := "https://youtu.be/XXK5wOWh7vM?si=uoM1ZUjTfWIOju5F"
 @onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
 @onready var header_icon: TextureRect = $Root/ContentPanel/Margin/VBox/Header/HeaderIcon
 @onready var close_button: Button = $Root/ContentPanel/Margin/VBox/Header/CloseButton
@@ -75,7 +74,6 @@ const DIALECTIC_VIDEO_URL := "https://youtu.be/XXK5wOWh7vM?si=uoM1ZUjTfWIOju5F"
 @onready var conc_fsm: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcHBox/ConcFSM
 @onready var conc_teacher: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcHBox/ConcTeacher
 @onready var conc_vbox: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox
-@onready var video_icon_btn: TextureButton = $Root/VideoIconBtn
 var audio_manager: Node = null
 var _current_tab: int = 0 
 var _card_tweens: Array = []
@@ -119,7 +117,6 @@ func _ready() -> void:
 	_setup_hfgs_easter_egg()
 	_setup_conc_body_click()
 	_setup_kite_easter_egg()
-	_setup_video_icon_btn()
 	_switch_tab(0)
 	UIStyleManager.fade_in(self, 0.5)
 	_update_layout()
@@ -1216,104 +1213,6 @@ func _show_hfgs_popup() -> void:
 	var close_btn := Button.new()
 	close_btn.text = _tr("EASTER_EGG_CLOSE")
 	close_btn.custom_minimum_size = Vector2(140, 44)
-	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
-	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
-	close_btn.pressed.connect(overlay.queue_free)
-	btn_row.add_child(close_btn)
-	overlay.modulate.a = 0.0
-	get_tree().root.add_child(overlay)
-	var fade_tw := create_tween()
-	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
-func _setup_video_icon_btn() -> void:
-	if not video_icon_btn:
-		return
-	video_icon_btn.tooltip_text = _tr("DIALECTIC_VIDEO_CHANNEL") + " — " + _tr("DIALECTIC_VIDEO_TOOLTIP")
-	UIStyleManager.add_hover_scale_effect(video_icon_btn, 1.12)
-	video_icon_btn.pressed.connect(_show_dialectic_video_popup)
-func _show_dialectic_video_popup() -> void:
-	if audio_manager:
-		audio_manager.play_sfx("ui_click", 0.8)
-	var overlay := Control.new()
-	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	overlay.z_index = 210
-	var bg := ColorRect.new()
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-	bg.color = Color(0.0, 0.0, 0.04, 0.93)
-	overlay.add_child(bg)
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	overlay.add_child(center)
-	var panel := Panel.new()
-	panel.custom_minimum_size = Vector2(560, 360)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.06, 0.05, 0.12, 0.97)
-	sb.corner_radius_top_left = 18
-	sb.corner_radius_top_right = 18
-	sb.corner_radius_bottom_left = 18
-	sb.corner_radius_bottom_right = 18
-	sb.border_width_left = 2
-	sb.border_width_right = 2
-	sb.border_width_top = 2
-	sb.border_width_bottom = 2
-	sb.border_color = Color(0.85, 0.30, 0.30, 0.75)
-	sb.shadow_size = 20
-	sb.shadow_color = Color(0, 0, 0, 0.65)
-	panel.add_theme_stylebox_override("panel", sb)
-	center.add_child(panel)
-	var margin := MarginContainer.new()
-	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override("margin_left", 40)
-	margin.add_theme_constant_override("margin_right", 40)
-	margin.add_theme_constant_override("margin_top", 32)
-	margin.add_theme_constant_override("margin_bottom", 28)
-	panel.add_child(margin)
-	var vbox := VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-	vbox.add_theme_constant_override("separation", 16)
-	margin.add_child(vbox)
-	var channel_lbl := Label.new()
-	channel_lbl.text = _tr("DIALECTIC_VIDEO_CHANNEL")
-	channel_lbl.add_theme_font_size_override("font_size", 14)
-	channel_lbl.add_theme_color_override("font_color", Color(0.80, 0.50, 0.50, 0.85))
-	channel_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(channel_lbl)
-	var title_lbl := Label.new()
-	title_lbl.text = _tr("DIALECTIC_VIDEO_TITLE")
-	title_lbl.add_theme_font_size_override("font_size", 22)
-	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
-	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vbox.add_child(title_lbl)
-	var sep := HSeparator.new()
-	sep.modulate = Color(0.85, 0.30, 0.30, 0.45)
-	vbox.add_child(sep)
-	var desc_lbl := RichTextLabel.new()
-	desc_lbl.bbcode_enabled = true
-	desc_lbl.text = "[center][color=#C8C0D8]" + _tr("DIALECTIC_VIDEO_DESC") + "[/color][/center]"
-	desc_lbl.fit_content = true
-	desc_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	desc_lbl.add_theme_font_size_override("normal_font_size", 16)
-	vbox.add_child(desc_lbl)
-	var spacer := Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(spacer)
-	var btn_row := HBoxContainer.new()
-	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	btn_row.add_theme_constant_override("separation", 16)
-	vbox.add_child(btn_row)
-	var open_btn := Button.new()
-	open_btn.text = _tr("DIALECTIC_VIDEO_OPEN")
-	open_btn.custom_minimum_size = Vector2(160, 48)
-	open_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	UIStyleManager.apply_button_style(open_btn, "primary", "medium")
-	UIStyleManager.add_hover_scale_effect(open_btn, 1.06)
-	open_btn.pressed.connect(func(): OS.shell_open(DIALECTIC_VIDEO_URL))
-	btn_row.add_child(open_btn)
-	var close_btn := Button.new()
-	close_btn.text = _tr("EASTER_EGG_CLOSE")
-	close_btn.custom_minimum_size = Vector2(120, 48)
 	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
 	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
