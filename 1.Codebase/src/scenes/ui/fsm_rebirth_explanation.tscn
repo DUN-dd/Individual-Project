@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://fsm_rebirth_explanation"]
+[gd_scene load_steps=8 format=3 uid="uid://fsm_rebirth_explanation"]
 
 [ext_resource type="Script" path="res://1.Codebase/src/scripts/ui/fsm_rebirth_explanation.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/characters/gloria_protagonis_happy.png" id="2_gloria_happy"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/characters/gloria_protagonis_sad.png" id="3_gloria_sad"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/ui/guide_fsm.png" id="4_fsm_guide"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/characters/teacher_chan_happy.png" id="5_teacher_chan"]
+[ext_resource type="Texture2D" path="res://1.Codebase/src/assets/icons/portal.png" id="6_portal_icon"]
 
 [sub_resource type="Gradient" id="grad_bg"]
 interpolation_mode = 2
@@ -612,6 +613,23 @@ theme_override_font_sizes/normal_font_size = 17
 bbcode_enabled = true
 text = ""
 fit_content = true
+
+[node name="VideoIconBtn" type="TextureButton" parent="Root"]
+z_index = 10
+layout_mode = 1
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -76.0
+offset_right = 76.0
+offset_bottom = -16.0
+grow_horizontal = 1
+grow_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("6_portal_icon")
+stretch_mode = 1
 
 [node name="ContentLabel" type="RichTextLabel" parent="Root/ContentPanel/Margin/VBox/ScrollContainer"]
 visible = false
