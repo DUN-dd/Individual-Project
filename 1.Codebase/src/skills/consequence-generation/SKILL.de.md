@@ -33,11 +33,6 @@ Du erhältst:
 ### Darf NICHT enthalten
 - Asset-Beschreibungen (werden bereits im Kontext geliefert)
 - Redundante Auflistungen von Gegenständen oder Ressourcen
-- Erfundene metaphorische Komposita für Geisteszustände oder Charaktereigenschaften (z. B. „Logikpanzerung", „Hexagon-Kämpfer", „Reinraumstrategie")
-- Technologie- oder Systemvergleiche für den Geist (z. B. „betriebssystembasiertes Denken", „Gehirnfabrik", „Firewall", „Immunsystem der Werte")
-- Extreme Krieger- oder Heldenmetaphern für moralische Kämpfe (z. B. „einsamer Gerechtigkeitskämpfer", „zum Angriff blasen", „dimensionaler Angriff")
-- Symbolische Objektpaare als Wertkontrast (z. B. „Spiegel vs. Filter", „Skalpell vs. Schmerzmittel")
-- Übertrieben dramatische, selbstverherrlichende Charakterbeschreibungen
 
 ---
 

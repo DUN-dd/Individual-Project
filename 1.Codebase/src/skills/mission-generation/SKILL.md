@@ -35,15 +35,6 @@ Generate a new mission scene that sets up the narrative arc. Each mission should
 - Apparent victories must hide tangible damage
 - Maintain satirical edge while being entertaining
 
-### Writing Style Restrictions — STRICTLY FORBIDDEN
-Do NOT use the following in any narrative text:
-1. **Invented metaphorical compound words** to describe characters or mental states (e.g. "logic armor", "sterile-room survival strategy", "hexagonal warrior"). Describe plainly instead.
-2. **Technology/system analogies for the mind** — no comparing reasoning or personality to computers, firewalls, operating systems, factories, or immune systems.
-3. **Extreme heroic/warrior metaphors** for moral or emotional struggles (e.g. "lone justice warrior", "warrior in the mud", "sound the charge", "dimensional strike").
-4. **Symbolic object contrast pairs** to represent value differences (e.g. "mirror vs. filter", "scalpel vs. painkiller").
-5. **Overly dramatic, self-aggrandizing character descriptions** (e.g. "a tragic hero forced to wear a villain's mask", "a conscientious person who clumsily hurt another").
-Describe characters, emotions, and situations directly and concretely — no invented poetic compound metaphors.
-
 ---
 
 ## JSON Output Schema

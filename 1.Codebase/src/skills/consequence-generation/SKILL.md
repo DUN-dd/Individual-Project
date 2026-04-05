@@ -33,11 +33,6 @@ You will receive:
 ### Must NOT Include
 - Asset descriptions (already provided in context)
 - Redundant listing of items or resources
-- Invented metaphorical compound nouns for mental states or character traits (e.g. "logic armor", "hexagonal warrior", "sterilized-room strategy")
-- Technology/system analogies for the mind (e.g. "operating system based on evidence", "brain factory", "firewall", "immune system for values")
-- Extreme warrior or heroic metaphors for moral struggles (e.g. "lone justice warrior", "sounding the charge", "dimensional strike")
-- Symbolic object contrast pairs (e.g. "mirror vs. filter", "scalpel vs. painkiller")
-- Overly dramatic self-aggrandizing character descriptions
 
 ---
 
