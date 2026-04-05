@@ -22,6 +22,17 @@ var _show_turnaround_btn: Button
 var _turnaround_background_paths: Array[String] = []
 var _last_turnaround_background_path: String = ""
 var _turnaround_rng := RandomNumberGenerator.new()
+const TRAFFIC_EASTER_EGG_URL := "https://music.apple.com/hk/song/%E7%B4%85%E7%B6%A0%E7%87%88/1501322393"
+const TRAFFIC_CLICK_TARGET := 5
+const TRAFFIC_CLICK_TIMEOUT := 5.0
+var _traffic_click_count: int = 0
+var _traffic_click_timer: float = 0.0
+var _traffic_label: Label = null
+func _process(delta: float) -> void:
+	if _traffic_click_count > 0:
+		_traffic_click_timer -= delta
+		if _traffic_click_timer <= 0.0:
+			_traffic_click_count = 0
 func _ready():
 	_turnaround_rng.randomize()
 	_load_turnaround_background_paths()
@@ -372,6 +383,7 @@ func _render_graph():
 	for child in _graph_container.get_children():
 		child.queue_free()
 	_graph_nodes.clear()
+	_traffic_label = null
 	var center = _graph_container.size / 2
 	if center == Vector2.ZERO: center = Vector2(400, 300)
 	_create_graph_node("protagonist", center)
@@ -459,36 +471,56 @@ func _draw_relationship_lines():
 		bg.position = mid_point - Vector2(30, 10)
 		bg.add_child(status_label)
 		_graph_container.add_child(bg)
+		if key == "gloria":
+			_traffic_label = Label.new()
+			_traffic_label.text = _tr("EASTER_EGG_TRAFFIC_TEXT")
+			_traffic_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			_traffic_label.add_theme_font_size_override("font_size", 20)
+			_traffic_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.40))
+			_traffic_label.mouse_filter = Control.MOUSE_FILTER_STOP
+			_traffic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+			_traffic_label.custom_minimum_size = Vector2(36, 28)
+			_traffic_label.position = mid_point - Vector2(18, 24)
+			_traffic_label.tooltip_text = _tr("EASTER_EGG_TRAFFIC_HINT").format({"remaining": TRAFFIC_CLICK_TARGET})
+			_traffic_label.gui_input.connect(_on_traffic_label_gui_input)
+			_graph_container.add_child(_traffic_label)
 func _get_relationship_status(char_key: String) -> Dictionary:
-	var game_state = ServiceLocator.get_game_state() if ServiceLocator else null
-	if not game_state: return {"color": Color.GRAY, "width": 2, "text": "?"}
-	var reality = game_state.reality_score
-	var positive = game_state.positive_energy
-	var result = {"color": Color.GRAY, "width": 2, "text": "RELATIONSHIP_NEUTRAL"}
-	match char_key:
-		"gloria":
-			if positive > 60 and reality < 40:
-				result = {"color": Color.GREEN, "width": 4, "text": "RELATIONSHIP_DEVOTED"}
-			elif reality > 60:
-				result = {"color": Color.RED, "width": 3, "text": "RELATIONSHIP_HOSTILE"}
-			elif positive < 30:
-				result = {"color": Color.ORANGE, "width": 2, "text": "RELATIONSHIP_SUSPICIOUS"}
-		"donkey":
-			if positive > 60:
-				result = {"color": Color.GREEN, "width": 4, "text": "RELATIONSHIP_LOYAL"}
-			elif positive < 40:
-				result = {"color": Color.ORANGE, "width": 2, "text": "RELATIONSHIP_DISAPPOINTED"}
-		"ark":
-			if reality > 40:
-				result = {"color": Color.CYAN, "width": 3, "text": "RELATIONSHIP_ALIGNED"}
-			elif reality < 30:
-				result = {"color": Color.RED, "width": 3, "text": "RELATIONSHIP_CRITICAL"}
-		"one":
-			if reality < 55 and positive < 45:
-				result = {"color": Color.PURPLE, "width": 3, "text": "RELATIONSHIP_SYMPATHETIC"}
-			elif positive > 70:
-				result = {"color": Color.GRAY, "width": 1, "text": "RELATIONSHIP_DISTANT"}
-	result.text = _tr(result.text)
+	var result = {"color": Color.GRAY, "width": 2, "text": _tr("RELATIONSHIP_NEUTRAL")}
+	var teammate_system = ServiceLocator.get_teammate_system() if ServiceLocator else null
+	if not teammate_system:
+		return result
+	var all_rels: Dictionary = teammate_system.get_all_relationships()
+	var player_rel: Dictionary = all_rels.get(char_key, {}).get("player", {})
+	if player_rel.is_empty():
+		return result
+	var value: int = player_rel.get("value", 0)
+	var status_text: String = player_rel.get("status", "")
+	if value >= 60:
+		result.color = Color.GREEN
+		result.width = 4
+		result.text = _tr("RELATIONSHIP_DEVOTED")
+	elif value >= 30:
+		result.color = Color.CYAN
+		result.width = 3
+		result.text = _tr("RELATIONSHIP_LOYAL")
+	elif value >= 0:
+		result.color = Color.GRAY
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_NEUTRAL")
+	elif value >= -30:
+		result.color = Color.ORANGE
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_SUSPICIOUS")
+	elif value >= -60:
+		result.color = Color(1.0, 0.5, 0.0, 1.0)
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_DISAPPOINTED")
+	else:
+		result.color = Color.RED
+		result.width = 3
+		result.text = _tr("RELATIONSHIP_HOSTILE")
+	if not status_text.is_empty():
+		result.text = status_text
 	return result
 func _tr(key: String) -> String:
 	if LocalizationManager:
@@ -531,6 +563,114 @@ func _apply_random_turnaround_background() -> void:
 		_last_turnaround_background_path = selected_path
 	else:
 		_turnaround_background.texture = null
+func _on_traffic_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_traffic_click_count += 1
+	_traffic_click_timer = TRAFFIC_CLICK_TIMEOUT
+	if _traffic_label and is_instance_valid(_traffic_label):
+		_traffic_label.pivot_offset = _traffic_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_traffic_label, "scale", Vector2(1.15, 1.15), 0.10)
+		tween.tween_property(_traffic_label, "scale", Vector2.ONE, 0.10)
+	var remaining := TRAFFIC_CLICK_TARGET - _traffic_click_count
+	if remaining > 0:
+		if _traffic_label and is_instance_valid(_traffic_label):
+			if remaining <= 2:
+				_traffic_label.tooltip_text = _tr("EASTER_EGG_TRAFFIC_CLICK").format({"remaining": remaining})
+			else:
+				_traffic_label.tooltip_text = _tr("EASTER_EGG_TRAFFIC_HINT").format({"remaining": remaining})
+		return
+	_traffic_click_count = 0
+	_traffic_click_timer = 0.0
+	_show_traffic_easter_egg()
+func _show_traffic_easter_egg() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center_c := CenterContainer.new()
+	center_c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center_c)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.05, 0.07, 0.06, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.85, 0.30, 0.25, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center_c.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_TRAFFIC_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.45, 0.35))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.85, 0.30, 0.25, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_TRAFFIC_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_TRAFFIC_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(160, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(TRAFFIC_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
 func _load_texture_safe(path: String) -> Texture2D:
 	if path == "" or not ResourceLoader.exists(path):
 		return null
