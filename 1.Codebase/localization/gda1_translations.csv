@@ -1769,6 +1769,12 @@ INTRO_NAV_ACT_4,Act IV,第四幕,Akt IV
 # Story Overlay Controller,,,
 GLORIA_DIARY_VERDICT_MSG,Gloria has formally judged your diary. Your private thoughts have been weaponized against you...,Gloria 已正式審判了你的日記。你的私人想法已被用來對付你...,Gloria hat Ihr Tagebuch offiziell beurteilt. Ihre privaten Gedanken wurden gegen Sie als Waffe eingesetzt ...
 GLORIA_ENCOURAGED_MSG,Gloria has 'encouraged' you. Reality feels more distant...,Gloria 已經「鼓勵」了你。現實感覺更加遙遠了...,Gloria hat dich „ermutigt“. Die Realität fühlt sich weiter entfernt an...
+GLORIA_INTERVENTION_COUNT_1,This is the 1st time Gloria has intervened in your life.,這是 Gloria 第 1 次介入你的人生。,Dies ist das 1. Mal dass Gloria in dein Leben eingegriffen hat.
+GLORIA_INTERVENTION_COUNT_2,This is the 2nd time Gloria has intervened. She is losing patience.,這是 Gloria 第 2 次介入。她正在失去耐心。,Dies ist das 2. Mal. Gloria verliert die Geduld.
+GLORIA_INTERVENTION_COUNT_3,This is the 3rd time. Gloria will NOT forgive again.,這是第 3 次了。Gloria 不會再原諒你了。,Zum 3. Mal. Gloria wird nicht mehr verzeihen.
+GLORIA_INTERVENTION_COUNT_MANY,Gloria has intervened {count} times. You are beyond redemption.,Gloria 已經介入了 {count} 次。你已經無可救藥了。,Gloria hat {count} Mal eingegriffen. Du bist nicht mehr zu retten.
+GLORIA_STAMP_GUILTY,GUILTY,有 罪,SCHULDIG
+GLORIA_STAMP_VERDICT_CONFIRMED,VERDICT CONFIRMED,判 決 確 認,URTEIL BESTÄTIGT
 ""
 # Save/Load Menu,,,
 SAVE_SLOT_HEADER,Slot %d,槽位 %d,Steckplatz %d
