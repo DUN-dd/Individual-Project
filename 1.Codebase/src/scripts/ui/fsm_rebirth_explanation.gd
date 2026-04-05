@@ -14,6 +14,9 @@ const RELIC_CLICK_TIMEOUT := 5.0
 const KITE_EASTER_EGG_URL := "https://open.spotify.com/track/5iXbvvbd1JotBgyk1RvHQW"
 const KITE_CLICK_TARGET := 5
 const KITE_CLICK_TIMEOUT := 5.0
+const HFGS_EASTER_EGG_URL := "https://www.youtube.com/results?search_query=%E9%84%A7%E5%81%A5%E6%B3%93+%E6%81%8D%E5%A6%82%E9%9A%94%E4%B8%96"
+const HFGS_CLICK_TARGET := 5
+const HFGS_CLICK_TIMEOUT := 5.0
 @onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
 @onready var header_icon: TextureRect = $Root/ContentPanel/Margin/VBox/Header/HeaderIcon
 @onready var close_button: Button = $Root/ContentPanel/Margin/VBox/Header/CloseButton
@@ -90,6 +93,9 @@ var _relic_label: Label = null
 var _kite_click_count: int = 0
 var _kite_click_timer: float = 0.0
 var _kite_label: Label = null
+var _hfgs_click_count: int = 0
+var _hfgs_click_timer: float = 0.0
+var _hfgs_label: Label = null
 const DAY_ACCENT_COLORS: Array = [
 	Color(1.0, 0.84, 0.0),
 	Color(0.31, 0.76, 0.97),
@@ -144,6 +150,10 @@ func _process(delta: float) -> void:
 		_kite_click_timer -= delta
 		if _kite_click_timer <= 0.0:
 			_kite_click_count = 0
+	if _hfgs_click_count > 0:
+		_hfgs_click_timer -= delta
+		if _hfgs_click_timer <= 0.0:
+			_hfgs_click_count = 0
 func _refresh_services() -> void:
 	if ServiceLocator:
 		audio_manager = ServiceLocator.get_audio_manager()
@@ -342,7 +352,7 @@ func _show_lyrics_popup() -> void:
 	var fade_tw := create_tween()
 	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
 func _setup_relic_easter_egg() -> void:
-	if not day_cards_container or not conc_card:
+	if not comparison_section or not conseq_card:
 		return
 	_relic_label = Label.new()
 	_relic_label.text = _tr("EASTER_EGG_RELIC_TEXT")
@@ -354,9 +364,7 @@ func _setup_relic_easter_egg() -> void:
 	_relic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_relic_label.gui_input.connect(_on_relic_label_gui_input)
 	_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_HINT").format({"remaining": RELIC_CLICK_TARGET})
-	var idx := conc_card.get_index()
-	philosophy_section.add_child(_relic_label)
-	philosophy_section.move_child(_relic_label, idx)
+	comparison_section.add_child(_relic_label)
 func _on_relic_label_gui_input(event: InputEvent) -> void:
 	if not (event is InputEventMouseButton):
 		return

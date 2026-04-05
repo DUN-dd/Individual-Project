@@ -316,11 +316,11 @@ func _slam_guilty_stamp() -> void:
 	stamp.text = stamp_text
 	stamp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stamp.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	stamp.set_anchors_preset(Control.PRESET_CENTER)
+	stamp.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
 	stamp.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	stamp.grow_vertical = Control.GROW_DIRECTION_BOTH
 	stamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	stamp.add_theme_font_size_override("font_size", 96)
+	stamp.add_theme_font_size_override("font_size", 140)
 	stamp.add_theme_color_override("font_color", Color(0.85, 0.1, 0.1, 0.85))
 	stamp.add_theme_color_override("font_shadow_color", Color(0.3, 0.0, 0.0, 0.6))
 	stamp.add_theme_constant_override("shadow_offset_x", 4)
