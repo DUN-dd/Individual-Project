@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cy8l66js1shh6"
-path="res://.godot/imported/bridge.png-f2b0ccb7f8cf000f32da6d351139128a.ctex"
+path="res://.godot/imported/bridge.png-4fac09dfaf4da56f549a269fc891dbbb.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://1.Codebase/src/assets/backgrounds/bridge.png"
-dest_files=["res://.godot/imported/bridge.png-f2b0ccb7f8cf000f32da6d351139128a.ctex"]
+dest_files=["res://.godot/imported/bridge.png-4fac09dfaf4da56f549a269fc891dbbb.ctex"]
 
 [params]
 

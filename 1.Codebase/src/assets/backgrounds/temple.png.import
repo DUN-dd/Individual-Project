@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dw7k32312vp5j"
-path="res://.godot/imported/temple.png-a879326b90ec564a02cde7ab15d598b9.ctex"
+path="res://.godot/imported/temple.png-7e35ea2e9ce57b0c0f0e9a71bef4f7a7.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://1.Codebase/src/assets/backgrounds/temple.png"
-dest_files=["res://.godot/imported/temple.png-a879326b90ec564a02cde7ab15d598b9.ctex"]
+dest_files=["res://.godot/imported/temple.png-7e35ea2e9ce57b0c0f0e9a71bef4f7a7.ctex"]
 
 [params]
 
