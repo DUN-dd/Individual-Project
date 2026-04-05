@@ -11,6 +11,9 @@ const LYRICS_DISCOVERY_SEQ := ["gloria", "fsm", "teacher"]
 const RELIC_EASTER_EGG_URL := "https://youtu.be/bjOAE17WajY"
 const RELIC_CLICK_TARGET := 5
 const RELIC_CLICK_TIMEOUT := 5.0
+const KITE_EASTER_EGG_URL := "https://open.spotify.com/track/5iXbvvbd1JotBgyk1RvHQW"
+const KITE_CLICK_TARGET := 5
+const KITE_CLICK_TIMEOUT := 5.0
 @onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
 @onready var header_icon: TextureRect = $Root/ContentPanel/Margin/VBox/Header/HeaderIcon
 @onready var close_button: Button = $Root/ContentPanel/Margin/VBox/Header/CloseButton
@@ -84,6 +87,9 @@ const _LYRICS_DISCOVERY_TIMEOUT := 4.0
 var _relic_click_count: int = 0
 var _relic_click_timer: float = 0.0
 var _relic_label: Label = null
+var _kite_click_count: int = 0
+var _kite_click_timer: float = 0.0
+var _kite_label: Label = null
 const DAY_ACCENT_COLORS: Array = [
 	Color(1.0, 0.84, 0.0),
 	Color(0.31, 0.76, 0.97),
@@ -103,6 +109,7 @@ func _ready() -> void:
 	_setup_lyrics_easter_egg()
 	_setup_relic_easter_egg()
 	_setup_conc_body_click()
+	_setup_kite_easter_egg()
 	_switch_tab(0)
 	UIStyleManager.fade_in(self, 0.5)
 	_update_layout()
@@ -132,6 +139,10 @@ func _process(delta: float) -> void:
 		_relic_click_timer -= delta
 		if _relic_click_timer <= 0.0:
 			_relic_click_count = 0
+	if _kite_click_count > 0:
+		_kite_click_timer -= delta
+		if _kite_click_timer <= 0.0:
+			_kite_click_count = 0
 func _refresh_services() -> void:
 	if ServiceLocator:
 		audio_manager = ServiceLocator.get_audio_manager()
@@ -450,6 +461,129 @@ func _show_relic_popup() -> void:
 	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
 	close_btn.pressed.connect(overlay.queue_free)
 	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_kite_easter_egg() -> void:
+	if not mechanism_section:
+		return
+	_kite_label = Label.new()
+	_kite_label.text = _tr("EASTER_EGG_KITE_TEXT")
+	_kite_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_kite_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_kite_label.add_theme_font_size_override("font_size", 13)
+	_kite_label.add_theme_color_override("font_color", Color(0.60, 0.72, 0.80, 0.35))
+	_kite_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_kite_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_kite_label.gui_input.connect(_on_kite_label_gui_input)
+	_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_HINT").format({"remaining": KITE_CLICK_TARGET})
+	mechanism_section.add_child(_kite_label)
+func _on_kite_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_kite_click_count += 1
+	_kite_click_timer = KITE_CLICK_TIMEOUT
+	if _kite_label and is_instance_valid(_kite_label):
+		_kite_label.pivot_offset = _kite_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_kite_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_kite_label, "scale", Vector2.ONE, 0.10)
+	var remaining := KITE_CLICK_TARGET - _kite_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_CLICK").format({"remaining": remaining})
+		else:
+			_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_HINT").format({"remaining": remaining})
+		return
+	_kite_click_count = 0
+	_kite_click_timer = 0.0
+	_show_kite_popup()
+func _show_kite_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.04, 0.07, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.45, 0.70, 0.85, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_KITE_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.55, 0.85, 1.0))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.4, 0.65, 0.85, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_KITE_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_KITE_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(KITE_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_kite_btn := Button.new()
+	close_kite_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_kite_btn.custom_minimum_size = Vector2(140, 44)
+	close_kite_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_kite_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_kite_btn, 1.06)
+	close_kite_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_kite_btn)
 	overlay.modulate.a = 0.0
 	get_tree().root.add_child(overlay)
 	var fade_tw := create_tween()
