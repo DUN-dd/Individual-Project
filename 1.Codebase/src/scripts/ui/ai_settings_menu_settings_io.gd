@@ -100,7 +100,7 @@ func save_ui_to_manager() -> bool:
 		else:
 			ai_manager.max_tokens = int(_menu.max_tokens_spin.value)
 	if _menu.request_timeout_spin:
-		ai_manager.request_timeout = float(_menu.request_timeout_spin.value)
+		ai_manager.request_timeout = _menu.request_timeout_spin.value
 	var gemini_key_value: String = _menu.gemini_key_input.text.strip_edges()
 	if not gemini_key_value.is_empty():
 		if gemini_key_value.begins_with("http://") or gemini_key_value.begins_with("https://"):

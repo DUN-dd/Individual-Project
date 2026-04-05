@@ -95,7 +95,7 @@ func initialize_request_system(parent_node: Node, http_req: HTTPRequest) -> void
 	http_request.process_mode = Node.PROCESS_MODE_ALWAYS
 	if not http_request.request_completed.is_connected(_on_request_completed):
 		http_request.request_completed.connect(_on_request_completed)
-	if _config_manager and _config_manager.request_timeout > 0.0:
+	if _config_manager:
 		_request_timeout = clampf(_config_manager.request_timeout, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
 	_timeout_timer = Timer.new()
 	_timeout_timer.one_shot = true
