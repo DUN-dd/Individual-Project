@@ -179,20 +179,11 @@ func _build_recap_prompt() -> String:
 				if not ev_text.is_empty():
 					lines.append("- " + ev_text)
 	var context_block := "\n".join(lines)
-	if _language == "zh":
-		return (
-			"請根據以下遊戲狀態與記憶，為玩家生成「上次在光榮拯救機構一號...」的旁白回顧。\n\n"
-			+ context_block
-			+ "\n\n請用繁體中文寫一段100-150字的戲劇性旁白，以「上次在光榮拯救機構一號...」開頭，"
-			+ "用諷刺而帶有暗黑幽默的口吻總結玩家迄今的故事。只輸出旁白文字，不要任何JSON或選項。"
-		)
-	else:
-		return (
-			"Based on the following game context and story memory, generate a \"Previously on Glorious Deliverance Agency 1...\" narrative recap.\n\n"
-			+ context_block
-			+ "\n\nWrite a 120-180 word dramatic recap in English, opening with \"Previously on Glorious Deliverance Agency 1...\", "
-			+ "in a sardonic, darkly humorous narrator voice. Output ONLY the recap text — no JSON, no choices, no headings."
-		)
+	return (
+		_tr("RECAP_PROMPT_PREFIX") + "\n\n"
+		+ context_block
+		+ "\n\n" + _tr("RECAP_PROMPT_SUFFIX")
+	)
 func _on_recap_received(response: Dictionary) -> void:
 	if not is_instance_valid(self) or _content_received:
 		return

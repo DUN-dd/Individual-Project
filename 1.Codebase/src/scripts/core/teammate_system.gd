@@ -98,10 +98,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_GLORIA_PERSONA"),
 			"color":   Color(1.0, 0.902, 0.702, 1.0),
 			"base_chance": 0.35,
-			"trigger_keywords": [
-				"logic", "complain", "negativity", "problem", "mistake",
-				"質疑", "抱怨", "負能量", "問題", "錯誤",
-			],
+			"trigger_keywords": _tr("TEAMMATE_GLORIA_KEYWORDS").split(","),
 			"trigger_rules": {
 				"complaint_counter_min": 2,
 				"reality_score_max":     65,
@@ -126,10 +123,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_DONKEY_PERSONA"),
 			"color":   Color(0.8, 0.6, 0.302, 1.0),
 			"base_chance": 0.4,
-			"trigger_keywords": [
-				"hero", "rescue", "princess", "plan", "women", "story", "female",
-				"拯救", "公主", "計畫", "女性", "故事",
-			],
+			"trigger_keywords": _tr("TEAMMATE_DONKEY_KEYWORDS").split(","),
 			"trigger_rules": {
 				"logic_success_only":  true,
 				"positive_energy_max": 75,
@@ -152,10 +146,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_ARK_PERSONA"),
 			"color":   Color(0.502, 0.502, 0.702, 1.0),
 			"base_chance": 0.32,
-			"trigger_keywords": [
-				"plan", "strategy", "process", "organize", "progress", "edit", "modify",
-				"策略", "流程", "整理", "進度", "修改",
-			],
+			"trigger_keywords": _tr("TEAMMATE_ARK_KEYWORDS").split(","),
 			"trigger_rules": {
 				"reality_score_min":  30,
 				"positive_energy_min": 20,
@@ -178,10 +169,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_ONE_PERSONA"),
 			"color":   Color(0.6, 0.702, 0.6, 1.0),
 			"base_chance": 0.1,
-			"trigger_keywords": [
-				"help", "message", "please", "exclude", "myanmar", "marginalize",
-				"求助", "幫忙", "私訊", "拜託", "緬甸", "排擠",
-			],
+			"trigger_keywords": _tr("TEAMMATE_ONE_KEYWORDS").split(","),
 			"trigger_rules": {
 				"reality_score_max":    55,
 				"positive_energy_max":  45,
