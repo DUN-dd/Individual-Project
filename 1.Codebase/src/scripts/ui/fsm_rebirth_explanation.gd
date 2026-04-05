@@ -109,6 +109,7 @@ func _ready() -> void:
 	_setup_lyrics_easter_egg()
 	_setup_relic_easter_egg()
 	_setup_hfgs_easter_egg()
+	_setup_conc_body_click()
 	_switch_tab(0)
 	UIStyleManager.fade_in(self, 0.5)
 	_update_layout()
@@ -464,6 +465,19 @@ func _show_relic_popup() -> void:
 	get_tree().root.add_child(overlay)
 	var fade_tw := create_tween()
 	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_conc_body_click() -> void:
+	if not conc_body:
+		return
+	conc_body.mouse_filter = Control.MOUSE_FILTER_STOP
+	conc_body.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	conc_body.gui_input.connect(_on_conc_body_gui_input)
+func _on_conc_body_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_show_lyrics_popup()
 func _style_tab_buttons() -> void:
 	var tabs: Array = [tab_mechanism, tab_comparison, tab_philosophy]
 	var tab_texts: Array = [
