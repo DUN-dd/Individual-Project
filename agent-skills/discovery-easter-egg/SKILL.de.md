@@ -59,11 +59,28 @@ Das Popup muss (in dieser Reihenfolge) enthalten:
 3. **Haupttext** — mit BBCode `[center]...[/center]`:
    - 1–3 Zeilen kontrastierende Liedtexte (in der Originalsprache, meist Chinesisch)
    - Eine englische oder deutsche Übersetzung dieser Zeilen
-   - Ein satirischer oder reflexiver Satz, der den Liedtext mit der Absurdität des Spiels verbindet, zum Beispiel:
-     - *„Vielleicht ist das, was wirkliches Erwachsenwerden bedeutet."*
-     - *„Das Spiel nennt es ‚negatives Denken'. Das Lied nennt es Weisheit."*
-     - *"也許，這才是真正的成長。"*
+   - Ein **subtiler** reflexiver Satz — siehe **Tonregel** unten
    - Quellenangabe: `— Künstlername「Liedtitel」`
+
+> **⚠️ Tonregel — Zeigen, nicht erklären**
+>
+> Der reflexive Satz darf **niemals** direkt aussprechen, was satirisiert wird.
+> NICHT Sätze wie *„Das Spiel nennt es ‚negatives Denken'. Das Lied nennt es Weisheit."* oder *„Das steht im Kontrast zur erzwungenen Positivität des Spiels."* schreiben.
+> Das ist zu offensichtlich — es zerstört das Entdeckungsgefühl und unterstellt dem Spieler, nicht selbst denken zu können.
+>
+> Stattdessen soll der **Kontrast für sich selbst sprechen**. Der Liedtext sagt bereits das Gegenteil des Spiels — ein guter reflexiver Satz lässt den Spieler einfach in dieser Spannung verweilen, ohne sie zu erklären.
+>
+> ✅ **Gut (subtil, lässt den Spieler die Ironie selbst spüren):**
+> - *„Vielleicht ist das, was wirkliches Erwachsenwerden bedeutet."*
+> - *「風箏斷了線，卻飛得更高。」* / *„Die Schnur des Drachens riss — doch er flog höher."*
+> - *「有些事，放下了才看得見。」* / *„Manches wird erst sichtbar, wenn man loslässt."*
+>
+> ❌ **Schlecht (zu direkt, erklärt den Witz):**
+> - *„Das Spiel sagt dir, positiv zu bleiben. Dieses Lied sagt das Gegenteil."*
+> - *„Anders als die Gehirnwäsche des Spiels spricht dieser Text die Wahrheit."*
+> - *„Das ist eine Satire auf die toxische Positivität des Wiedergeburtssystems."*
+>
+> Der Spieler hat ein verstecktes Ei entdeckt — belohne seine Neugier mit etwas Poetischem, nicht mit einer Belehrung.
 4. **Schaltflächenreihe**:
    - **Anhören-Schaltfläche** (`♪ Spotify`) — öffnet die Track-URL via `OS.shell_open()`
    - **Schließen-Schaltfläche** — gibt das Overlay frei

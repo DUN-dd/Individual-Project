@@ -59,11 +59,28 @@ The popup must contain (in order):
 3. **Body** — using BBCode `[center]...[/center]`:
    - 1–3 lines of contrasting lyrics (in the original language, usually Chinese)
    - An English or German translation of those lyrics (for multilingual support)
-   - A satirical or reflective line that connects the lyric to the game's absurdity, for example:
-     - *"Perhaps this is what growing up actually looks like."*
-     - *"The game calls this 'negative thinking'. The song calls it wisdom."*
-     - *"也許，這才是真正的成長。"*
+   - A **subtle** reflective line — see the **Tone Rule** below
    - Attribution: `— Artist Name「Song Title」`
+
+> **⚠️ Tone Rule — Show, Don't Explain**
+>
+> The reflective line must **never** directly spell out what is being satirised.
+> Do NOT write lines like *"The game calls this 'negative thinking'. The song calls it wisdom."* or *"This contrasts with the game's forced positivity."*
+> That is too on-the-nose — it kills the discovery feeling and treats the player as if they cannot think for themselves.
+>
+> Instead, let the **contrast speak for itself**. The lyric already says the opposite of the game — a good reflective line simply leaves the player sitting with that tension, without explaining it.
+>
+> ✅ **Good (subtle, lets the player feel the irony):**
+> - *"也許，這才是真正的成長。"* / *"Perhaps this is what growing up actually looks like."*
+> - *"風箏斷了線，卻飛得更高。"* / *"The kite's string snapped — yet it flew higher."*
+> - *"有些事，放下了才看得見。"* / *"Some things only become visible once you let go."*
+>
+> ❌ **Bad (too direct, explains the joke):**
+> - *"The game tells you to stay positive. This song says otherwise."*
+> - *"Unlike the game's brainwashing, this lyric speaks real truth."*
+> - *"This is a satire of the rebirth system's toxic positivity."*
+>
+> The player discovered a hidden egg — reward their curiosity with something poetic, not a lecture.
 4. **Button row**:
    - **Listen button** (`♪ Spotify` or `♪ Listen`) — opens the track URL via `OS.shell_open()`
    - **Close button** — frees the overlay
