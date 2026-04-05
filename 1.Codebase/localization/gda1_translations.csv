@@ -1762,10 +1762,31 @@ INTRO_NAV_NEXT,Next,下一頁,Nächste
 INTRO_NAV_START_GAME,Start Game,開始遊戲,Spiel starten
 INTRO_NAV_PAGE_FORMAT,Page %d of %d,第 %d 頁 / 共 %d 頁,Seite %d von %d
 INTRO_NAV_CHAPTERS,Chapters,章節,Kapitel
-INTRO_NAV_ACT_1,Act I,第一幕,Akt I
-INTRO_NAV_ACT_2,Act II,第二幕,Akt II
-INTRO_NAV_ACT_3,Act III,第三幕,Akt III
-INTRO_NAV_ACT_4,Act IV,第四幕,Akt IV
+INTRO_NAV_ACT_1,Chapter I: Rescue,第一章拯救,Kapitel I: Rettung
+INTRO_NAV_ACT_2,Chapter XXXVII: Missing,第三十七章失踪,Kapitel XXXVII: Vermisst
+INTRO_NAV_ACT_3,Chapter LXXXI: Remember,第八十一章记得,Kapitel LXXXI: Erinnern
+INTRO_NAV_ACT_4,Chapter 153: Reluctance,第153章/不捨,Kapitel 153: Zögern
+# Chapter Easter Eggs (story page chapter-label triggers),,,
+EASTER_EGG_CH1_TITLE,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~
+EASTER_EGG_CH1_BODY,"[center]我要將你拯救　逃離人類荒謬\n我們　身邊太多假人\n我們　身邊太多批評\n干擾敏感生命　不想太清醒\n\nI want to rescue you — escape humanity's absurdity\nToo many false people around us\nToo much criticism around us\n\n[i]— Dear Jane「哪裡只得我共你」[/i][/center]","[center]我要將你拯救　逃離人類荒謬\n我們　身邊太多假人\n我們　身邊太多批評\n干擾敏感生命　不想太清醒\n\nIch will dich retten — weg von der Absurdität der Menschen\nZu viele falsche Menschen um uns herum\nZu viel Kritik um uns herum\n\n[i]— Dear Jane「哪裡只得我共你」[/i][/center]"
+EASTER_EGG_CH1_HINT,Click the chapter title... ({remaining} clicks remaining),點擊章節標題...（還有 {remaining} 下）,Klicken Sie auf den Kapiteltitel... ({remaining} Klicks verbleibend)
+EASTER_EGG_CH1_CLICK,Almost there... ({remaining} more),快了...（還差 {remaining} 下）,Fast da... (noch {remaining} mal)
+EASTER_EGG_CH1_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_CH2_TITLE,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~
+EASTER_EGG_CH2_BODY,"[center]花光了心血　還是不相信\n從你眼中\n找到了拯救幾秒鐘\n只不過期望已經不同\n沿著高速開到最盡\n凝望天邊一世發夢\n誰若消失我連痛都　不痛\n\nSpent everything, still no belief\nFor a few seconds found salvation in your eyes\nbut expectations have long since changed\n\n[i]— Dear Jane「只知感覺失了蹤」[/i][/center]","[center]花光了心血　還是不相信\n從你眼中\n找到了拯救幾秒鐘\n只不過期望已經不同\n沿著高速開到最盡\n凝望天邊一世發夢\n誰若消失我連痛都　不痛\n\nAlles gegeben, trotzdem kein Glaube\nFür ein paar Sekunden Rettung in deinen Augen gefunden\ndoch die Erwartungen haben sich längst verändert\n\n[i]— Dear Jane「只知感覺失了蹤」[/i][/center]"
+EASTER_EGG_CH2_HINT,Click the chapter title... ({remaining} clicks remaining),點擊章節標題...（還有 {remaining} 下）,Klicken Sie auf den Kapiteltitel... ({remaining} Klicks verbleibend)
+EASTER_EGG_CH2_CLICK,Almost there... ({remaining} more),快了...（還差 {remaining} 下）,Fast da... (noch {remaining} mal)
+EASTER_EGG_CH2_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_CH3_TITLE,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~
+EASTER_EGG_CH3_BODY,"[center]經過一些秋與冬\n當然他不肯放手\n如果准我 重新學過可會白頭\n罵戰中不撤走 負責的不押後\n做錯的不怕醜 別掙扎說沒有\n我根本不比別人優秀\n\nThrough some autumns and winters\nof course he won't let go\nIf allowed to learn again would we grow old together?\n\n[i]— Dear Jane「經過一些秋與冬」[/i][/center]","[center]經過一些秋與冬\n當然他不肯放手\n如果准我 重新學過可會白頭\n罵戰中不撤走 負責的不押後\n做錯的不怕醜 別掙扎說沒有\n我根本不比別人優秀\n\nDurch einige Herbste und Winter\nnatürlich lässt er nicht los\nDürfte ich es neu lernen — würden wir zusammen alt?\n\n[i]— Dear Jane「經過一些秋與冬」[/i][/center]"
+EASTER_EGG_CH3_HINT,Click the chapter title... ({remaining} clicks remaining),點擊章節標題...（還有 {remaining} 下）,Klicken Sie auf den Kapiteltitel... ({remaining} Klicks verbleibend)
+EASTER_EGG_CH3_CLICK,Almost there... ({remaining} more),快了...（還差 {remaining} 下）,Fast da... (noch {remaining} mal)
+EASTER_EGG_CH3_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_CH4_TITLE,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~,~ ♪ Dear Jane ♪ ~
+EASTER_EGG_CH4_BODY,"[center]我已不太在乎日子怎樣走過\n永恆的工作隨風飄泊\n\nI no longer care much how the days pass\nEternal work drifts with the wind\n\n[i]— Dear Jane「你流淚所以我流淚」[/i][/center]","[center]我已不太在乎日子怎樣走過\n永恆的工作隨風飄泊\n\nEs ist mir nicht mehr wichtig, wie die Tage vergehen\nEwige Arbeit treibt mit dem Wind\n\n[i]— Dear Jane「你流淚所以我流淚」[/i][/center]"
+EASTER_EGG_CH4_HINT,Click the chapter title... ({remaining} clicks remaining),點擊章節標題...（還有 {remaining} 下）,Klicken Sie auf den Kapiteltitel... ({remaining} Klicks verbleibend)
+EASTER_EGG_CH4_CLICK,Almost there... ({remaining} more),快了...（還差 {remaining} 下）,Fast da... (noch {remaining} mal)
+EASTER_EGG_CH4_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
 ""
 # Story Overlay Controller,,,
 GLORIA_DIARY_VERDICT_MSG,Gloria has formally judged your diary. Your private thoughts have been weaponized against you...,Gloria 已正式審判了你的日記。你的私人想法已被用來對付你...,Gloria hat Ihr Tagebuch offiziell beurteilt. Ihre privaten Gedanken wurden gegen Sie als Waffe eingesetzt ...
