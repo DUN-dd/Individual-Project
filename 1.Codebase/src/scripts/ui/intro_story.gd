@@ -25,6 +25,13 @@ const COLOR_BORDER := Color(0.62, 0.42, 0.18, 0.8)
 const COLOR_INK := Color(0.13, 0.08, 0.03, 1.0)
 const COLOR_TITLE_INK := Color(0.45, 0.25, 0.06, 1.0)
 const COLOR_PAGE_NUM := Color(0.50, 0.32, 0.10, 1.0)
+const CH1_RESCUE_URL := "https://music.apple.com/eg/album/%E5%93%AA%E8%A3%A1%E5%8F%AA%E5%BE%97%E6%88%91%E5%85%B1%E4%BD%A0-single/1089928735"
+const CH2_MISSING_URL := "https://music.apple.com/us/album/%E5%8F%AA%E7%9F%A5%E6%84%9F%E8%A6%BA%E5%A4%B1%E4%BA%86%E8%B9%A4-single/1124399061"
+const CH3_REMEMBER_URL := "https://music.apple.com/mo/music-video/%E7%B6%93%E9%81%8E%E4%B8%80%E4%BA%9B%E7%A7%8B%E8%88%87%E5%86%AC/1435894991"
+const CH4_RELUCTANCE_URL := "https://music.apple.com/us/album/%E4%BD%A0%E6%B5%81%E6%B7%9A%E6%89%80%E4%BB%A5%E6%88%91%E6%B5%81%E6%B7%9A-single/1799121973"
+const CHAPTER_EGG_CLICK_TARGET := 5
+const CHAPTER_EGG_CLICK_TIMEOUT := 5.0
+const CHAPTER_START_PAGES := [0, 10, 20, 30]
 signal intro_completed
 signal intro_skipped
 var current_page: int = 0
@@ -45,6 +52,9 @@ var prev_button: Button
 var next_button: Button
 var audio_manager: Node = null
 var current_language: String = "en"
+var _chapter_egg_click_count: int = 0
+var _chapter_egg_click_timer: float = 0.0
+var _chapter_egg_active_page: int = -1
 func _report_info(message: String, details: Dictionary = {}) -> void:
 	ErrorReporterBridge.report_info(ERROR_CONTEXT, message, details)
 func _report_warning(message: String, details: Dictionary = {}) -> void:
@@ -508,6 +518,7 @@ func _update_display() -> void:
 	var chapter_title := _get_chapter_title()
 	if chapter_label:
 		chapter_label.text = chapter_title
+		_setup_chapter_egg_interactivity()
 	var indicator_format := _tr("INTRO_NAV_PAGE_FORMAT")
 	if indicator_format.find("%d") >= 0:
 		page_indicator_label.text = indicator_format % [current_page + 1, TOTAL_PAGES]
@@ -522,7 +533,7 @@ func _update_display() -> void:
 		next_button.text = _tr("INTRO_NAV_NEXT")
 		next_button.icon = ICON_NEXT if ICON_NEXT else null
 func _get_chapter_title() -> String:
-	if current_page < 15:
+	if current_page < 10:
 		return _tr("INTRO_NAV_ACT_1")
 	elif current_page < 20:
 		return _tr("INTRO_NAV_ACT_2")
@@ -553,7 +564,7 @@ func _on_chapter_selected(chapter_id: int) -> void:
 		0:
 			current_page = 0
 		1:
-			current_page = 15
+			current_page = 10
 		2:
 			current_page = 20
 		3:
@@ -601,8 +612,8 @@ func _update_chapter_menu() -> void:
 	popup.add_check_item(_tr("INTRO_NAV_ACT_2"), 1)
 	popup.add_check_item(_tr("INTRO_NAV_ACT_3"), 2)
 	popup.add_check_item(_tr("INTRO_NAV_ACT_4"), 3)
-	popup.set_item_checked(0, current_page < 15)
-	popup.set_item_checked(1, current_page >= 15 and current_page < 20)
+	popup.set_item_checked(0, current_page < 10)
+	popup.set_item_checked(1, current_page >= 10 and current_page < 20)
 	popup.set_item_checked(2, current_page >= 20 and current_page < 30)
 	popup.set_item_checked(3, current_page >= 30)
 func _load_story_image(image_path: String) -> void:
@@ -694,6 +705,149 @@ func set_story_page(page_index: int, title_en: String, title_zh: String, text_en
 func set_all_story_pages(pages: Array[Dictionary]) -> void:
 	story_pages = pages
 	_update_display()
+func _process(delta: float) -> void:
+	if _chapter_egg_click_count > 0:
+		_chapter_egg_click_timer -= delta
+		if _chapter_egg_click_timer <= 0.0:
+			_chapter_egg_click_count = 0
+func _setup_chapter_egg_interactivity() -> void:
+	if not chapter_label:
+		return
+	var is_chapter_start := current_page in CHAPTER_START_PAGES
+	if is_chapter_start:
+		chapter_label.mouse_filter = Control.MOUSE_FILTER_STOP
+		chapter_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		if not chapter_label.gui_input.is_connected(_on_chapter_label_gui_input):
+			chapter_label.gui_input.connect(_on_chapter_label_gui_input)
+		_chapter_egg_active_page = current_page
+		_chapter_egg_click_count = 0
+		_chapter_egg_click_timer = 0.0
+		var hint_key := "EASTER_EGG_CH%d_HINT" % (CHAPTER_START_PAGES.find(current_page) + 1)
+		chapter_label.tooltip_text = _tr(hint_key).format({"remaining": CHAPTER_EGG_CLICK_TARGET})
+	else:
+		chapter_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chapter_label.mouse_default_cursor_shape = Control.CURSOR_ARROW
+		chapter_label.tooltip_text = ""
+		if chapter_label.gui_input.is_connected(_on_chapter_label_gui_input):
+			chapter_label.gui_input.disconnect(_on_chapter_label_gui_input)
+func _on_chapter_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_chapter_egg_click_count += 1
+	_chapter_egg_click_timer = CHAPTER_EGG_CLICK_TIMEOUT
+	var chapter_index := CHAPTER_START_PAGES.find(_chapter_egg_active_page) + 1
+	var remaining := CHAPTER_EGG_CLICK_TARGET - _chapter_egg_click_count
+	if chapter_label and is_instance_valid(chapter_label):
+		chapter_label.pivot_offset = chapter_label.size * 0.5
+		var tw := create_tween()
+		tw.tween_property(chapter_label, "scale", Vector2(1.04, 1.04), 0.08)
+		tw.tween_property(chapter_label, "scale", Vector2.ONE, 0.08)
+	if remaining > 0:
+		var key := "EASTER_EGG_CH%d_CLICK" % chapter_index if remaining <= 2 else "EASTER_EGG_CH%d_HINT" % chapter_index
+		if chapter_label and is_instance_valid(chapter_label):
+			chapter_label.tooltip_text = _tr(key).format({"remaining": remaining})
+		return
+	_chapter_egg_click_count = 0
+	_chapter_egg_click_timer = 0.0
+	_show_chapter_easter_egg_popup(_chapter_egg_active_page)
+func _show_chapter_easter_egg_popup(page: int) -> void:
+	var chapter_index := CHAPTER_START_PAGES.find(page) + 1
+	if chapter_index <= 0:
+		return
+	var url: String
+	match chapter_index:
+		1: url = CH1_RESCUE_URL
+		2: url = CH2_MISSING_URL
+		3: url = CH3_REMEMBER_URL
+		4: url = CH4_RELUCTANCE_URL
+		_: return
+	if audio_manager and audio_manager.has_method("play_sfx"):
+		audio_manager.play_sfx("ui_click", 0.8)
+	var title_key := "EASTER_EGG_CH%d_TITLE" % chapter_index
+	var body_key := "EASTER_EGG_CH%d_BODY" % chapter_index
+	var listen_key := "EASTER_EGG_CH%d_LISTEN" % chapter_index
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.04, 0.04, 0.10, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.50, 0.38, 0.70, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr(title_key)
+	title_lbl.add_theme_font_size_override("font_size", 22)
+	title_lbl.add_theme_color_override("font_color", Color(0.80, 0.70, 1.0))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.50, 0.38, 0.70, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr(body_key)
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr(listen_key)
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	listen_btn.pressed.connect(func(): OS.shell_open(url))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		match event.keycode:
