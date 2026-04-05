@@ -1228,7 +1228,7 @@ func _show_hfgs_popup() -> void:
 func _setup_video_icon_btn() -> void:
 	if not video_icon_btn:
 		return
-	video_icon_btn.tooltip_text = "大問題Dialectic — 觀看相關影片"
+	video_icon_btn.tooltip_text = _tr("DIALECTIC_VIDEO_CHANNEL") + " — " + _tr("DIALECTIC_VIDEO_TOOLTIP")
 	UIStyleManager.add_hover_scale_effect(video_icon_btn, 1.12)
 	video_icon_btn.pressed.connect(_show_dialectic_video_popup)
 func _show_dialectic_video_popup() -> void:
@@ -1274,13 +1274,13 @@ func _show_dialectic_video_popup() -> void:
 	vbox.add_theme_constant_override("separation", 16)
 	margin.add_child(vbox)
 	var channel_lbl := Label.new()
-	channel_lbl.text = "大問題Dialectic"
+	channel_lbl.text = _tr("DIALECTIC_VIDEO_CHANNEL")
 	channel_lbl.add_theme_font_size_override("font_size", 14)
 	channel_lbl.add_theme_color_override("font_color", Color(0.80, 0.50, 0.50, 0.85))
 	channel_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(channel_lbl)
 	var title_lbl := Label.new()
-	title_lbl.text = "當真相無比殘酷，我們還應該相信嗎？\n如何進行自我PUA？"
+	title_lbl.text = _tr("DIALECTIC_VIDEO_TITLE")
 	title_lbl.add_theme_font_size_override("font_size", 22)
 	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.92, 0.55))
 	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1291,7 +1291,7 @@ func _show_dialectic_video_popup() -> void:
 	vbox.add_child(sep)
 	var desc_lbl := RichTextLabel.new()
 	desc_lbl.bbcode_enabled = true
-	desc_lbl.text = "[center][color=#C8C0D8]點擊下方按鈕，在瀏覽器中開啟這條影片。[/color][/center]"
+	desc_lbl.text = "[center][color=#C8C0D8]" + _tr("DIALECTIC_VIDEO_DESC") + "[/color][/center]"
 	desc_lbl.fit_content = true
 	desc_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	desc_lbl.add_theme_font_size_override("normal_font_size", 16)
@@ -1304,7 +1304,7 @@ func _show_dialectic_video_popup() -> void:
 	btn_row.add_theme_constant_override("separation", 16)
 	vbox.add_child(btn_row)
 	var open_btn := Button.new()
-	open_btn.text = "▶  開啟影片"
+	open_btn.text = _tr("DIALECTIC_VIDEO_OPEN")
 	open_btn.custom_minimum_size = Vector2(160, 48)
 	open_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	UIStyleManager.apply_button_style(open_btn, "primary", "medium")
@@ -1312,7 +1312,7 @@ func _show_dialectic_video_popup() -> void:
 	open_btn.pressed.connect(func(): OS.shell_open(DIALECTIC_VIDEO_URL))
 	btn_row.add_child(open_btn)
 	var close_btn := Button.new()
-	close_btn.text = "關閉"
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
 	close_btn.custom_minimum_size = Vector2(120, 48)
 	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	UIStyleManager.apply_button_style(close_btn, "danger", "medium")

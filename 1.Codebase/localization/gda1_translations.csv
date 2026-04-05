@@ -2849,3 +2849,9 @@ PAUSE_MENU_STATS,Stats,遊戲統計,Statistiken
 # Game Recap Overlay,,,
 RECAP_PROMPT_PREFIX,"Based on the following game context and story memory, generate a ""Previously on Glorious Deliverance Agency 1..."" narrative recap.",請根據以下遊戲狀態與記憶，為玩家生成「上次在光榮拯救機構一號...」的旁白回顧。,Generiere anhand des folgenden Spielkontexts und der Erinnerungen eine „Zuletzt in der Glorious Deliverance Agency 1..."-Erzählung.
 RECAP_PROMPT_SUFFIX,"Write a 120-180 word dramatic recap in English, opening with ""Previously on Glorious Deliverance Agency 1..."", in a sardonic, darkly humorous narrator voice. Output ONLY the recap text — no JSON, no choices, no headings.",請用繁體中文寫一段100-150字的戲劇性旁白，以「上次在光榮拯救機構一號...」開頭，用諷刺而帶有暗黑幽默的口吻總結玩家迄今的故事。只輸出旁白文字，不要任何JSON或選項。,"Schreibe eine 120-180 Wörter dramatische Zusammenfassung auf Deutsch, beginnend mit „Zuletzt in der Glorious Deliverance Agency 1...", in einem sarkastischen, dunkel-humorvollen Erzählerstil. Gib NUR den Zusammenfassungstext aus — kein JSON, keine Optionen, keine Überschriften."
+# Dialectic Video Popup,,,
+DIALECTIC_VIDEO_TOOLTIP,Watch a related video,觀看相關影片,Verwandtes Video ansehen
+DIALECTIC_VIDEO_CHANNEL,大問題Dialectic,大問題Dialectic,大問題Dialectic
+DIALECTIC_VIDEO_TITLE,"When truth is unbearably cruel, should we still believe? How to self-gaslight?",當真相無比殘酷，我們還應該相信嗎？如何進行自我PUA？,"Wenn die Wahrheit unerträglich grausam ist, sollten wir noch glauben? Wie betreibt man Selbst-Gaslighting?"
+DIALECTIC_VIDEO_DESC,Click the button below to open this video in your browser.,點擊下方按鈕，在瀏覽器中開啟這條影片。,Klicken Sie auf die Schaltfläche unten, um dieses Video im Browser zu öffnen.
+DIALECTIC_VIDEO_OPEN,▶  Open Video,▶  開啟影片,▶  Video öffnen
