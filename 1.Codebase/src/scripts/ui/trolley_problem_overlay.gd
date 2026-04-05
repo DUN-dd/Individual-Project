@@ -1,9 +1,13 @@
 extends Control
 signal choice_selected(choice_id: String)
+const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
 const ERROR_CONTEXT := "TrolleyProblemOverlay"
 const TROLLEY_ON_SOUND := "trolley_problem_on"
 const TROLLEY_OFF_SOUND := "trolley_problem_off"
 const TROLLEY_BGM := "trolley_problem_bgm"
+const TROLLEY_RELIC_EASTER_EGG_URL := "https://youtu.be/bjOAE17WajY"
+const TROLLEY_RELIC_CLICK_TARGET := 5
+const TROLLEY_RELIC_CLICK_TIMEOUT := 5.0
 @onready var scenario_label: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScenarioText
 @onready var choices_container: VBoxContainer = $Root/ContentPanel/Margin/VBox/ChoicesScroll/ChoicesContainer
 @onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
@@ -22,14 +26,24 @@ var _audio_sequence_token: int = 0
 var _overlay_music_started: bool = false
 var _previous_music_name: String = ""
 var _audio_restored: bool = false
+var _trolley_relic_click_count: int = 0
+var _trolley_relic_click_timer: float = 0.0
+var _trolley_relic_label: Label = null
 func _tr(key: String) -> String:
 	if LocalizationManager:
 		return LocalizationManager.get_translation(key)
 	return key
+func _process(delta: float) -> void:
+	if _trolley_relic_click_count > 0:
+		_trolley_relic_click_timer -= delta
+		if _trolley_relic_click_timer <= 0.0:
+			_trolley_relic_click_count = 0
+			set_process(false)
 func _ready() -> void:
 	z_index = 200
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	modulate.a = 0.0
+	set_process(false)
 	var tween := create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.5)
 	var audio := _get_audio_manager()
@@ -204,6 +218,7 @@ func setup(data: Dictionary) -> void:
 		else:
 			thematic_label.visible = false
 	_create_choice_panels(_choices_data, lang)
+	_setup_trolley_relic_easter_egg()
 func _get_template_label(template: String, lang: String) -> String:
 	if lang == "zh":
 		match template:
@@ -395,3 +410,132 @@ func _resolve_choice(choice_id: String) -> void:
 	tween.tween_property(self, "modulate:a", 0.0, 0.4)
 	await tween.finished
 	choice_selected.emit(choice_id)
+func _setup_trolley_relic_easter_egg() -> void:
+	if not thematic_label:
+		return
+	var vbox := thematic_label.get_parent()
+	if not vbox:
+		return
+	_trolley_relic_label = Label.new()
+	_trolley_relic_label.text = _tr("EASTER_EGG_TROLLEY_RELIC_TEXT")
+	_trolley_relic_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_trolley_relic_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_trolley_relic_label.add_theme_font_size_override("font_size", 12)
+	_trolley_relic_label.add_theme_color_override("font_color", Color(0.65, 0.55, 0.40, 0.30))
+	_trolley_relic_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_trolley_relic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_trolley_relic_label.gui_input.connect(_on_trolley_relic_label_gui_input)
+	_trolley_relic_label.tooltip_text = _tr("EASTER_EGG_TROLLEY_RELIC_HINT").format({"remaining": TROLLEY_RELIC_CLICK_TARGET})
+	vbox.add_child(_trolley_relic_label)
+func _on_trolley_relic_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_trolley_relic_click_count += 1
+	_trolley_relic_click_timer = TROLLEY_RELIC_CLICK_TIMEOUT
+	set_process(true)
+	if _trolley_relic_label and is_instance_valid(_trolley_relic_label):
+		_trolley_relic_label.pivot_offset = _trolley_relic_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_trolley_relic_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_trolley_relic_label, "scale", Vector2.ONE, 0.10)
+	var remaining := TROLLEY_RELIC_CLICK_TARGET - _trolley_relic_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_trolley_relic_label.tooltip_text = _tr("EASTER_EGG_TROLLEY_RELIC_CLICK").format({"remaining": remaining})
+		else:
+			_trolley_relic_label.tooltip_text = _tr("EASTER_EGG_TROLLEY_RELIC_HINT").format({"remaining": remaining})
+		return
+	_trolley_relic_click_count = 0
+	_trolley_relic_click_timer = 0.0
+	set_process(false)
+	_show_trolley_relic_popup()
+func _show_trolley_relic_popup() -> void:
+	var audio := _get_audio_manager()
+	if audio and audio.has_method("play_sfx"):
+		audio.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(520, 340)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_TROLLEY_RELIC_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.7, 0.6, 0.3, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_TROLLEY_RELIC_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 18)
+	body_lbl.add_theme_color_override("default_color", Color(0.95, 0.90, 0.80))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_TROLLEY_RELIC_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(TROLLEY_RELIC_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)

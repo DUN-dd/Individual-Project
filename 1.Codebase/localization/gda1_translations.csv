@@ -2716,3 +2716,31 @@ EASTER_EGG_TRAFFIC_BODY,"[center]明明綠燈　轉眼變成紅燈\n來又去　
 EASTER_EGG_TRAFFIC_HINT,Something flickers between them... ({remaining} clicks remaining),兩人之間有些什麼在閃爍……（還有 {remaining} 下）,Etwas flackert zwischen ihnen... ({remaining} Klicks verbleibend)
 EASTER_EGG_TRAFFIC_CLICK,Almost there... ({remaining} more),快了……（還差 {remaining} 下）,Fast geschafft... (noch {remaining} mal)
 EASTER_EGG_TRAFFIC_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
+
+EASTER_EGG_TROLLEY_RELIC_TEXT,The cruel cleansing of excitement past...,殘忍的清洗　過去的興奮Be……,Die grausame Reinigung vergangener Aufregung...
+EASTER_EGG_TROLLEY_RELIC_TITLE,~ ♪ Relic 遺物 ♪ ~,~ ♪ 遺物 ♪ ~,~ ♪ Relikt 遺物 ♪ ~
+EASTER_EGG_TROLLEY_RELIC_BODY,"[center]殘忍的清洗　過去的興奮Be
+
+Cruel cleansing
+Of excitement past
+
+Even the trolley cannot outrun what has already been done.
+
+[i]— 許廷鏗 Alfred Hui「遺物」
+TVB drama「法外風雲」theme[/i][/center]","[center]殘忍的清洗　過去的興奮Be
+
+就算是電車，也無法追回已做的事。
+
+[i]— 許廷鏗「遺物」
+TVB劇集「法外風雲」主題曲[/i][/center]","[center]殘忍的清洗　過去的興奮Be
+
+Grausame Reinigung
+Vergangene Aufregung
+
+Selbst die Straßenbahn kann nicht vor dem fliehen, was bereits getan wurde.
+
+[i]— 許廷鏗 Alfred Hui「遺物」
+TVB-Drama「法外風雲」Titellied[/i][/center]"
+EASTER_EGG_TROLLEY_RELIC_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_TROLLEY_RELIC_HINT,"A faint echo... ({remaining} clicks remaining)","隱約的迴音……（還有 {remaining} 下）","Ein schwaches Echo... ({remaining} Klicks verbleibend)"
+EASTER_EGG_TROLLEY_RELIC_CLICK,"The melody draws near... ({remaining} more)","旋律漸近……（還差 {remaining} 下）","Die Melodie kommt näher... (noch {remaining} mal)"
