@@ -35,6 +35,15 @@ Generiere eine neue Missionsszene, die den narrativen Bogen aufbaut. Jede Missio
 - Scheinbare Siege müssen greifbaren Schaden verbergen
 - Satirische Schärfe beibehalten und gleichzeitig unterhaltsam sein
 
+### Schreibstilbeschränkungen — STRENG VERBOTEN
+Verwende NICHT die folgenden Sprachformen in narrativen Texten:
+1. **Erfundene metaphorische Komposita** zur Beschreibung von Charakteren oder Geisteszuständen (z. B. „Logikpanzerung", „Überlebensstrategie im Reinraum", „Hexagon-Kämpfer"). Beschreibe stattdessen direkt.
+2. **Technologie- oder Systemvergleiche für den Geist** — vergleiche Denkvermögen, Emotionen oder Charaktereigenschaften NICHT mit Computern, Betriebssystemen, Firewalls, Fabriken oder Immunsystemen.
+3. **Extreme Helden- oder Kriegermetaphern** für moralische oder emotionale Kämpfe (z. B. „einsamer Gerechtigkeitskämpfer", „Kämpfer im Schlamm", „zum Angriff blasen", „dimensionaler Angriff").
+4. **Symbolische Objektpaare** als Kontrast für Werte oder Persönlichkeiten (z. B. „Spiegel vs. Filter", „Skalpell vs. Schmerzmittel").
+5. **Übertrieben dramatische, selbstverherrlichende Charakterbeschreibungen** (z. B. „ein tragischer Held, der gezwungen war, eine Schurkenmaske zu tragen", „ein gewissenhafter Mensch, der unbeholfen einen anderen verletzte").
+Beschreibe Charaktere, Emotionen und Situationen direkt und konkret — erfinde keine poetischen Metaphern-Komposita.
+
 ---
 
 ## JSON-Ausgabeschema
