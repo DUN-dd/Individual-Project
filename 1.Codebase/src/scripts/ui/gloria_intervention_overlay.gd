@@ -45,6 +45,7 @@ const VOICE_ACCEPT_IDS: Array[String] = [
 @onready var dim_background: ColorRect = $Dim
 const CRYING_FACE_PATH = "res://1.Codebase/src/assets/characters/gloria_protagonis_sad.png"
 const ANGRY_FACE_TEXTURE = preload("res://1.Codebase/src/assets/characters/gloria_protagonis_angry.png")
+const JUDGE_COURT_TEXTURE = preload("res://1.Codebase/src/assets/characters/gloria_judge_court.png")
 @onready var ai_guilt_text: RichTextLabel = $ContentPanel/Margin/VBox/AIGuiltText
 @onready var horror_bg_container: Control = $HorrorBackground
 @onready var intervention_counter: Label = $ContentPanel/Margin/VBox/InterventionCounter
@@ -587,8 +588,21 @@ func setup_diary_judgment_mode() -> void:
 func _apply_diary_judgment_portrait() -> void:
 	if not portrait:
 		return
-	portrait.texture = ANGRY_FACE_TEXTURE
-	portrait.modulate = Color(1.3, 0.7, 0.7)
+	portrait.texture = JUDGE_COURT_TEXTURE
+	portrait.modulate = Color(1.0, 1.0, 1.0)
+	var portrait_parent := portrait.get_parent()
+	if portrait_parent and not portrait_parent.has_node("CourtLabel"):
+		var court_label := Label.new()
+		court_label.name = "CourtLabel"
+		court_label.text = _tr("GLORIA_COURT_TITLE")
+		court_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		court_label.add_theme_font_size_override("font_size", 14)
+		court_label.add_theme_color_override("font_color", Color(0.85, 0.72, 0.30))
+		court_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
+		court_label.add_theme_constant_override("shadow_offset_x", 1)
+		court_label.add_theme_constant_override("shadow_offset_y", 1)
+		portrait_parent.add_child(court_label)
+		portrait_parent.move_child(court_label, portrait.get_index() + 1)
 func _request_ai_guilt_trip() -> void:
 	if not AIManager:
 		return

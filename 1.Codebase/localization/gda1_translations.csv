@@ -1776,6 +1776,7 @@ GLORIA_INTERVENTION_COUNT_3,This is the 3rd time. Gloria will NOT forgive again.
 GLORIA_INTERVENTION_COUNT_MANY,Gloria has intervened {count} times. You are beyond redemption.,Gloria 已經介入了 {count} 次。你已經無可救藥了。,Gloria hat {count} Mal eingegriffen. Du bist nicht mehr zu retten.
 GLORIA_STAMP_GUILTY,GUILTY,有 罪,SCHULDIG
 GLORIA_STAMP_VERDICT_CONFIRMED,VERDICT CONFIRMED,判 決 確 認,URTEIL BESTÄTIGT
+GLORIA_COURT_TITLE,"⚖ Moral High Ground Court ⚖","⚖ 道德高地法庭 ⚖","⚖ Gericht des moralischen Hochlands ⚖"
 ""
 # Save/Load Menu,,,
 SAVE_SLOT_HEADER,Slot %d,槽位 %d,Steckplatz %d
