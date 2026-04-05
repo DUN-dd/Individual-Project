@@ -89,54 +89,54 @@ const METADATA_LABELS := {
 	"purpose": {
 		"en": "Purpose: %s",
 		"zh": "AI_I18N_META_PURPOSE",
-		"de": "Zweck: %s",
+		"de": "AI_I18N_META_PURPOSE_DE",
 	},
 	"player_choice": {
 		"en": "Player choice: %s",
 		"zh": "AI_I18N_META_PLAYER_CHOICE",
-		"de": "Spielerwahl: %s",
+		"de": "AI_I18N_META_PLAYER_CHOICE_DE",
 	},
 	"success_check": {
 		"en": "Success check: %s",
 		"zh": "AI_I18N_META_SUCCESS_CHECK",
-		"de": "Erfolgsprüfung: %s",
+		"de": "AI_I18N_META_SUCCESS_CHECK_DE",
 	},
 	"player_prayer": {
 		"en": "Player prayer: %s",
 		"zh": "AI_I18N_META_PLAYER_PRAYER",
-		"de": "Spielergebet: %s",
+		"de": "AI_I18N_META_PLAYER_PRAYER_DE",
 	},
 	"player_action": {
 		"en": "Player action: %s",
 		"zh": "AI_I18N_META_PLAYER_ACTION",
-		"de": "Spieleraktion: %s",
+		"de": "AI_I18N_META_PLAYER_ACTION_DE",
 	},
 	"current_teammate": {
 		"en": "Current teammate: %s",
 		"zh": "AI_I18N_META_CURRENT_TEAMMATE",
-		"de": "Aktueller Teamkollege: %s",
+		"de": "AI_I18N_META_CURRENT_TEAMMATE_DE",
 	},
 }
 const STATS_FORMAT := {
 	"reality": {
 		"en": "Reality %d/%d",
 		"zh": "AI_I18N_STATS_REALITY",
-		"de": "Realität %d/%d",
+		"de": "AI_I18N_STATS_REALITY_DE",
 	},
 	"positive": {
 		"en": "Positive %d/%d",
 		"zh": "AI_I18N_STATS_POSITIVE",
-		"de": "Positiv %d/%d",
+		"de": "AI_I18N_STATS_POSITIVE_DE",
 	},
 	"entropy": {
 		"en": "Entropy %d",
 		"zh": "AI_I18N_STATS_ENTROPY",
-		"de": "Entropie %d",
+		"de": "AI_I18N_STATS_ENTROPY_DE",
 	},
 	"stats_label": {
 		"en": "Stats: %s",
 		"zh": "AI_I18N_STATS_LABEL",
-		"de": "Statistiken: %s",
+		"de": "AI_I18N_STATS_LABEL_DE",
 	},
 }
 static func get_text(category: Dictionary, key: String, language: String = "en") -> String:
