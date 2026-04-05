@@ -475,12 +475,12 @@ func _draw_relationship_lines():
 			_traffic_label = Label.new()
 			_traffic_label.text = _tr("EASTER_EGG_TRAFFIC_TEXT")
 			_traffic_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			_traffic_label.add_theme_font_size_override("font_size", 20)
+			_traffic_label.add_theme_font_size_override("font_size", 40)
 			_traffic_label.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.40))
 			_traffic_label.mouse_filter = Control.MOUSE_FILTER_STOP
 			_traffic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-			_traffic_label.custom_minimum_size = Vector2(36, 28)
-			_traffic_label.position = mid_point - Vector2(18, 24)
+			_traffic_label.custom_minimum_size = Vector2(60, 50)
+			_traffic_label.position = mid_point - Vector2(30, 42)
 			_traffic_label.tooltip_text = _tr("EASTER_EGG_TRAFFIC_HINT").format({"remaining": TRAFFIC_CLICK_TARGET})
 			_traffic_label.gui_input.connect(_on_traffic_label_gui_input)
 			_graph_container.add_child(_traffic_label)
