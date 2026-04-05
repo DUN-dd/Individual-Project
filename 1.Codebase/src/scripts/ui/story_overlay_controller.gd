@@ -15,7 +15,6 @@ var pause_menu_scene: PackedScene
 var settings_menu_scene: PackedScene
 var journal_menu_scene: PackedScene
 var characters_page_scene: PackedScene
-var relationship_graph_scene: PackedScene
 var night_overlay_scene: PackedScene
 var gloria_overlay_scene: PackedScene
 var export_story_dialog_scene: PackedScene
@@ -35,7 +34,6 @@ func _init(p_story_scene: Control) -> void:
 	pause_menu_scene = load("res://1.Codebase/src/scenes/ui/pause_menu.tscn")
 	settings_menu_scene = load("res://1.Codebase/src/scenes/ui/settings_menu.tscn")
 	journal_menu_scene = load("res://1.Codebase/src/scenes/ui/journal_system.tscn")
-	relationship_graph_scene = load("res://1.Codebase/src/scenes/ui/relationship_graph_viewer.tscn")
 	characters_page_scene = load("res://1.Codebase/src/scenes/ui/characters_page.tscn")
 	night_overlay_scene = load("res://1.Codebase/src/scenes/ui/night_cycle_overlay.tscn")
 	gloria_overlay_scene = load("res://1.Codebase/src/scenes/ui/gloria_intervention_overlay.tscn")
@@ -281,30 +279,6 @@ func open_characters_page(start_in_graph_mode: bool = false) -> void:
 		audio_manager.play_sfx("menu_click")
 func _on_characters_page_closed(paused_here: bool) -> void:
 	characters_page_instance = null
-	pop_overlay_pause(paused_here)
-	var audio_manager = get_audio_manager()
-	if audio_manager:
-		audio_manager.play_sfx("menu_click")
-func open_relationship_graph(opened_from_topbar: bool = false) -> void:
-	if not relationship_graph_scene:
-		_report_error("Relationship graph scene not loaded")
-		return
-	var paused_here: bool = push_overlay_pause()
-	var graph_instance = relationship_graph_scene.instantiate()
-	_prepare_overlay_node(graph_instance)
-	story_scene.add_child(graph_instance)
-	if graph_instance is Control:
-		graph_instance.z_index = 200
-	if graph_instance.has_signal("close_requested"):
-		graph_instance.close_requested.connect(_on_relationship_graph_closed.bind(paused_here, graph_instance))
-	elif graph_instance.has_signal("hidden"):
-		graph_instance.hidden.connect(_on_relationship_graph_closed.bind(paused_here, graph_instance))
-	var audio_manager = get_audio_manager()
-	if audio_manager:
-		audio_manager.play_sfx("menu_click")
-func _on_relationship_graph_closed(paused_here: bool, instance: Node) -> void:
-	if instance and is_instance_valid(instance):
-		instance.queue_free()
 	pop_overlay_pause(paused_here)
 	var audio_manager = get_audio_manager()
 	if audio_manager:
