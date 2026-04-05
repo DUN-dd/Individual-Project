@@ -485,35 +485,42 @@ func _draw_relationship_lines():
 			_traffic_label.gui_input.connect(_on_traffic_label_gui_input)
 			_graph_container.add_child(_traffic_label)
 func _get_relationship_status(char_key: String) -> Dictionary:
-	var game_state = ServiceLocator.get_game_state() if ServiceLocator else null
-	if not game_state: return {"color": Color.GRAY, "width": 2, "text": "?"}
-	var reality = game_state.reality_score
-	var positive = game_state.positive_energy
-	var result = {"color": Color.GRAY, "width": 2, "text": "RELATIONSHIP_NEUTRAL"}
-	match char_key:
-		"gloria":
-			if positive > 60 and reality < 40:
-				result = {"color": Color.GREEN, "width": 4, "text": "RELATIONSHIP_DEVOTED"}
-			elif reality > 60:
-				result = {"color": Color.RED, "width": 3, "text": "RELATIONSHIP_HOSTILE"}
-			elif positive < 30:
-				result = {"color": Color.ORANGE, "width": 2, "text": "RELATIONSHIP_SUSPICIOUS"}
-		"donkey":
-			if positive > 60:
-				result = {"color": Color.GREEN, "width": 4, "text": "RELATIONSHIP_LOYAL"}
-			elif positive < 40:
-				result = {"color": Color.ORANGE, "width": 2, "text": "RELATIONSHIP_DISAPPOINTED"}
-		"ark":
-			if reality > 40:
-				result = {"color": Color.CYAN, "width": 3, "text": "RELATIONSHIP_ALIGNED"}
-			elif reality < 30:
-				result = {"color": Color.RED, "width": 3, "text": "RELATIONSHIP_CRITICAL"}
-		"one":
-			if reality < 55 and positive < 45:
-				result = {"color": Color.PURPLE, "width": 3, "text": "RELATIONSHIP_SYMPATHETIC"}
-			elif positive > 70:
-				result = {"color": Color.GRAY, "width": 1, "text": "RELATIONSHIP_DISTANT"}
-	result.text = _tr(result.text)
+	var result = {"color": Color.GRAY, "width": 2, "text": _tr("RELATIONSHIP_NEUTRAL")}
+	var teammate_system = ServiceLocator.get_teammate_system() if ServiceLocator else null
+	if not teammate_system:
+		return result
+	var all_rels: Dictionary = teammate_system.get_all_relationships()
+	var player_rel: Dictionary = all_rels.get(char_key, {}).get("player", {})
+	if player_rel.is_empty():
+		return result
+	var value: int = player_rel.get("value", 0)
+	var status_text: String = player_rel.get("status", "")
+	if value >= 60:
+		result.color = Color.GREEN
+		result.width = 4
+		result.text = _tr("RELATIONSHIP_DEVOTED")
+	elif value >= 30:
+		result.color = Color.CYAN
+		result.width = 3
+		result.text = _tr("RELATIONSHIP_LOYAL")
+	elif value >= 0:
+		result.color = Color.GRAY
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_NEUTRAL")
+	elif value >= -30:
+		result.color = Color.ORANGE
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_SUSPICIOUS")
+	elif value >= -60:
+		result.color = Color(1.0, 0.5, 0.0, 1.0)
+		result.width = 2
+		result.text = _tr("RELATIONSHIP_DISAPPOINTED")
+	else:
+		result.color = Color.RED
+		result.width = 3
+		result.text = _tr("RELATIONSHIP_HOSTILE")
+	if not status_text.is_empty():
+		result.text = status_text
 	return result
 func _tr(key: String) -> String:
 	if LocalizationManager:
