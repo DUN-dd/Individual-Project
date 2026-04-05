@@ -751,7 +751,7 @@ func _setup_3am_easter_egg() -> void:
 	_3am_label.text = _tr("EASTER_EGG_3AM_TEXT")
 	_3am_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_3am_label.add_theme_font_size_override("font_size", 11)
-	_3am_label.add_theme_color_override("font_color", Color(0.68, 0.60, 0.88, 0.28))
+	_3am_label.add_theme_color_override("font_color", Color(0.68, 0.60, 0.88, 0.65))
 	_3am_label.mouse_filter = Control.MOUSE_FILTER_STOP
 	_3am_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	_3am_label.tooltip_text = _tr("EASTER_EGG_3AM_HINT").replace("{remaining}", str(THREE_AM_CLICK_TARGET))
