@@ -19,6 +19,8 @@ func load_current_settings() -> void:
 	sync_gemini_model_selection(ai_manager.gemini_model)
 	if _menu.max_tokens_spin:
 		_menu.max_tokens_spin.value = ai_manager.max_tokens
+	if _menu.request_timeout_spin:
+		_menu.request_timeout_spin.value = ai_manager.request_timeout
 	if _menu.safety_level_option:
 		var current_safety = ai_manager.gemini_safety_settings
 		match current_safety:
@@ -97,6 +99,8 @@ func save_ui_to_manager() -> bool:
 			ai_manager.set_max_tokens(int(_menu.max_tokens_spin.value))
 		else:
 			ai_manager.max_tokens = int(_menu.max_tokens_spin.value)
+	if _menu.request_timeout_spin:
+		ai_manager.request_timeout = float(_menu.request_timeout_spin.value)
 	var gemini_key_value: String = _menu.gemini_key_input.text.strip_edges()
 	if not gemini_key_value.is_empty():
 		if gemini_key_value.begins_with("http://") or gemini_key_value.begins_with("https://"):

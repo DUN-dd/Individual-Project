@@ -55,6 +55,7 @@ var ai_router_api_format: int = 0
 var ai_router_custom_endpoint: String = ""
 var web_proxy_url: String = ""
 var max_tokens: int = DEFAULT_MAX_TOKENS
+var request_timeout: float = GameConstants.AI.DEFAULT_REQUEST_TIMEOUT
 var memory_max_items: int = 20
 var memory_summary_threshold: int = 10
 var memory_full_entries: int = 5
@@ -103,6 +104,7 @@ func save_settings() -> Error:
 	config.set_value("ai", "ai_router_api_format", ai_router_api_format)
 	config.set_value("ai", "ai_router_custom_endpoint", ai_router_custom_endpoint)
 	config.set_value("ai", "max_tokens", max_tokens)
+	config.set_value("ai", "request_timeout", request_timeout)
 	config.set_value("ai", "memory_limit", memory_max_items)
 	config.set_value("ai", "memory_summary_threshold", memory_summary_threshold)
 	config.set_value("ai", "memory_full_entries", memory_full_entries)
@@ -170,6 +172,7 @@ func load_settings() -> Error:
 	ai_router_api_format = int(config.get_value("ai", "ai_router_api_format", 0))
 	ai_router_custom_endpoint = str(config.get_value("ai", "ai_router_custom_endpoint", ""))
 	max_tokens = _normalize_max_tokens(int(config.get_value("ai", "max_tokens", DEFAULT_MAX_TOKENS)))
+	request_timeout = clampf(float(config.get_value("ai", "request_timeout", GameConstants.AI.DEFAULT_REQUEST_TIMEOUT)), GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
 	memory_max_items = int(config.get_value("ai", "memory_limit", memory_max_items))
 	memory_summary_threshold = int(config.get_value("ai", "memory_summary_threshold", memory_summary_threshold))
 	memory_full_entries = int(config.get_value("ai", "memory_full_entries", memory_full_entries))
@@ -282,6 +285,7 @@ func get_state_snapshot() -> Dictionary:
 		"lmstudio_port": lmstudio_port,
 		"lmstudio_model": lmstudio_model,
 		"max_tokens": max_tokens,
+		"request_timeout": request_timeout,
 		"custom_tone": custom_ai_tone_style,
 		"memory_max": memory_max_items,
 		"memory_threshold": memory_summary_threshold,
@@ -314,6 +318,8 @@ func load_state_snapshot(state: Dictionary) -> void:
 		lmstudio_model = state["lmstudio_model"]
 	if state.has("max_tokens"):
 		set_max_tokens(int(state["max_tokens"]))
+	if state.has("request_timeout"):
+		request_timeout = clampf(float(state["request_timeout"]), GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
 	if state.has("custom_tone"):
 		custom_ai_tone_style = state["custom_tone"]
 	if state.has("memory_max"):

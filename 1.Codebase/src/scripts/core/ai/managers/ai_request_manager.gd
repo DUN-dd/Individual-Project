@@ -79,6 +79,10 @@ signal request_error(message: String)
 signal response_received(response: Dictionary)
 func set_config_manager(config_mgr: AIConfigManager) -> void:
 	_config_manager = config_mgr
+func set_request_timeout(timeout: float) -> void:
+	_request_timeout = clampf(timeout, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
+	if _timeout_timer:
+		_timeout_timer.wait_time = _request_timeout
 func set_provider_manager(provider_mgr) -> void:
 	_provider_manager = provider_mgr
 func set_context_manager(context_mgr) -> void:
@@ -91,6 +95,8 @@ func initialize_request_system(parent_node: Node, http_req: HTTPRequest) -> void
 	http_request.process_mode = Node.PROCESS_MODE_ALWAYS
 	if not http_request.request_completed.is_connected(_on_request_completed):
 		http_request.request_completed.connect(_on_request_completed)
+	if _config_manager and _config_manager.request_timeout > 0.0:
+		_request_timeout = clampf(_config_manager.request_timeout, GameConstants.AI.MIN_REQUEST_TIMEOUT, GameConstants.AI.MAX_REQUEST_TIMEOUT)
 	_timeout_timer = Timer.new()
 	_timeout_timer.one_shot = true
 	_timeout_timer.wait_time = _request_timeout

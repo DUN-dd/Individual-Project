@@ -45,6 +45,7 @@ func rebuild_layout_into_tabs() -> void:
 		_move_control(_menu.test_button, global_settings)
 		_move_control(_menu.status_label, global_settings)
 		_create_max_tokens_controls(global_settings)
+		_create_request_timeout_controls(global_settings)
 		tab_container = TabContainer.new()
 		tab_container.name = "AISettingsTabs"
 		tab_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -182,6 +183,30 @@ func _create_max_tokens_controls(parent: VBoxContainer) -> void:
 	_menu.max_tokens_hint_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	_menu.max_tokens_hint_label.text = "Limits one AI response length (output only). Not full-playthrough total, and not input token limit."
 	parent.add_child(_menu.max_tokens_hint_label)
+func _create_request_timeout_controls(parent: VBoxContainer) -> void:
+	_menu.request_timeout_container = HBoxContainer.new()
+	_menu.request_timeout_container.name = "RequestTimeoutContainer"
+	_menu.request_timeout_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_menu.request_timeout_container.add_theme_constant_override("separation", 12)
+	parent.add_child(_menu.request_timeout_container)
+	var timeout_label := Label.new()
+	timeout_label.name = "RequestTimeoutLabel"
+	timeout_label.text = "AI Request Timeout (seconds):"
+	_menu.request_timeout_container.add_child(timeout_label)
+	_menu.request_timeout_spin = SpinBox.new()
+	_menu.request_timeout_spin.name = "RequestTimeoutSpin"
+	_menu.request_timeout_spin.min_value = GameConstants.AI.MIN_REQUEST_TIMEOUT
+	_menu.request_timeout_spin.max_value = GameConstants.AI.MAX_REQUEST_TIMEOUT
+	_menu.request_timeout_spin.step = 5
+	_menu.request_timeout_spin.value = GameConstants.AI.DEFAULT_REQUEST_TIMEOUT
+	_menu.request_timeout_spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_menu.request_timeout_container.add_child(_menu.request_timeout_spin)
+	_menu.request_timeout_hint_label = Label.new()
+	_menu.request_timeout_hint_label.name = "RequestTimeoutHintLabel"
+	_menu.request_timeout_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_menu.request_timeout_hint_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	_menu.request_timeout_hint_label.text = "How long to wait for AI response before retrying. Increase for slow local models (LMStudio/Ollama)."
+	parent.add_child(_menu.request_timeout_hint_label)
 func _create_online_provider_sections() -> void:
 	var tab_online = _menu.tab_online_providers
 	var gemini_section = _create_provider_section("Google Gemini", tab_online)
