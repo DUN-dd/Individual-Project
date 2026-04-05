@@ -2710,3 +2710,9 @@ EASTER_EGG_KITE_BODY,"[center]天色豈會每日也明亮如晴空\n一天總要
 EASTER_EGG_KITE_LISTEN,♪ Spotify,♪ Spotify 收聽,♪ Spotify
 EASTER_EGG_KITE_HINT,Something drifts... ({remaining} clicks remaining),有什麼在飄動……（還有 {remaining} 下）,Etwas schwebt vorbei... ({remaining} Klicks verbleibend)
 EASTER_EGG_KITE_CLICK,Almost found... ({remaining} more),快找到了……（還差 {remaining} 下）,Fast gefunden... (noch {remaining} mal)
+EASTER_EGG_TRAFFIC_TEXT,🚦,🚦,🚦
+EASTER_EGG_TRAFFIC_TITLE,~ ♪ 紅綠燈 ♪ ~,~ ♪ 紅綠燈 ♪ ~,~ ♪ Ampel 紅綠燈 ♪ ~
+EASTER_EGG_TRAFFIC_BODY,"[center]明明綠燈　轉眼變成紅燈\n來又去　要找的際遇未接近\n\nClearly green — yet the light turns red in an instant.\nComing and going — the encounter you seek never draws near.\n\n燈號換了，人卻還在等。\n\n[i]— 鄭融「紅綠燈」[/i][/center]","[center]明明綠燈　轉眼變成紅燈\n來又去　要找的際遇未接近\n\n燈號換了，人卻還在等。\n\n[i]— 鄭融「紅綠燈」[/i][/center]","[center]明明綠燈　轉眼變成紅燈\n來又去　要找的際遇未接近\n\nKlar auf Grün — und im nächsten Augenblick springt die Ampel auf Rot.\nHin und her — die Begegnung, die du suchst, kommt nie wirklich näher.\n\nDie Ampel hat gewechselt, doch man wartet noch immer.\n\n[i]— 鄭融「紅綠燈」[/i][/center]"
+EASTER_EGG_TRAFFIC_HINT,Something flickers between them... ({remaining} clicks remaining),兩人之間有些什麼在閃爍……（還有 {remaining} 下）,Etwas flackert zwischen ihnen... ({remaining} Klicks verbleibend)
+EASTER_EGG_TRAFFIC_CLICK,Almost there... ({remaining} more),快了……（還差 {remaining} 下）,Fast geschafft... (noch {remaining} mal)
+EASTER_EGG_TRAFFIC_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
