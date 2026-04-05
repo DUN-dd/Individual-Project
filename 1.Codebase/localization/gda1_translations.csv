@@ -1769,6 +1769,12 @@ INTRO_NAV_ACT_4,Act IV,第四幕,Akt IV
 # Story Overlay Controller,,,
 GLORIA_DIARY_VERDICT_MSG,Gloria has formally judged your diary. Your private thoughts have been weaponized against you...,Gloria 已正式審判了你的日記。你的私人想法已被用來對付你...,Gloria hat Ihr Tagebuch offiziell beurteilt. Ihre privaten Gedanken wurden gegen Sie als Waffe eingesetzt ...
 GLORIA_ENCOURAGED_MSG,Gloria has 'encouraged' you. Reality feels more distant...,Gloria 已經「鼓勵」了你。現實感覺更加遙遠了...,Gloria hat dich „ermutigt“. Die Realität fühlt sich weiter entfernt an...
+GLORIA_INTERVENTION_COUNT_1,This is the 1st time Gloria has intervened in your life.,這是 Gloria 第 1 次介入你的人生。,Dies ist das 1. Mal dass Gloria in dein Leben eingegriffen hat.
+GLORIA_INTERVENTION_COUNT_2,This is the 2nd time Gloria has intervened. She is losing patience.,這是 Gloria 第 2 次介入。她正在失去耐心。,Dies ist das 2. Mal. Gloria verliert die Geduld.
+GLORIA_INTERVENTION_COUNT_3,This is the 3rd time. Gloria will NOT forgive again.,這是第 3 次了。Gloria 不會再原諒你了。,Zum 3. Mal. Gloria wird nicht mehr verzeihen.
+GLORIA_INTERVENTION_COUNT_MANY,Gloria has intervened {count} times. You are beyond redemption.,Gloria 已經介入了 {count} 次。你已經無可救藥了。,Gloria hat {count} Mal eingegriffen. Du bist nicht mehr zu retten.
+GLORIA_STAMP_GUILTY,GUILTY,有 罪,SCHULDIG
+GLORIA_STAMP_VERDICT_CONFIRMED,VERDICT CONFIRMED,判 決 確 認,URTEIL BESTÄTIGT
 ""
 # Save/Load Menu,,,
 SAVE_SLOT_HEADER,Slot %d,槽位 %d,Steckplatz %d
@@ -2677,6 +2683,14 @@ EASTER_EGG_RELIC_TEXT,Give me one more moment... always missing you... then I ca
 EASTER_EGG_RELIC_TITLE,~ ♪ Relic 遺物 ♪ ~,~ ♪ 遺物 ♪ ~,~ ♪ Relikt 遺物 ♪ ~
 EASTER_EGG_RELIC_BODY,[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\nGive me one more moment\nAlways missing you\nThen I can forget yesterday\n\nThis song speaks to the real rebirth — not the rebirth the player experiences in the game.\n\n[i]— 許廷鏗 Alfred Hui「遺物」[/i][/center],[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\n這首歌所指向的，是「真正的重生」，不是玩家在遊戲中經歷的那個重生。\n\n[i]— 許廷鏗「遺物」\nTVB劇集「法外風雲」主題曲[/i][/center],"[center]給我多一刻　一直掛念你　我便能遺忘昨天\n\nGib mir noch einen Moment\nDich stets vermissend\nDann kann ich das Gestern vergessen\n\nDieses Lied meint die wahre Wiedergeburt — nicht die Wiedergeburt, die der Spieler im Spiel erlebt.\n\n[i]— 許廷鏗 Alfred Hui「遺物」[/i][/center]"
 EASTER_EGG_RELIC_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
+EASTER_EGG_RELIC_HINT,"A faint echo... ({remaining} clicks remaining)","隱約的迴音……（還有 {remaining} 下）","Ein schwaches Echo... ({remaining} Klicks verbleibend)"
+EASTER_EGG_RELIC_CLICK,"The melody draws near... ({remaining} more)","旋律漸近……（還差 {remaining} 下）","Die Melodie kommt näher... (noch {remaining} mal)"
+EASTER_EGG_HFGS_TEXT,"Every action, already foretold...","每個動作　早已預告……","Jede Handlung, schon vorhergesagt..."
+EASTER_EGG_HFGS_TITLE,~ ♪ 恍如隔世 ♪ ~,~ ♪ 恍如隔世 ♪ ~,~ ♪ 恍如隔世 ♪ ~
+EASTER_EGG_HFGS_BODY,"[center]Every action, already foretold — no longer living out any variation.\n\nThe game tells you: be positive, work hard, and you'll be reborn.\nThe song already knows: it was all foretold — there were never any variables to begin with.\n\n[i]— Tang Kin-Hung 鄧健泓「恍如隔世」\nTheme of drama「隔世追兇」[/i][/center]","[center]每個動作　早已預告　再也活不出變數\n\n遊戲告訴你：正能量、努力打卡，就能重生。\n歌早就知道了：一切早已預告——從來就沒有變數。\n\n[i]— 鄧健泓「恍如隔世」\n劇集《隔世追兇》主題曲[/i][/center]","[center]Jede Handlung, schon vorhergesagt — keine Abweichung mehr möglich.\n\nDas Spiel sagt dir: Sei positiv, melde dich täglich an, dann wirst du wiedergeboren.\nDas Lied weiß es längst: Alles war vorhergesagt — es gab nie eine Variable.\n\n[i]— Tang Kin-Hung 鄧健泓「恍如隔世」\nTitellied der Serie「隔世追兇」[/i][/center]"
+EASTER_EGG_HFGS_HINT,"A forgotten world... ({remaining} clicks remaining)","恍如隔世……（還有 {remaining} 下）","Wie aus einer anderen Welt... ({remaining} Klicks verbleibend)"
+EASTER_EGG_HFGS_CLICK,"Coming back into focus... ({remaining} more)","漸漸浮現……（還差 {remaining} 下）","Kommt langsam zurück... (noch {remaining} mal)"
+EASTER_EGG_HFGS_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
 EASTER_EGG_RELIC_HINT,A faint echo... ({remaining} clicks remaining),隱約的迴音……（還有 {remaining} 下）,Ein schwaches Echo... ({remaining} Klicks verbleibend)
 EASTER_EGG_RELIC_CLICK,The melody draws near... ({remaining} more),旋律漸近……（還差 {remaining} 下）,Die Melodie kommt näher... (noch {remaining} mal)
 EASTER_EGG_GLORIA_CHAO_TITLE,Clamor,嘈,Lärm
