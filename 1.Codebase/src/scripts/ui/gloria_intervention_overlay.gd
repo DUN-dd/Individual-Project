@@ -81,8 +81,7 @@ func _ready() -> void:
 	_apply_styles()
 	if subtitle_label:
 		subtitle_label.gui_input.connect(_on_subtitle_gui_input)
-	if _is_diary_judgment:
-		_apply_diary_judgment_portrait()
+	_apply_diary_judgment_portrait()
 	_apply_localization()
 	_setup_intervention_counter()
 	_start_bgm()
@@ -318,7 +317,14 @@ func _slam_guilty_stamp() -> void:
 	stamp.text = stamp_text
 	stamp.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	stamp.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	stamp.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
+	stamp.anchor_left = 0.70
+	stamp.anchor_top = 0.42
+	stamp.anchor_right = 0.70
+	stamp.anchor_bottom = 0.42
+	stamp.offset_left = 0
+	stamp.offset_top = 0
+	stamp.offset_right = 0
+	stamp.offset_bottom = 0
 	stamp.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	stamp.grow_vertical = Control.GROW_DIRECTION_BOTH
 	stamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -578,6 +584,7 @@ func _apply_styles() -> void:
 	if body_text:
 		body_text.add_theme_color_override("default_color", Color(1.0, 0.9, 0.9))
 	if portrait:
+		portrait.texture = JUDGE_COURT_TEXTURE
 		portrait.modulate = Color(1.2, 0.8, 0.8)
 		portrait.custom_minimum_size = Vector2(300, 300)
 func setup_diary_judgment_mode() -> void:
@@ -589,9 +596,19 @@ func _apply_diary_judgment_portrait() -> void:
 	if not portrait:
 		return
 	portrait.texture = JUDGE_COURT_TEXTURE
-	portrait.modulate = Color(1.0, 1.0, 1.0)
+	if _is_diary_judgment:
+		portrait.modulate = Color(1.0, 1.0, 1.0)
 	var portrait_parent := portrait.get_parent()
 	if portrait_parent and not portrait_parent.has_node("CourtLabel"):
+		var portrait_idx := portrait.get_index()
+		portrait_parent.remove_child(portrait)
+		var portrait_vbox := VBoxContainer.new()
+		portrait_vbox.name = "PortraitVBox"
+		portrait_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		portrait_vbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		portrait_parent.add_child(portrait_vbox)
+		portrait_parent.move_child(portrait_vbox, portrait_idx)
+		portrait_vbox.add_child(portrait)
 		var court_label := Label.new()
 		court_label.name = "CourtLabel"
 		court_label.text = _tr("GLORIA_COURT_TITLE")
@@ -601,8 +618,7 @@ func _apply_diary_judgment_portrait() -> void:
 		court_label.add_theme_color_override("font_shadow_color", Color(0.0, 0.0, 0.0, 0.8))
 		court_label.add_theme_constant_override("shadow_offset_x", 1)
 		court_label.add_theme_constant_override("shadow_offset_y", 1)
-		portrait_parent.add_child(court_label)
-		portrait_parent.move_child(court_label, portrait.get_index() + 1)
+		portrait_vbox.add_child(court_label)
 func _request_ai_guilt_trip() -> void:
 	if not AIManager:
 		return
