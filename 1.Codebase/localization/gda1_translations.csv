@@ -2744,3 +2744,9 @@ TVB-Drama「法外風雲」Titellied[/i][/center]"
 EASTER_EGG_TROLLEY_RELIC_LISTEN,♪ Listen,♪ 聆聽,♪ Anhören
 EASTER_EGG_TROLLEY_RELIC_HINT,"A faint echo... ({remaining} clicks remaining)","隱約的迴音……（還有 {remaining} 下）","Ein schwaches Echo... ({remaining} Klicks verbleibend)"
 EASTER_EGG_TROLLEY_RELIC_CLICK,"The melody draws near... ({remaining} more)","旋律漸近……（還差 {remaining} 下）","Die Melodie kommt näher... (noch {remaining} mal)"
+EASTER_EGG_GELI_TEXT,Single tick... isolated from him...,單剔　隔絕我跟他……,Einzelner Haken... von ihm getrennt...
+EASTER_EGG_GELI_TITLE,~ ♪ 隔離 ♪ ~,~ ♪ 隔離 ♪ ~,~ ♪ Quarantäne 隔離 ♪ ~
+EASTER_EGG_GELI_BODY,"[center]十四天　大概足以證實\n他已狠心離棄\n\n但我清清楚楚　終止交往他更快樂過\n被退出驚訝什麼\n\n未曾犯錯　隔離了我\n阻止我搞清楚\n\n[i]— Jace Chan「隔離」[/i][/center]","[center]十四天　大概足以證實\n他已狠心離棄\n\n但我清清楚楚　終止交往他更快樂過\n被退出驚訝什麼\n\n未曾犯錯　隔離了我\n阻止我搞清楚\n\n[i]— Jace Chan「隔離」[/i][/center]","[center]Vierzehn Tage — genug, um zu bestätigen\ndass er mich kaltblütig verlassen hat\n\nAber ich weiß ganz klar: das Ende der Beziehung macht ihn glücklicher\nWarum also überrascht sein, ausgesperrt zu werden\n\nNie einen Fehler gemacht — doch er isolierte mich\nhält mich davon ab, es zu verstehen\n\n[i]— Jace Chan「隔離」[/i][/center]"
+EASTER_EGG_GELI_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
+EASTER_EGG_GELI_HINT,A message left on read... ({remaining} clicks remaining),訊息已讀不回……（還有 {remaining} 下）,Nachricht gelesen, keine Antwort... ({remaining} Klicks verbleibend)
+EASTER_EGG_GELI_CLICK,Waiting for a reply... ({remaining} more),等待回覆中……（還差 {remaining} 下）,Warte auf Antwort... (noch {remaining} mal)
