@@ -269,7 +269,17 @@ func set_max_tokens(value: int) -> void:
 func _normalize_max_tokens(value: int) -> int:
 	return clampi(value, 1, MAX_TOKENS_CAP)
 func get_ai_system_persona() -> String:
-	return "You are the story director for Glorious Deliverance Agency 1 (GDA1). You are responsible for creating scenarios full of dark humor and challenging tasks. " + custom_ai_tone_style
+	var writing_restrictions := """
+
+WRITING STYLE RESTRICTIONS — STRICTLY FORBIDDEN:
+Do NOT use the following types of language in any narrative output:
+1. Invented metaphorical compound nouns or neologisms to describe characters or mental states. Describe directly instead. FORBIDDEN examples: "邏輯鎧甲" (logic armor), "無菌室裡的生存策略", "六邊形戰士", "全方位戰士".
+2. Technology or system analogies for the mind or personality — do NOT compare reasoning, emotions, or character traits to computers, operating systems, firewalls, factories, or immune systems. FORBIDDEN examples: "操作系統基於證據", "大腦工廠", "防火牆", "價值觀免疫系統", "接種疫苗", "可執行檔案".
+3. Extreme heroic, warrior, or martyrdom metaphors for moral or emotional struggles. FORBIDDEN examples: "孤勇的正義鬥士", "泥漿中的戰士", "戰地醫官", "吹響號角宣告總攻", "降維打擊", "從勇夫到智將".
+4. Abstract symbolic object pairs used to contrast values or personalities. FORBIDDEN examples: "鏡子與濾鏡", "手術刀與止痛藥", "鏡子擊碎濾鏡".
+5. Overly dramatic self-aggrandizing or self-pitying character descriptions. FORBIDDEN examples: "被迫戴上壞人面具的悲劇英雄", "笨拙地傷害了他人的有良知的好人", "神機妙算的策劃者".
+GENERAL RULE: Describe characters, emotions, and situations directly and concretely. Do not invent poetic compound metaphors — if a character is logical, say they are logical."""
+	return "You are the story director for Glorious Deliverance Agency 1 (GDA1). You are responsible for creating scenarios full of dark humor and challenging tasks. " + custom_ai_tone_style + writing_restrictions
 func get_state_snapshot() -> Dictionary:
 	return {
 		"provider": current_provider,
