@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c3vc0m1qjxgjk"]
+[gd_scene load_steps=9 format=3 uid="uid://c3vc0m1qjxgjk"]
 
 [ext_resource type="Script" path="res://1.Codebase/src/scripts/ui/fsm_challenge_overlay.gd" id="1_fsm_challenge"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/characters/gloria_protagonis_happy.png" id="2_gloria_happy"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/ui/guide_fsm.png" id="4_fsm_image"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/characters/teacher_chan_happy.png" id="5_teacher_chan"]
 [ext_resource type="Texture2D" path="res://1.Codebase/src/assets/rebirth_challenge/rebirth_conclusion_bg.png" id="6_crash_bg"]
+[ext_resource type="Texture2D" path="res://1.Codebase/src/assets/icons/portal.png" id="7_portal_icon"]
 
 [sub_resource type="Gradient" id="1_gradient_bg"]
 interpolation_mode = 2
@@ -518,3 +519,20 @@ custom_minimum_size = Vector2(260, 56)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "回到遊戲"
+
+[node name="VideoIconBtn" type="TextureButton" parent="CrashPanel"]
+z_index = 10
+layout_mode = 1
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -76.0
+offset_right = 76.0
+offset_bottom = -16.0
+grow_horizontal = 1
+grow_vertical = 0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("7_portal_icon")
+stretch_mode = 1
