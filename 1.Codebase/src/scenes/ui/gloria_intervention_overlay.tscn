@@ -117,6 +117,11 @@ custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 mouse_filter = 2
 
+[node name="RebirthSuggestionLabel" type="Label" parent="ContentPanel/Margin/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="ContinueButton" type="Button" parent="ContentPanel/Margin/VBox"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
