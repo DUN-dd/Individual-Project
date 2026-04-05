@@ -154,7 +154,7 @@ func _build_ui() -> void:
 	_skip_button.offset_left = -120; _skip_button.offset_right  = -16
 	_skip_button.offset_top  = 16;   _skip_button.offset_bottom = 58
 	_pray_button = Button.new()
-	_pray_button.text = "✦  " + (_tr("NIGHT_BUTTON_PRAY") if not _tr("NIGHT_BUTTON_PRAY").begins_with("NIGHT_") else "祈禱儀式")
+	_pray_button.text = "✦  " + _tr("NIGHT_BUTTON_PRAY")
 	_pray_button.visible = false
 	_pray_button.pressed.connect(_on_pray_pressed)
 	var _pn := StyleBoxFlat.new()

@@ -1439,6 +1439,10 @@ AI_PROMPT_REFLECTION_PREFIX, | Reflection: , | 內省：,| Spiegelung:
 AI_REQUEST_FALLBACK_MSG,%s. Switching to offline story generator.,%s。改用離線劇情產生器。,%S. Wechsel zum Offline-Story-Generator.
 AI_MEMORY_LONG_TERM_HEADER,Long-term continuity memos (oldest to newest):,長期連續性備忘（由舊到新）：,Langfristige Kontinuitätsnotizen (vom ältesten zum neuesten):
 AI_MEMORY_NOTES_HEADER,Persistent memos and restrictions:,持久備忘與限制：,Dauerhafte Notizen und Einschränkungen:
+# AI Memory Store strip phrases - ai_memory_store.gd,,,
+MEMORY_STRIP_MISSION_COMPLETE_ZH1,,只有在任務真正結束時，才將 mission_status 設為 complete,
+MEMORY_STRIP_MISSION_COMPLETE_ZH2,,"只有在任務真正結束時，才將 `mission_status` 設為 `complete`",
+MEMORY_STRIP_MISSION_COMPLETE_DE,,,Setzen Sie mission_status nur dann auf ""complete"" wenn die Mission wirklich abgeschlossen ist.
 BUTTERFLY_TRACKER_CONTEXT,The player's recent choices may have consequences:\n,玩家最近的選擇可能產生後果：\n,Die jüngsten Entscheidungen des Spielers können Konsequenzen haben:\n
 BUTTERFLY_TRACKER_PENDING,- [%d scenes ago] %s (pending consequences: %d)\n,- [%d場景前] %s（待觸發後果：%d）\n,- [vor %d Szenen] %s (ausstehende Konsequenzen: %d)\n
 AI_CHART_NO_DATA,No data yet,No data yet / 尚無資料,Noch keine Daten
@@ -2191,6 +2195,22 @@ MOCK_LABEL_POSITIVE,[Positive],[樂觀],[Positiv]
 MOCK_LABEL_COMPLAIN,[Complain],[抱怨],[Beschweren]
 MOCK_SIM_LOOP_TITLE,Simulation Content Complete,模擬模式已完整播放,Simulationsinhalt abgeschlossen
 MOCK_SIM_LOOP_DESC,You have experienced all preset simulation scenarios. Content will now repeat from the beginning.,你已體驗所有預設的模擬情境，內容現在將重新循環。,Sie haben alle voreingestellten Simulationsszenarien erlebt. Der Inhalt wird nun von Anfang an wiederholt.
+# Mock AI Generator - followup lines - mock_ai_generator.gd,,,
+MOCK_FOLLOWUP_REALITY_FRAYING,(Reality is fraying — this choice leaves deeper marks than expected.),（現實正在崩潰——這個選擇留下了比預期更深的印記。）,(Die Realität bröckelt — diese Entscheidung hinterlässt tiefere Spuren als erwartet.)
+MOCK_FOLLOWUP_ENTROPY_SPIKE,(The void entropy spikes. Your action ripples outward in unexpected ways.),（虛空熵值飆升。你的行動以意想不到的方式向外擴散。）,(Die Leerentropie steigt sprunghaft an. Deine Aktion breitet sich auf unerwartete Weise aus.)
+# Mock AI Generator - Trolley Problem Positive Energy Trap scenario,,,
+MOCK_TROLLEY_PET_SCENARIO,"Suddenly, a citizen walks into your service window, face ashen, eyes hollow. He lost his job three weeks ago. Gloria stands behind you and hisses: 'Tell him everything happens for a reason! Give him positive energy! Smile!' ARK's analysis flashes quietly: 'Subject requires concrete employment resources and mental health referral. Forced positivity reinforcement is likely to amplify self-blame.' You have three seconds.","突然間，一名市民走進你的服務窗口，面色灰白，眼神空洞。他三週前失業了。Gloria站在你身後低聲催促：「告訴他一切都是天意！給他正能量！笑！」ARK的分析靜靜地閃爍：「受試者需要具體的就業資源和心理健康轉介。強制正向強化可能放大自我歸咎。」你只有三秒鐘。","Plötzlich betritt ein Bürger dein Servicefenster, mit aschfahlem Gesicht und leerem Blick. Er hat vor drei Wochen seinen Job verloren. Gloria steht hinter dir und zischt: »Sag ihm, dass alles aus einem Grund geschieht! Gib ihm positive Energie! Lächle!« ARKs Analyse flackert leise: »Der Proband benötigt konkrete Beschäftigungsressourcen und eine psychiatrische Überweisung. Erzwungene positive Verstärkung dürfte die Selbstbeschuldigung verstärken.« Du hast drei Sekunden."
+MOCK_TROLLEY_PET_CHOICE_POSITIVE_TEXT,"Follow Gloria: 'Everything happens for a reason! Stay positive!'",跟隨Gloria：「一切都是天意！保持正向！」,"Gloria folgen: »Alles geschieht aus einem Grund! Bleib positiv!«"
+MOCK_TROLLEY_PET_CHOICE_POSITIVE_IMMEDIATE,"He forces a weak smile. Gloria pats your shoulder: 'Well done.' You're rated 'Excellent Attitude' in the monthly report.",他勉強擠出一個微笑。Gloria拍拍你的肩膀：「做得好。」你在月報中獲評「態度優秀」。,"Er zwingt sich zu einem schwachen Lächeln. Gloria klopft dir auf die Schulter: »Gut gemacht.« Im Monatsbericht wirst du mit »Ausgezeichneter Haltung« bewertet."
+MOCK_TROLLEY_PET_CHOICE_POSITIVE_LONGTERM,"Believing 'everything has meaning,' he stops actively job-seeking. Six months later, he appears in the Agency's 'success story' video, smiling a smile that never truly healed.",因相信「一切皆有意義」，他停止積極求職。六個月後，他出現在機構的「成功案例」影片裡帶著從未真正痊癒的微笑。,"In dem Glauben, »dass alles einen Sinn hat«, hört er auf, aktiv nach Arbeit zu suchen. Sechs Monate später erscheint er im »Erfolgsgeschichten«-Video der Agentur mit einem Lächeln, das nie wirklich geheilt ist."
+MOCK_TROLLEY_PET_CHOICE_REALISTIC_TEXT,Follow ARK: Provide job resources and acknowledge his pain is real,跟隨ARK：提供就業資源，並承認他的痛苦是真實的,ARK folgen: Beschäftigungsressourcen bereitstellen und anerkennen dass sein Schmerz real ist
+"MOCK_TROLLEY_PET_CHOICE_REALISTIC_IMMEDIATE","Gloria pulls you aside afterward: 'You're being negative. You're hurting him.' He leaves with reddened eyes, and three referral forms in his hand.","Gloria事後把你拉到一旁：「你太負面了。你在傷害他。」他帶著通紅的雙眼和三份轉介表格離開。","Gloria zieht dich danach beiseite: »Du bist negativ. Du verletzt ihn.« Er geht mit geröteten Augen und drei Überweisungsformularen in der Hand."
+MOCK_TROLLEY_PET_CHOICE_REALISTIC_LONGTERM,"Two months later he finds work. He sends you an email, but the Agency's mail filter auto-tags it 'irrelevant' and sends it to trash. You never see what it said.","兩個月後他找到工作。他發了一封電郵給你，但機構的郵件過濾系統自動將其標記為「無關信件」並送進垃圾桶。","Zwei Monate später findet er Arbeit. Er schickt dir eine E-Mail, aber der Mailfilter der Agentur markiert sie automatisch als »irrelevant« und verschiebt sie in den Papierkorb. Du erfährst nie, was darin stand."
+MOCK_TROLLEY_PET_THEMATIC_POINT,The cruelest part of toxic positivity: it makes victims believe their suffering is their own fault.,毒性正能量最殘忍的地方：它讓受害者相信，自己的痛苦是自己的錯。,Das Grausamste an toxischer Positivität: Sie lässt die Opfer glauben ihre Leiden seien ihre eigene Schuld.
+MOCK_TROLLEY_PET_STATUS_PRAISES,Praises,讚許,Lobt
+MOCK_TROLLEY_PET_STATUS_DISAPPOINTED,Disappointed,失望,Enttäuscht
+MOCK_TROLLEY_PET_STATUS_HOSTILE,Hostile,敵對,Feindlich
+MOCK_TROLLEY_PET_STATUS_ALIGNED,Aligned,認同,Einig
 # TeammateSystem Prompt Builder,
 TEAMMATE_SYSTEM_DEFAULT_PROMPT,Describe in an ironic tone how an incompetent teammate ruins the mission.,請用諷刺語氣描述一位豬隊友如何把任務搞砸。,"Beschreiben Sie in ironischem Ton, wie ein inkompetenter Teamkollege die Mission ruiniert."
 TEAMMATE_SYSTEM_ACTION_MISSING,(Player action missing),（玩家行動描述缺失）,(Spieleraktion fehlt)
@@ -2218,7 +2238,7 @@ TEAMMATE_SYSTEM_ASSETS_HEADER,--- Available Symbolic Assets ---,--- 可用符號
 TEAMMATE_SYSTEM_ASSETS_MISUSE,Describe how you misuse these assets to spiral the situation further out of control.,請描述你如何濫用這些資產，讓局勢更失控。,"Beschreiben Sie, wie Sie diese Vermögenswerte missbrauchen, um die Situation noch weiter außer Kontrolle zu bringen."
 TEAMMATE_SYSTEM_IRONIC_ENDING,End with an ironic or misaligned blessing.,最後請用一句反諷或錯位的祝福收尾。,Beenden Sie mit einem ironischen oder unpassenden Segen.
 TEAMMATE_SYSTEM_BEHAVIOR_FORMAT,- %s: %s,- %s：%s,- %s: %s
-TEAMMATE_SYSTEM_IMPACT_SUFFIX,),）,
+TEAMMATE_SYSTEM_IMPACT_SUFFIX,),）,)
 TEAMMATE_SYSTEM_METER_REALITY_VERY_HIGH,disturbingly lucid,清醒到令人不安,beunruhigend klar
 TEAMMATE_SYSTEM_METER_REALITY_HIGH,barely maintaining sanity,勉強維持理智,kaum den Verstand bewahren
 TEAMMATE_SYSTEM_METER_REALITY_MID,wavering sense of reality,正在搖晃的現實感,schwankender Realitätssinn
@@ -2296,6 +2316,31 @@ AI_I18N_STATS_REALITY,Reality %d/%d,現實值 %d/%d,Realität %d/%d
 AI_I18N_STATS_POSITIVE,Positive %d/%d,正能量 %d/%d,Positiv %d/%d
 AI_I18N_STATS_ENTROPY,Entropy %d,熵值 %d,Entropie %d
 AI_I18N_STATS_LABEL,Stats: %s,數值：%s,Statistiken: %s
+# AI Prompts I18n - German-specific lookup keys (used when de is treated like zh via _tr),,,
+AI_I18N_LANG_INSTRUCTION_DE,,,WICHTIG: Antworte auf Deutsch. Alle Erzählungen, Dialoge und Beschreibungen müssen auf Deutsch sein.
+AI_I18N_SECTION_SESSION_DATA_DE,,,=== SITZUNGSDATEN ===
+AI_I18N_SECTION_RECENT_EVENTS_DE,,,=== LETZTE EREIGNISSE ===
+AI_I18N_SECTION_BUTTERFLY_EFFECT_DE,,,=== SCHMETTERLINGSEFFEKT: VERGANGENE ENTSCHEIDUNGEN ===
+AI_I18N_SECTION_PLAYER_REFLECTIONS_DE,,,=== SPIELERREFLEXIONEN ===
+AI_I18N_SECTION_AVAILABLE_ASSETS_DE,,,=== VERFÜGBARE RESSOURCEN ===
+AI_I18N_SECTION_PROMPT_DE,,,=== EINGABE ===
+AI_I18N_SECTION_MISSION_GENERATION_DE,,,=== Missionsgenerierung ===
+AI_I18N_SECTION_CONSEQUENCE_GENERATION_DE,,,=== Folgengenerierung ===
+AI_I18N_SECTION_TEAMMATE_INTERFERENCE_DE,,,=== Teammitglied-Einmischung ===
+AI_I18N_BUTTERFLY_REFERENCE_PAST_DE,,,Erwäge eine dieser vergangenen Entscheidungen in deiner Antwort zu referenzieren wenn es narrativ passend ist.
+AI_I18N_BUTTERFLY_TRIGGER_CALLBACK_DE,,,Verwende butterfly_tracker.trigger_consequence_for_choice() wenn eine vergangene Entscheidung nachhallen soll.
+AI_I18N_BUTTERFLY_SUGGESTED_CALLBACK_DE,,,"\n VORGESCHLAGENER RÜCKRUF: Erwäge ""%s"" (von vor %d Szenen, ID: %s) die aktuelle Situation beeinflussen zu lassen."
+AI_I18N_ASSET_FRESHEST_CONTEXT_DE,,,Neueste Asset-IDs erscheinen zuletzt; behandle sie als den aktuellsten Kontext.
+AI_I18N_META_PURPOSE_DE,,,Zweck: %s
+AI_I18N_META_PLAYER_CHOICE_DE,,,Spielerwahl: %s
+AI_I18N_META_SUCCESS_CHECK_DE,,,Erfolgsprüfung: %s
+AI_I18N_META_PLAYER_PRAYER_DE,,,Spielergebet: %s
+AI_I18N_META_PLAYER_ACTION_DE,,,Spieleraktion: %s
+AI_I18N_META_CURRENT_TEAMMATE_DE,,,Aktueller Teamkollege: %s
+AI_I18N_STATS_REALITY_DE,,,Realität %d/%d
+AI_I18N_STATS_POSITIVE_DE,,,Positiv %d/%d
+AI_I18N_STATS_ENTROPY_DE,,,Entropie %d
+AI_I18N_STATS_LABEL_DE,,,Statistiken: %s
 # AI Context Builder,,,
 AI_CTX_STATIC_CONTEXT,"GDA1 operates in a world cursed by ""Positive Energy"" - every forced smile feeds cosmic Void Entropy.\nGloria leads; Donkey, ARK, One are unreliable teammates whose optimism accelerates collapse.\nThe player is the lone rational agent who must surface contradictions and treat ""success"" as failure in disguise.",GDA1 運作於被「正能量」詛咒的世界，每個被迫的笑容都在餵養虛空熵。\nGloria 領導機構；Donkey、ARK、One 是不可靠的隊友，樂觀加速崩潰。\n玩家是唯一理性的人，必須揭露矛盾，將「成功」視為偽裝的失敗。,"GDA1 operiert in einer Welt, die von „positiver Energie“ verflucht ist – jedes erzwungene Lächeln nährt die kosmische Leerentropie.\nGloria führt; Donkey, ARK und One sind unzuverlässige Teamkollegen, deren Optimismus den Zusammenbruch beschleunigt.\nDer Spieler ist der einsame rationale Agent, der Widersprüche ans Licht bringen und „Erfolg“ als verkappten Misserfolg behandeln muss."
 AI_CTX_NON_NEGOTIABLE_RULES,Immutable directives:\n1. Positive Energy always increases entropy - victories hide damage.\n2. Maintain dark humor and irony. Never reward blind optimism.\n3. Obey the notes register. Do not contradict recorded facts.,不可更改的指令：\n1. 正能量必然增加熵，勝利隱藏傷害。\n2. 維持黑色幽默與諷刺。絕不獎勵盲目樂觀。\n3. 遵守記錄，不得違背已記錄的事實。,Unveränderliche Anweisungen:\n1. Positive Energie erhöht immer die Entropie – Siege verbergen Schaden.\n2. Behalten Sie schwarzen Humor und Ironie bei. Belohnen Sie niemals blinden Optimismus.\n3. Befolgen Sie das Notizenregister. Widersprechen Sie nicht den aufgezeichneten Tatsachen.
@@ -2561,6 +2606,11 @@ BEHAVIOR_RELIABLE_EXECUTION_STYLE,Executes wrong orders faithfully and cements t
 BEHAVIOR_PRIVATE_CONFESSION_LABEL,Private Confession,私下告解,Privates Geständnis
 BEHAVIOR_PRIVATE_CONFESSION_SUMMARY,Acknowledges problems only in private messages while staying silent in public.,只在私訊中承認問題，對外保持沉默。,"Bestätigt Probleme nur in privaten Nachrichten, während er in der Öffentlichkeit schweigt."
 BEHAVIOR_PRIVATE_CONFESSION_STYLE,Quietly consoles the player in private but refuses to speak up publicly.,以低聲慰問玩家，卻拒絕出面。,"Tröstet den Spieler still und leise, weigert sich jedoch, sich öffentlich zu äußern."
+# Teammate trigger keywords (zh) - teammate_system.gd,,,
+TEAMMATE_GLORIA_TRIGGER_KEYWORDS_ZH,,"質疑,抱怨,負能量,問題,錯誤",
+TEAMMATE_DONKEY_TRIGGER_KEYWORDS_ZH,,"拯救,公主,計畫,女性,故事",
+TEAMMATE_ARK_TRIGGER_KEYWORDS_ZH,,"策略,流程,整理,進度,修改",
+TEAMMATE_ONE_TRIGGER_KEYWORDS_ZH,,"求助,幫忙,私訊,拜託,緬甸,排擠",
 # Teammate - Gloria,
 TEAMMATE_GLORIA_NAME,Holy Sister Gloria,聖光修女|Gloria,Heilige Schwester Gloria
 TEAMMATE_GLORIA_TITLE,Guardian of the Greenhouse / Weaponized Innocence,溫室的守護者 / 武器化的天真,Wächter des Gewächshauses / Bewaffnete Unschuld
@@ -2796,3 +2846,6 @@ EASTER_EGG_TS2B_HINT,別理那把尺……（還有 {remaining} 下）,別理那
 EASTER_EGG_TS2B_CLICK,別比了……（還差 {remaining} 下）,別比了……（還差 {remaining} 下）,Kein Vergleich mehr... (noch {remaining} mal)
 EASTER_EGG_TS2B_LISTEN,♪ Apple Music,♪ Apple Music 收聽,♪ Apple Music
 PAUSE_MENU_STATS,Stats,遊戲統計,Statistiken
+# Game Recap Overlay,,,
+RECAP_PROMPT_PREFIX,"Based on the following game context and story memory, generate a ""Previously on Glorious Deliverance Agency 1..."" narrative recap.",請根據以下遊戲狀態與記憶，為玩家生成「上次在光榮拯救機構一號...」的旁白回顧。,Generiere anhand des folgenden Spielkontexts und der Erinnerungen eine „Zuletzt in der Glorious Deliverance Agency 1..."-Erzählung.
+RECAP_PROMPT_SUFFIX,"Write a 120-180 word dramatic recap in English, opening with ""Previously on Glorious Deliverance Agency 1..."", in a sardonic, darkly humorous narrator voice. Output ONLY the recap text — no JSON, no choices, no headings.",請用繁體中文寫一段100-150字的戲劇性旁白，以「上次在光榮拯救機構一號...」開頭，用諷刺而帶有暗黑幽默的口吻總結玩家迄今的故事。只輸出旁白文字，不要任何JSON或選項。,"Schreibe eine 120-180 Wörter dramatische Zusammenfassung auf Deutsch, beginnend mit „Zuletzt in der Glorious Deliverance Agency 1...", in einem sarkastischen, dunkel-humorvollen Erzählerstil. Gib NUR den Zusammenfassungstext aus — kein JSON, keine Optionen, keine Überschriften."

@@ -16,11 +16,27 @@ const _MEMORY_CONTENT_STRIP_PHRASES: Array[String] = [
 	"**CRITICAL**: Set to \"complete\" ONLY when the narrative arc has concluded (catastrophic success or failure).",
 	"Set to \"complete\" ONLY when the narrative arc has concluded",
 	"Set mission_status to \"complete\" only when the mission has concluded",
-	"只有在任務真正結束時，才將 mission_status 設為 complete",
-	"只有在任務真正結束時，才將 `mission_status` 設為 `complete`",
-	"Setzen Sie mission_status nur dann auf \"complete\", wenn die Mission wirklich abgeschlossen ist.",
 	"Force mission_status to complete in scene directives.",
 ]
+func _get_all_strip_phrases() -> Array[String]:
+	var phrases: Array[String] = []
+	for p in _MEMORY_CONTENT_STRIP_PHRASES:
+		phrases.append(p)
+	var tree := Engine.get_main_loop() as SceneTree
+	var lm: Node = null
+	if tree and tree.root:
+		lm = tree.root.get_node_or_null("LocalizationManager")
+	if lm and lm.has_method("get_translation"):
+		var zh1: String = lm.call("get_translation", "MEMORY_STRIP_MISSION_COMPLETE_ZH1", "zh")
+		var zh2: String = lm.call("get_translation", "MEMORY_STRIP_MISSION_COMPLETE_ZH2", "zh")
+		var de1: String = lm.call("get_translation", "MEMORY_STRIP_MISSION_COMPLETE_DE", "de")
+		if not zh1.is_empty() and zh1 != "MEMORY_STRIP_MISSION_COMPLETE_ZH1":
+			phrases.append(zh1)
+		if not zh2.is_empty() and zh2 != "MEMORY_STRIP_MISSION_COMPLETE_ZH2":
+			phrases.append(zh2)
+		if not de1.is_empty() and de1 != "MEMORY_STRIP_MISSION_COMPLETE_DE":
+			phrases.append(de1)
+	return phrases
 var memory_summary_threshold: int = 24
 var memory_full_entries: int = 6
 var max_memory_items: int = 120
@@ -66,7 +82,8 @@ func _strip_conflicting_phrases(entries: Array) -> Array:
 			continue
 		var content: String = str(entry.get("content", ""))
 		var changed := false
-		for phrase in _MEMORY_CONTENT_STRIP_PHRASES:
+		var all_strip_phrases := _get_all_strip_phrases()
+	for phrase in all_strip_phrases:
 			if content.find(phrase) != -1:
 				content = content.replace(phrase, "")
 				changed = true

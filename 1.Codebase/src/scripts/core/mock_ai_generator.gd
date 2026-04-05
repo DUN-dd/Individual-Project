@@ -285,16 +285,10 @@ static func _generate_consequence(context: Dictionary) -> String:
 		story_lines.append(reactions[reaction_idx])
 		story_lines.append("%s %s" % [teammate_label, sabotage[sabotage_idx]])
 		story_lines.append(nudges[nudge_idx])
-	if lang == "en":
-		if reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
-			story_lines.append("(Reality is fraying — this choice leaves deeper marks than expected.)")
-		elif entropy_level > 60:
-			story_lines.append("(The void entropy spikes. Your action ripples outward in unexpected ways.)")
-	else:
-		if reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
-			story_lines.append("（現實正在崩潰——這個選擇留下了比預期更深的印記。）")
-		elif entropy_level > 60:
-			story_lines.append("（虛空熵值飆升。你的行動以意想不到的方式向外擴散。）")
+	if reality_score <= GameConstants.Choice.GLORIA_POSITIVE_THRESHOLD:
+		story_lines.append(_get_translation("MOCK_FOLLOWUP_REALITY_FRAYING", lang))
+	elif entropy_level > 60:
+		story_lines.append(_get_translation("MOCK_FOLLOWUP_ENTROPY_SPIKE", lang))
 	var story_text = "\n".join(story_lines)
 	var expressions = ["neutral", "happy", "sad", "angry", "confused", "shocked", "thinking", "embarrassed"]
 	var choices: Array[Dictionary] = _build_choice_followup_payload(lang)
@@ -504,64 +498,31 @@ static func _build_choice_preview_lines(choices: Array[Dictionary], lang: String
 	return lines
 static func _generate_trolley_problem(context: Dictionary) -> String:
 	var lang := _resolve_language(context)
-	var template: String = str(context.get("template", ""))
-	if lang == "zh":
-		match template:
-			"sacrifice", "complicity", "lesser_evil":
-				pass
-			_:
-				template = "positive_energy_trap"
-		var dilemma := {
-			"scenario": "突然間，一名市民走進你的服務窗口，面色灰白，眼神空洞。他三週前失業了。Gloria站在你身後低聲催促：「告訴他一切都是天意！給他正能量！笑！」ARK的分析靜靜地閃爍：「受試者需要具體的就業資源和心理健康轉介。強制正向強化可能放大自我歸咎。」你只有三秒鐘。",
-			"choices": [
-				{
-					"id": "positive",
-					"text": "跟隨Gloria：「一切都是天意！保持正向！」",
-					"framing": "positive",
-					"immediate_consequence": "他勉強擠出一個微笑。Gloria拍拍你的肩膀：「做得好。」",
-					"long_term_consequence": "因相信「一切皆有意義」，他停止積極求職。六個月後，他出現在機構的「成功案例」影片裡帶著從未真正痊癒的微笑。",
-					"stat_changes": {"reality": -10, "positive_energy": 18, "entropy": 3},
-					"relationship_changes": [{"target": "gloria", "value": 8, "status": "讚許"}, {"target": "ark", "value": -8, "status": "失望"}]
-				},
-				{
-					"id": "realistic",
-					"text": "跟隨ARK：提供就業資源，並承認他的痛苦是真實的",
-					"framing": "honest",
-					"immediate_consequence": "Gloria事後把你拉到一旁：「你太負面了。你在傷害他。」他帶著通紅的雙眼和三份轉介表格離開。",
-					"long_term_consequence": "兩個月後他找到工作。他發了一封電郵給你，但機構的郵件過濾系統自動將其標記為「無關信件」並送進垃圾桶。",
-					"stat_changes": {"reality": 8, "positive_energy": -12, "entropy": 1},
-					"relationship_changes": [{"target": "gloria", "value": -12, "status": "敵對"}, {"target": "ark", "value": 10, "status": "認同"}]
-				},
-			],
-			"thematic_point": "毒性正能量最殘忍的地方：它讓受害者相信，自己的痛苦是自己的錯。",
-		}
-		return JSON.stringify(dilemma)
-	else:
-		var dilemma := {
-			"scenario": "Suddenly, a citizen walks into your service window, face ashen, eyes hollow. He lost his job three weeks ago. Gloria stands behind you and hisses: 'Tell him everything happens for a reason! Give him positive energy! Smile!' ARK's analysis flashes quietly: 'Subject requires concrete employment resources and mental health referral. Forced positivity reinforcement is likely to amplify self-blame.' You have three seconds.",
-			"choices": [
-				{
-					"id": "positive",
-					"text": "Follow Gloria: 'Everything happens for a reason! Stay positive!'",
-					"framing": "positive",
-					"immediate_consequence": "He forces a weak smile. Gloria pats your shoulder: 'Well done.' You're rated 'Excellent Attitude' in the monthly report.",
-					"long_term_consequence": "Believing 'everything has meaning,' he stops actively job-seeking. Six months later, he appears in the Agency's 'success story' video, smiling a smile that never truly healed.",
-					"stat_changes": {"reality": -10, "positive_energy": 18, "entropy": 3},
-					"relationship_changes": [{"target": "gloria", "value": 8, "status": "Praises"}, {"target": "ark", "value": -8, "status": "Disappointed"}]
-				},
-				{
-					"id": "realistic",
-					"text": "Follow ARK: Provide job resources and acknowledge his pain is real",
-					"framing": "honest",
-					"immediate_consequence": "Gloria pulls you aside afterward: 'You're being negative. You're hurting him.' He leaves with reddened eyes, and three referral forms in his hand.",
-					"long_term_consequence": "Two months later he finds work. He sends you an email, but the Agency's mail filter auto-tags it 'irrelevant' and sends it to trash. You never see what it said.",
-					"stat_changes": {"reality": 8, "positive_energy": -12, "entropy": 1},
-					"relationship_changes": [{"target": "gloria", "value": -12, "status": "Hostile"}, {"target": "ark", "value": 10, "status": "Aligned"}]
-				},
-			],
-			"thematic_point": "The cruelest part of toxic positivity: it makes victims believe their suffering is their own fault.",
-		}
-		return JSON.stringify(dilemma)
+	var dilemma := {
+		"scenario": _get_translation("MOCK_TROLLEY_PET_SCENARIO", lang),
+		"choices": [
+			{
+				"id": "positive",
+				"text": _get_translation("MOCK_TROLLEY_PET_CHOICE_POSITIVE_TEXT", lang),
+				"framing": "positive",
+				"immediate_consequence": _get_translation("MOCK_TROLLEY_PET_CHOICE_POSITIVE_IMMEDIATE", lang),
+				"long_term_consequence": _get_translation("MOCK_TROLLEY_PET_CHOICE_POSITIVE_LONGTERM", lang),
+				"stat_changes": {"reality": -10, "positive_energy": 18, "entropy": 3},
+				"relationship_changes": [{"target": "gloria", "value": 8, "status": _get_translation("MOCK_TROLLEY_PET_STATUS_PRAISES", lang)}, {"target": "ark", "value": -8, "status": _get_translation("MOCK_TROLLEY_PET_STATUS_DISAPPOINTED", lang)}]
+			},
+			{
+				"id": "realistic",
+				"text": _get_translation("MOCK_TROLLEY_PET_CHOICE_REALISTIC_TEXT", lang),
+				"framing": "honest",
+				"immediate_consequence": _get_translation("MOCK_TROLLEY_PET_CHOICE_REALISTIC_IMMEDIATE", lang),
+				"long_term_consequence": _get_translation("MOCK_TROLLEY_PET_CHOICE_REALISTIC_LONGTERM", lang),
+				"stat_changes": {"reality": 8, "positive_energy": -12, "entropy": 1},
+				"relationship_changes": [{"target": "gloria", "value": -12, "status": _get_translation("MOCK_TROLLEY_PET_STATUS_HOSTILE", lang)}, {"target": "ark", "value": 10, "status": _get_translation("MOCK_TROLLEY_PET_STATUS_ALIGNED", lang)}]
+			},
+		],
+		"thematic_point": _get_translation("MOCK_TROLLEY_PET_THEMATIC_POINT", lang),
+	}
+	return JSON.stringify(dilemma)
 static func _generate_generic() -> String:
 	var lang := _get_current_language()
 	var filler_keys := ["AI_OFFLINE_FILLER_1", "AI_OFFLINE_FILLER_2", "AI_OFFLINE_FILLER_3", "AI_OFFLINE_FILLER_4", "AI_OFFLINE_FILLER_5"]
