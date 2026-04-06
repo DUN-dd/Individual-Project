@@ -132,7 +132,7 @@ func _apply_panel_styling() -> void:
 	var backdrop = ColorRect.new()
 	backdrop.color = Color(0.0, 0.0, 0.0, 0.55)
 	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
-	backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(backdrop)
 	move_child(backdrop, 0)
 	var panel = $Panel
