@@ -65,6 +65,37 @@ Ein frommer Glaeubiger, zu dessen Schlagwoertern "Vertraue dem Goettlichen" und 
 **Schwaeche**:
 - **Realitaetsschock**: Angst vor direkten, ungefilterten Konflikten.
 
+**Lebenslauf (Selbstdeklariert)**:
+
+Vor der Apokalypse hielt Gloria zwei Positionen, die sie als ihre eindrucksvollsten Referenzen betrachtet:
+
+**Vorsitzende — Heiliges Anstandsüberwachungskorps, FSM-Akademie des Heiligen Lichts**
+*Offizielle Beschreibung*: Leitete Ausschussmitglieder, gab Arbeitsanweisungen, überwachte und koordinierte Programme für 200 Studierende, löste Teamkonflikte, trieb Mitglieder auf gemeinsame Ziele zu, und stärkte schulweite Kommunikation und Unterstützung.
+*Was das tatsächlich bedeutet*: Sie führte ein Schüler-Verhaltensüberwachungsnetzwerk — ein Gremium, das sich als Anstandschampion positionierte, während es systematisch überwachte, ob Studierende dem "korrekten" Verhalten entsprachen. "Höflichkeit fördern" war operativ nicht von "Abweichler melden" zu unterscheiden. Sie hatte die institutionelle Autorität, zu definieren, wie Anstand aussieht, und ihn dann durchzusetzen.
+
+**Leiterin — Propaganda- und Gehirnwäsche-Abteilung (洗腦宣傳部), FSM-Campusabteilung**
+*Offizielle Beschreibung*: Nutzte Designfähigkeiten für Plakate, Pressemitteilungen und Social-Media-Inhalte für das FSM; entwickelte und führte Kampagnenpläne durch; sorgte für klare Kommunikation; förderte Teamzusammenhalt; verwaltete Teamstreitigkeiten; trieb Mitglieder zur Erreichung kollektiver Ziele an.
+*Was das tatsächlich bedeutet*: Groß angelegte ideologische Konditionierung. Sie verpackte FSM-Doktrin in ästhetisch ansprechende Inhalte — Plakate, Bildunterschriften, "Bewusstseinskampagnen" — die Hunderte absorbierten, ohne zu merken, dass sie rekrutiert wurden. Jeder Slogan, jede "ermutigende" Grafik, die dazu entwickelt wurde, das FSM unvermeidlich und gut erscheinen zu lassen, war ihre Schöpfung.
+
+**Der Kern der Ironie**:
+Glorias Lebenslauf beansprucht Expertise in:
+- "Teamkonflikten bewältigen"
+- "Zusammenarbeit für gemeinsame Ziele fördern"
+- "Kommunikation und Unterstützung stärken"
+- "Alle Parteien koordinieren"
+- 200 Studierende in angemessenem Verhalten anleiten
+
+Glorias tatsächliche Bilanz:
+- Duldete Gruppenchat-Diskussionen auf Deutsch und löschte ONE stillschweigend aus jedem Schlüsselgespräch
+- Nutzte ONEs höfliche Geste als Schutzschild gegen die legitimen Beschwerden des Protagonisten
+- Setzte die persönliche Traumageschichte des Protagonisten als Angriffsmunition ein
+- Verwarf zwei Monate emotionalen Tiefpunkts mit "was bringt es, über den Ausschluss durch Mitschüler zu reden"
+- Schrieb den gesamten emotionalen Tiefpunkt des Protagonisten Duncan zu
+
+Das Gremium, das ihren Namen trug, existierte genau dafür, zu verhindern, was sie ONE antat.
+
+Sie ist nicht nur eine Heuchlerin. Sie ist etwas Präziseres: eine Person, die institutionelle moralische Autorität aufbaute, um sicherzustellen, dass sie diese Moralstandards nie auf sich selbst anwenden müsste.
+
 **Charaktermerkmal**:
 Sie spricht oft, als ob sie glaubt, dass sie sich auf moralischer Hoehe befindet, aber in Wirklichkeit ist sie das nicht.
 

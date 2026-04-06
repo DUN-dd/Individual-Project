@@ -65,6 +65,37 @@ A devout believer whose catchphrases include "Entrust to the Divine" and "Gratit
 **Weakness**:
 - **Reality Shock**: Fear of direct, unfiltered conflict.
 
+**Curriculum Vitae (Self-Proclaimed)**:
+
+Before the apocalypse, Gloria held two positions she considers her most impressive credentials:
+
+**Chairperson — Sacred Propriety Inspection Corps, FSM Academy of Sacred Light**
+*Official description*: Led committee members, provided work directives, oversaw and coordinated programmes covering 200 students, resolved team conflicts, drove members toward shared goals, and strengthened school-wide communication and support.
+*What this actually means*: She ran a student behavioural surveillance network — a body that positioned itself as an etiquette champion while systematically monitoring whether students conformed to "correct" conduct. "Promoting civility" was operationally indistinguishable from "reporting on those who deviated". She had the institutional authority to define what civility looked like, and then enforce it.
+
+**Head — Propaganda & Brainwashing Division (洗腦宣傳部), FSM Campus Chapter**
+*Official description*: Applied design skills to produce posters, press releases and social media content for the FSM; developed and executed campaign plans; ensured clear communication; fostered team cohesion; managed team disputes; drove members to achieve collective goals.
+*What this actually means*: Large-scale ideological conditioning. She packaged FSM doctrine into aesthetically pleasing content — posters, captions, "awareness campaigns" — that hundreds absorbed without realising they were being recruited. Every slogan, every "uplifting" graphic, every caption engineered to make the FSM feel inevitable and good, was her creation.
+
+**The Core Irony**:
+Gloria's CV claims expertise in:
+- "Handling team conflict"
+- "Promoting cooperation toward shared goals"
+- "Strengthening communication and support"
+- "Coordinating all parties"
+- Leading 200 students in proper conduct
+
+Gloria's actual track record:
+- Permitted group chat discussions in German, silently erasing ONE from every key conversation
+- Weaponized ONE's own polite courtesy as a shield against the protagonist's legitimate grievances
+- Deployed the protagonist's personal trauma history as attack ammunition
+- Dismissed two months of emotional suffering as "what's the point of dwelling on being excluded by classmates"
+- Attributed the protagonist's entire emotional low point to Duncan
+
+The committee that bore her name existed to prevent exactly what she was doing to ONE.
+
+She is not merely a hypocrite. She is something more precise: a person who built institutional moral authority specifically so she would never have to apply it to herself.
+
 **Character Trait**:
 She often speaks as though she believes she is on the moral high ground, but in fact she is not.
 
