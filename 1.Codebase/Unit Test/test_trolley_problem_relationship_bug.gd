@@ -86,7 +86,7 @@ func test_reproduction():
 				g_to_p["player"]["status"] = "Neutral"
 	var initial_gloria_value: int = 0
 	if teammate_system and teammate_system.has_method("get_relationships_for"):
-		var before_g := teammate_system.get_relationships_for("gloria")
+		var before_g: Dictionary = teammate_system.get_relationships_for("gloria")
 		if before_g.has("player") and before_g["player"] is Dictionary:
 			initial_gloria_value = int(before_g["player"].get("value", 0))
 	generator.resolve_dilemma("choice_1")
