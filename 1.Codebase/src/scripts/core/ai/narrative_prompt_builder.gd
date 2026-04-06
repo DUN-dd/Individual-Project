@@ -90,9 +90,9 @@ static func _build_stats_snapshot(game_state: Variant) -> String:
 		game_state.entropy_level,
 	]
 static func _build_json_schema(lang: String) -> String:
-	var cautious_preview_label := _s_tr("ARCHETYPE_LABEL_CAUTIOUS", lang)
-	if lang.to_lower().begins_with("de"):
-		cautious_preview_label = "[Vorsichtig]"
+	var cautious_preview_label := _s_tr("CHOICE_PREVIEW_LABEL_CAUTIOUS", lang)
+	if cautious_preview_label == "CHOICE_PREVIEW_LABEL_CAUTIOUS":
+		cautious_preview_label = _s_tr("ARCHETYPE_LABEL_CAUTIOUS", lang)
 	var preview_labels := {
 		"cautious": cautious_preview_label,
 		"balanced": _s_tr("ARCHETYPE_LABEL_BALANCED", lang),

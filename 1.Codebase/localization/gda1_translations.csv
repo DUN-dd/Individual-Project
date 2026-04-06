@@ -1934,6 +1934,7 @@ PRAYER_POSITIVE_WORD_6,Gratitude,感恩,Dankbarkeit
 PRAYER_POSITIVE_WORD_7,Optimism,樂觀,Optimismus
 # Narrative Prompt Builder - Archetype Labels,,,
 ARCHETYPE_LABEL_CAUTIOUS,[Cautious],[謹慎],[Zurückhaltend]
+CHOICE_PREVIEW_LABEL_CAUTIOUS,[Cautious],[謹慎],[Vorsichtig]
 ARCHETYPE_LABEL_BALANCED,[Balanced],[權衡],[Ausgewogen]
 ARCHETYPE_LABEL_RECKLESS,[Reckless],[瘋狂],[Rücksichtslos]
 ARCHETYPE_LABEL_POSITIVE,[Positive],[樂觀],[Positiv]

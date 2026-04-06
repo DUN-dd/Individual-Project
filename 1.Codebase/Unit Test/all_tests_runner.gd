@@ -86,7 +86,7 @@ func _discover_test_files(base_path: String) -> Array[String]:
 	var files: Array[String] = []
 	var dir := DirAccess.open(base_path)
 	if dir == null:
-		push_warning("all_tests_runner: cannot open '%s'" % base_path)
+		_warn("cannot open '%s'" % base_path)
 		return files
 	dir.list_dir_begin()
 	var entry := dir.get_next()
@@ -102,11 +102,11 @@ func _discover_test_files(base_path: String) -> Array[String]:
 func _run_test_file(path: String) -> void:
 	var TestClass = load(path)
 	if TestClass == null:
-		push_warning("all_tests_runner: cannot load '%s'" % path)
+		_warn("cannot load '%s'" % path)
 		return
 	var created_instance: Variant = TestClass.new()
 	if not (created_instance is Node):
-		push_warning("all_tests_runner: skipping non-Node suite '%s'" % path)
+		_warn("skipping non-Node suite '%s'" % path)
 		return
 	var inst: Node = created_instance
 	inst.tree_exiting.connect(_capture_suite_result.bind(inst))
@@ -122,7 +122,7 @@ func _run_test_file(path: String) -> void:
 	_watchdog.timeout.connect(func():
 		if is_instance_valid(inst) and inst.is_inside_tree():
 			_timed_out = true
-			push_warning("all_tests_runner: suite '%s' timed out after %.0fs — force-killing" \
+			_warn("suite '%s' timed out after %.0fs — force-killing" \
 					% [path.get_file(), SUITE_TIMEOUT_SEC])
 			inst.queue_free()
 	)
@@ -412,3 +412,6 @@ func _prepare_for_shutdown() -> void:
 		AIManager.last_prompt_metrics = {}
 	if GameState and GameState.has_method("clear_all_debuffs"):
 		GameState.clear_all_debuffs()
+func _warn(message: String, details: Dictionary = { }) -> void:
+	if ErrorReporter != null and ErrorReporter.has_method("report_warning"):
+		ErrorReporter.report_warning("all_tests_runner", message, details)
