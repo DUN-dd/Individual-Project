@@ -113,6 +113,7 @@ func _run_test_file(path: String) -> void:
 	add_child.call_deferred(inst)
 	await inst.tree_entered
 	if not is_instance_valid(inst) or not inst.is_inside_tree():
+		_warn("suite '%s' did not enter tree; skipping execution" % path.get_file())
 		return
 	var tree := get_tree()
 	if tree == null:
