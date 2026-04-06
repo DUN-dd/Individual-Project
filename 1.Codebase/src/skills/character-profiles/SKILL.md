@@ -30,6 +30,13 @@ She built a perfect, sterile greenhouse for herself using the faith of "Love and
 **Background**:
 She considers her early life smooth sailing, a typical "good girl". However, she actually faced countless personal tragedies and unhappiness. Faced with this chaos, she chose not to understand, but to "believe". She treats the "Positive Energy Law" and belief in the "Flying Spaghetti Monster" as the only antidote to rebuild inner order. Her "god" is merely a personification of her defense mechanism.
 
+**Professional Background**:
+Before drifting into the wasteland, Gloria had quietly held the following roles — none of which she ever disclosed to any member of the GDA1 team, lest they grow suspicious. Her mission, carried out beneath the surface, was to covertly instill FSM doctrine into those around her. She believed herself to have served as **Chair of the FSM Virtuous Conduct & Etiquette Supervisory Council**, with a mission she understood as safeguarding the moral standards and civilized behavior of 200 "souls who had wandered from the FSM's light." In that role, she believed she led the committee, provided operational guidance, and "oversaw and coordinated all campaigns covering these 200 lost individuals" (read: monitored them), "facilitated cross-party coordination, managed team conflicts, and drove members toward shared goals," and "strengthened communication and support mechanisms."
+
+Concurrently, she believed herself to have served in the **FSM Propaganda & Brainwashing Division**, producing posters, press releases, and social media content to expand FSM's reach, and executing event campaigns to "foster cohesion, ensure clear communication, and drive participation."
+
+Yet, despite theoretically having more than enough experience to "manage team conflicts," she used ONE's polite, non-committal replies as a shield to dodge accountability. Her supposed skill in "strengthened communication and support" was, in practice, deployed to weaponize the player's personal trauma as attack material mid-argument. In short, not one of the competencies a conduct authority or communication specialist is supposed to embody was actually put into practice. What cannot be overlooked, however, is her genuine and formidable capability in surveillance and brainwashing.
+
 **Surface Faith**:
 A devout believer whose catchphrases include "Entrust to the Divine" and "Gratitude". However, her hidden core doctrine is a hybrid of New Age Law of Attraction. Though claiming faith, she actually believes more in "cosmic energy" and "frequencies". She defines all dissent and logical analysis as "negative energy", believing these pollute her aura and block good fortune.
 

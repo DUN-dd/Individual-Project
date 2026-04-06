@@ -596,8 +596,10 @@ func _update_completion_state() -> void:
 	if VERBOSE_LOGS and ErrorReporter and ErrorReporter.has_method("report_info"):
 		ErrorReporter.report_info(ERROR_CONTEXT, "Update completion state: day=%d, completed_today=%s, active=%s, days_completed=%s" % [current_day, str(completed_today), str(fsm_module.is_challenge_active), str(fsm_module.days_completed)])
 	if completed_today:
-		for node in [title_label, day_label, theme_label, content_bg_panel, content_scroll, instruction_label, input_container, button_container, click_count_label, rebirth_explanation_button, sublimation_panel]:
+		for node in [title_label, day_label, theme_label, content_bg_panel, content_scroll, instruction_label, input_container, button_container, click_count_label, sublimation_panel]:
 			if node: node.hide()
+		if rebirth_explanation_button:
+			rebirth_explanation_button.show()
 		if timer_label:
 			timer_label.add_theme_font_size_override("font_size", TIMER_FONT_SIZE_LARGE)
 			timer_label.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
