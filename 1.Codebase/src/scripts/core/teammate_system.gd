@@ -98,7 +98,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_GLORIA_PERSONA"),
 			"color":   Color(1.0, 0.902, 0.702, 1.0),
 			"base_chance": 0.35,
-			"trigger_keywords": _tr("TEAMMATE_GLORIA_KEYWORDS").split(","),
+			"trigger_keywords": Array(_tr("TEAMMATE_GLORIA_KEYWORDS").split(",")),
 			"trigger_rules": {
 				"complaint_counter_min": 2,
 				"reality_score_max":     65,
@@ -123,7 +123,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_DONKEY_PERSONA"),
 			"color":   Color(0.8, 0.6, 0.302, 1.0),
 			"base_chance": 0.4,
-			"trigger_keywords": _tr("TEAMMATE_DONKEY_KEYWORDS").split(","),
+			"trigger_keywords": Array(_tr("TEAMMATE_DONKEY_KEYWORDS").split(",")),
 			"trigger_rules": {
 				"logic_success_only":  true,
 				"positive_energy_max": 75,
@@ -146,7 +146,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_ARK_PERSONA"),
 			"color":   Color(0.502, 0.502, 0.702, 1.0),
 			"base_chance": 0.32,
-			"trigger_keywords": _tr("TEAMMATE_ARK_KEYWORDS").split(","),
+			"trigger_keywords": Array(_tr("TEAMMATE_ARK_KEYWORDS").split(",")),
 			"trigger_rules": {
 				"reality_score_min":  30,
 				"positive_energy_min": 20,
@@ -169,7 +169,7 @@ func _build_default_data() -> void:
 			"persona": _tr("TEAMMATE_ONE_PERSONA"),
 			"color":   Color(0.6, 0.702, 0.6, 1.0),
 			"base_chance": 0.1,
-			"trigger_keywords": _tr("TEAMMATE_ONE_KEYWORDS").split(","),
+			"trigger_keywords": Array(_tr("TEAMMATE_ONE_KEYWORDS").split(",")),
 			"trigger_rules": {
 				"reality_score_max":    55,
 				"positive_energy_max":  45,

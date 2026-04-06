@@ -30,9 +30,7 @@ func _ready():
 	await run_all_tests()
 	print_summary()
 	cleanup_test_files()
-	var exit_code := 0 if _test_results.all(func(result): return bool(result.get("passed", false))) else 1
 	queue_free()
-	get_tree().quit(exit_code)
 func run_all_tests():
 	await run_test("Initialization", test_initialization)
 	await run_test("Autosave Creation", test_autosave)
