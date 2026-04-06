@@ -59,6 +59,10 @@ func get_service(name: String) -> Variant:
 		var root := get_tree().root
 		if root == null:
 			return null
+		var existing_service := root.get_node_or_null(name)
+		if existing_service != null:
+			register_service(name, existing_service)
+			return existing_service
 		var created_service: Variant = _ensure_service_instance(name, root)
 		if created_service == null:
 			return null

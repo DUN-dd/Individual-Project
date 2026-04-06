@@ -75,15 +75,18 @@ func _run_all_tests() -> void:
 			"category": category,
 		})
 	_print_final_summary(total_suites)
-	await get_tree().create_timer(0.2).timeout
+	var tree := get_tree()
+	if tree:
+		await tree.create_timer(0.2).timeout
 	_prepare_for_shutdown()
 	Engine.print_error_messages = false
-	get_tree().quit(0 if _total_failed == 0 else 1)
+	if tree:
+		tree.quit(0 if _total_failed == 0 else 1)
 func _discover_test_files(base_path: String) -> Array[String]:
 	var files: Array[String] = []
 	var dir := DirAccess.open(base_path)
 	if dir == null:
-		push_warning("all_tests_runner: cannot open '%s'" % base_path)
+		_warn("cannot open '%s'" % base_path)
 		return files
 	dir.list_dir_begin()
 	var entry := dir.get_next()
@@ -99,17 +102,28 @@ func _discover_test_files(base_path: String) -> Array[String]:
 func _run_test_file(path: String) -> void:
 	var TestClass = load(path)
 	if TestClass == null:
-		push_warning("all_tests_runner: cannot load '%s'" % path)
+		_warn("cannot load '%s'" % path)
 		return
-	var inst: Node = TestClass.new()
+	var created_instance: Variant = TestClass.new()
+	if not (created_instance is Node):
+		_warn("skipping non-Node suite '%s'" % path)
+		return
+	var inst: Node = created_instance
 	inst.tree_exiting.connect(_capture_suite_result.bind(inst))
-	add_child(inst)
+	add_child.call_deferred(inst)
+	await inst.tree_entered
+	if not is_instance_valid(inst) or not inst.is_inside_tree():
+		_warn("suite '%s' did not enter tree; skipping execution" % path.get_file())
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
 	var _timed_out := false
-	var _watchdog := get_tree().create_timer(SUITE_TIMEOUT_SEC)
+	var _watchdog := tree.create_timer(SUITE_TIMEOUT_SEC)
 	_watchdog.timeout.connect(func():
 		if is_instance_valid(inst) and inst.is_inside_tree():
 			_timed_out = true
-			push_warning("all_tests_runner: suite '%s' timed out after %.0fs — force-killing" \
+			_warn("suite '%s' timed out after %.0fs — force-killing" \
 					% [path.get_file(), SUITE_TIMEOUT_SEC])
 			inst.queue_free()
 	)
@@ -399,3 +413,6 @@ func _prepare_for_shutdown() -> void:
 		AIManager.last_prompt_metrics = {}
 	if GameState and GameState.has_method("clear_all_debuffs"):
 		GameState.clear_all_debuffs()
+func _warn(message: String, details: Dictionary = { }) -> void:
+	if ErrorReporter != null and ErrorReporter.has_method("report_warning"):
+		ErrorReporter.report_warning("all_tests_runner", message, details)
