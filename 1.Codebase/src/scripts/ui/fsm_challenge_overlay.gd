@@ -56,8 +56,8 @@ const TIMER_FONT_SIZE_LARGE := 26
 @onready var invitation_teacher: TextureRect = $InvitationPanel/MarginContainer/VBoxContainer/Images/TeacherChanImage
 @onready var crash_panel: Panel = $CrashPanel
 @onready var crash_back_button: Button = $CrashPanel/MarginContainer/VBoxContainer/BackButton
-@onready var crash_icon: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashIcon
-@onready var crash_footer: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashFooter
+@onready var crash_icon: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashTextBg/InnerMargin/InnerVBox/CrashIcon
+@onready var crash_footer: Label = $CrashPanel/MarginContainer/VBoxContainer/CrashTextBg/InnerMargin/InnerVBox/CrashFooter
 @onready var crash_video_btn: TextureButton = $CrashPanel/VideoIconBtn
 var current_day: int = 1
 var click_count: int = 0
@@ -204,12 +204,12 @@ func _setup_ui() -> void:
 		completion_container.hide()
 	if crash_panel:
 		_setup_crash_panel_style()
-		var crash_title = crash_panel.get_node_or_null("MarginContainer/VBoxContainer/CrashTitle")
+		var crash_title = crash_panel.get_node_or_null("MarginContainer/VBoxContainer/CrashTextBg/InnerMargin/InnerVBox/CrashTitle")
 		if crash_title:
 			crash_title.text = _tr("FSM_CHALLENGE_CRASH_TITLE")
 			crash_title.add_theme_font_size_override("font_size", 32)
 			crash_title.add_theme_color_override("font_color", Color(1, 0.3, 0.3))
-		var crash_content = crash_panel.get_node_or_null("MarginContainer/VBoxContainer/CrashContent")
+		var crash_content = crash_panel.get_node_or_null("MarginContainer/VBoxContainer/CrashTextBg/InnerMargin/InnerVBox/CrashContent")
 		if crash_content:
 			crash_content.text = _tr("FSM_CHALLENGE_CRASH_CONTENT")
 			crash_content.add_theme_font_size_override("normal_font_size", 18)
@@ -1038,6 +1038,20 @@ func _setup_crash_panel_style() -> void:
 	crash_style.shadow_color = Color(1, 0, 0, 0.15)
 	crash_style.shadow_size = 20
 	crash_panel.add_theme_stylebox_override("panel", crash_style)
+	var crash_text_bg = crash_panel.get_node_or_null("MarginContainer/VBoxContainer/CrashTextBg")
+	if crash_text_bg:
+		var text_bg_style := StyleBoxFlat.new()
+		text_bg_style.bg_color = Color(0.05, 0.02, 0.02, 0.78)
+		text_bg_style.corner_radius_top_left = 10
+		text_bg_style.corner_radius_top_right = 10
+		text_bg_style.corner_radius_bottom_left = 10
+		text_bg_style.corner_radius_bottom_right = 10
+		text_bg_style.border_width_top = 1
+		text_bg_style.border_width_bottom = 1
+		text_bg_style.border_width_left = 1
+		text_bg_style.border_width_right = 1
+		text_bg_style.border_color = Color(0.8, 0.6, 0.0, 0.25)
+		crash_text_bg.add_theme_stylebox_override("panel", text_bg_style)
 func _animate_invitation_images() -> void:
 	var images: Array = [invitation_happy, invitation_fsm_image, invitation_sad, invitation_teacher]
 	var delay := 0.0
