@@ -2862,5 +2862,7 @@ RECAP_PROMPT_SUFFIX,"Write a 120-180 word dramatic recap in English, opening wit
 DIALECTIC_VIDEO_TOOLTIP,Watch a related video,觀看相關影片,Verwandtes Video ansehen
 DIALECTIC_VIDEO_CHANNEL,大問題Dialectic,大問題Dialectic,大問題Dialectic
 DIALECTIC_VIDEO_TITLE,"When truth is unbearably cruel, should we still believe? How to self-gaslight?",當真相無比殘酷，我們還應該相信嗎？如何進行自我PUA？,"Wenn die Wahrheit unerträglich grausam ist, sollten wir noch glauben? Wie betreibt man Selbst-Gaslighting?"
-DIALECTIC_VIDEO_DESC,Click the button below to open this video in your browser.,點擊下方按鈕，在瀏覽器中開啟這條影片。,Klicken Sie auf die Schaltfläche unten, um dieses Video im Browser zu öffnen.
+DIALECTIC_VIDEO_DESC,"Click the button below to open this video in your browser. (Note: This video is in Chinese only — no English or German version is available.)","點擊下方按鈕，在瀏覽器中開啟這條影片。（注意：此影片僅有中文版本，目前無德文或英文版。）","Klicken Sie auf die Schaltfläche unten, um dieses Video im Browser zu öffnen. (Hinweis: Dieses Video ist nur auf Chinesisch verfügbar — keine deutsche oder englische Version vorhanden.)"
+DIALECTIC_VIDEO_BTN_HINT,Hmm... ({remaining} clicks remaining),嗯……（還有 {remaining} 下）,Hmm... ({remaining} Klicks verbleibend)
+DIALECTIC_VIDEO_BTN_CLICK,Almost there... ({remaining} more),快了……（還差 {remaining} 下）,Fast geschafft... (noch {remaining} mal)
 DIALECTIC_VIDEO_OPEN,▶  Open Video,▶  開啟影片,▶  Video öffnen

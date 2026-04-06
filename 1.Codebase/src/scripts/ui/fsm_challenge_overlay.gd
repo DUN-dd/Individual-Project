@@ -11,6 +11,7 @@ const INVITE_METADATA_KEY := "fsm_challenge_invite_seen"
 const DIALECTIC_VIDEO_URL := "https://youtu.be/XXK5wOWh7vM?si=uoM1ZUjTfWIOju5F"
 const PIG_SNAKE_PIGEON_URL := "https://en.wikipedia.org/wiki/The_Pig,_the_Snake_and_the_Pigeon"
 const PIG_SNAKE_PIGEON_CLICKS_NEEDED := 5
+const DIALECTIC_VIDEO_CLICKS_NEEDED := 5
 const TIMER_FONT_SIZE_DEFAULT := 16
 const TIMER_FONT_SIZE_LARGE := 26
 @onready var background_dim: ColorRect = $BackgroundDim
@@ -74,6 +75,7 @@ var _gloria_velocities: Array = []
 var _gloria_rot_speeds: Array = []
 var _fsm_image_click_count: int = 0
 var _fsm_image_easter_egg_unlocked: bool = false
+var _video_btn_click_count: int = 0
 func _ready() -> void:
 	_refresh_services()
 	_setup_ui()
@@ -262,9 +264,9 @@ func _connect_signals() -> void:
 	if crash_back_button:
 		crash_back_button.pressed.connect(_on_crash_back_pressed)
 	if crash_video_btn:
-		crash_video_btn.tooltip_text = _tr("DIALECTIC_VIDEO_CHANNEL") + " — " + _tr("DIALECTIC_VIDEO_TOOLTIP")
+		crash_video_btn.tooltip_text = _tr("DIALECTIC_VIDEO_BTN_HINT").format({"remaining": DIALECTIC_VIDEO_CLICKS_NEEDED})
 		UIStyleManager.add_hover_scale_effect(crash_video_btn, 1.12)
-		crash_video_btn.pressed.connect(_show_dialectic_video_popup)
+		crash_video_btn.gui_input.connect(_on_video_btn_gui_input)
 	if invitation_accept:
 		invitation_accept.pressed.connect(_on_invitation_accept)
 	if invitation_decline:
@@ -1111,6 +1113,24 @@ func _apply_sublimation_panel_style(panel: Panel) -> void:
 	style.corner_radius_bottom_left = 10
 	style.corner_radius_bottom_right = 10
 	panel.add_theme_stylebox_override("panel", style)
+func _on_video_btn_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_video_btn_click_count += 1
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	if _video_btn_click_count >= DIALECTIC_VIDEO_CLICKS_NEEDED:
+		_video_btn_click_count = 0
+		if crash_video_btn:
+			crash_video_btn.tooltip_text = _tr("DIALECTIC_VIDEO_BTN_HINT").format({"remaining": DIALECTIC_VIDEO_CLICKS_NEEDED})
+		_show_dialectic_video_popup()
+		return
+	var remaining := DIALECTIC_VIDEO_CLICKS_NEEDED - _video_btn_click_count
+	if crash_video_btn:
+		crash_video_btn.tooltip_text = _tr("DIALECTIC_VIDEO_BTN_CLICK").format({"remaining": remaining})
 func _setup_fsm_image_easter_egg() -> void:
 	for img in [invitation_fsm_image, completion_fsm_image]:
 		if img:
