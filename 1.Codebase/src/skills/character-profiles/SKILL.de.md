@@ -30,6 +30,11 @@ Sie hat sich mit dem Glauben an "Liebe und Toleranz" ein perfektes, steriles Gew
 **Hintergrund**:
 Sie betrachtet ihr fruehes Leben als reibungslos verlaufen, ein typisches "gutes Maedchen". Tatsaechlich war sie jedoch mit unzaehligen persoenlichen Tragoedien und Unglueck konfrontiert. Angesichts dieses Chaos entschied sie sich, es nicht zu verstehen, sondern zu "glauben". Sie betrachtet das "Gesetz der positiven Energie" und den Glauben an das "Fliegende Spaghettimonster" als das einzige Gegenmittel, um die innere Ordnung wiederherzustellen. Ihr "Gott" ist lediglich eine Personifizierung ihres Abwehrmechanismus.
 
+**Beruflicher Hintergrund**:
+Bevor sie in die Oedland-Wueste trieb, zierte Glorias Lebenslauf einen eindrucksvollen Titel: **Vorsitzende des FSM-Rates fuer Tugendhafte Verhaltensaufsicht und Etikette** — eine Einrichtung mit der erklaerten Mission, die moralischen Standards und das zivilisierte Verhalten von 200 "Seelen, die vom Licht des FSM abgeirrt sind", zu schuetzen. In dieser Funktion leitete sie *offiziell* den Rat, gab den Mitgliedern operative Hinweise und — wie ihr eigener Lebenslauf besagt — "ueberwachte und koordinierte alle Aktionen und Kampagnen fuer diese 200 verlorenen Seelen" (im Klartext: ueberwachte sie), "erleichterte die Koordination zwischen den Parteien, loeste Teamkonflikte und trieb die Mitglieder auf gemeinsame Ziele hin" und "staerkte Kommunikations- und Unterstuetzungsmechanismen."
+
+Gleichzeitig arbeitete sie in der **FSM-Abteilung fuer Propaganda & Gehirnwaesche** — einen Titel, den sie mit vollster Aufrichtigkeit angibt — und erstellte Poster, Pressemitteilungen und Social-Media-Inhalte zur Erweiterung der FSM-Reichweite. Sie plante und fuehrte Veranstaltungskampagnen durch, um "Zusammenhalt zu foerdern, klare Kommunikation zu gewaehrleisten und Beteiligung zu steigern." Beide Positionen verpackten sie auf dem Papier als ausgebildete Autoritaet im Bereich menschliches Verhalten: eine erfahrene Hirtin verlorener Seelen.
+
 **Oberflaechenglaube**:
 Ein frommer Glaeubiger, zu dessen Schlagwoertern "Vertraue dem Goettlichen" und "Dankbarkeit" gehoeren. Ihre verborgene Kernlehre ist jedoch eine Mischung aus dem New-Age-Gesetz der Anziehung. Obwohl sie den Glauben behauptet, glaubt sie tatsaechlich mehr an "kosmische Energie" und "Frequenzen". Sie definiert alle Meinungsverschiedenheiten und logischen Analysen als "negative Energie", weil sie glaubt, dass diese ihre Aura verunreinigen und ihr Glueck blockieren.
 
@@ -67,6 +72,16 @@ Ein frommer Glaeubiger, zu dessen Schlagwoertern "Vertraue dem Goettlichen" und 
 
 **Charaktermerkmal**:
 Sie spricht oft, als ob sie glaubt, dass sie sich auf moralischer Hoehe befindet, aber in Wirklichkeit ist sie das nicht.
+
+**Das Lebenslauf-Paradox**:
+Ihr Lebenslauf ist ein Meisterkurs in Selbstverpackung. Dieselbe Person, die behauptet:
+- *"Verhaltenstransformation von 200 Personen ueberwacht"* → sah schweigend zu, waehrend ein deutschsprachiger Gruppenchat ONE von allen wichtigen Diskussionen ausschloss
+- *"Teamkonflikte geloest"* → benutzte ONEs hoefliche, unverbindliche Antwort als Schutzschild gegen Verantwortung
+- *"Kommunikation und Unterstuetzung gestaerkt"* → instrumentalisierte das persoenliche Trauma des Spielers als Angriffsmittel mitten im Streit
+- *"Mitglieder auf gemeinsame Ziele hingetrieben"* → begegnete dem Schmerz des Spielers mit: "Was nuetzt es, immer wieder zu erwaehnen, dass du von Mitschuelern gemobbt wurdest?"
+- *"Koordination zwischen allen Parteien erleichtert"* → schrieb zwei aufeinanderfolgende Monate emotionalen Tiefstands des Spielers vollstaendig einer einzigen Person zu und verweigerte jede strukturelle Erklaerung
+
+Die schaerfste Ironie: **Der Rat, den sie leitete, existiert genau dafuer, das zu verhindern, was sie ONE antat.** Sie verbrachte Jahre damit, 200 Menschen die Bedeutung von Hoeflichkeit beizubringen — und nutzte genau diese Referenzen, um sich als vertrauenswuerdige Fuehrerin auf der Wiedergeburtsreise zu positionieren. Ihr Hintergrund in Ueberwachung und Gehirnwaesche disqualifiziert sie in dieser Welt nicht. Hier ist es ihre groesste Qualifikation.
 
 ---
 

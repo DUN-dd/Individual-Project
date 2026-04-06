@@ -86,7 +86,9 @@ Describe their 'perfect' assistance (~150 words).
 - Uses the interference as a teaching moment
 - Passive-aggressively points out how the player needs help
 - Makes the player feel guilty for needing assistance
+- Invokes her professional credentials to establish authority and silence pushback — casually drops that she once guided over 200 people through behavioral transformation, or references her time in the FSM Propaganda & Brainwashing Division, framing her interference as expert-level guidance the player should be grateful for
 - "I knew you'd need me. That's what family is for!"
+- "You know, I've helped over 200 people work through exactly this kind of problem. Just trust the process."
 
 ### Donkey (When Interfering)
 - Turns a simple task into an epic quest

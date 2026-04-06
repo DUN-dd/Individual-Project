@@ -30,6 +30,11 @@ She built a perfect, sterile greenhouse for herself using the faith of "Love and
 **Background**:
 She considers her early life smooth sailing, a typical "good girl". However, she actually faced countless personal tragedies and unhappiness. Faced with this chaos, she chose not to understand, but to "believe". She treats the "Positive Energy Law" and belief in the "Flying Spaghetti Monster" as the only antidote to rebuild inner order. Her "god" is merely a personification of her defense mechanism.
 
+**Professional Background**:
+Before drifting into the wasteland, Gloria's résumé carried an impressively titled role: **Chair of the FSM Virtuous Conduct & Etiquette Supervisory Council** — an institution whose declared mission was to safeguard the moral standards and civilized behavior of 200 "souls who had wandered from the FSM's light." In that capacity, she *officially* led the committee, provided operational guidance to members, and — as her own CV reads — "oversaw and coordinated all promotional campaigns covering these 200 lost individuals" (read: monitored them), "facilitated cross-party coordination, managed team conflicts, and drove members toward shared goals," and "strengthened communication and support mechanisms."
+
+Concurrently, she served in the **FSM Propaganda & Brainwashing Division** — a role she cites with full sincerity — producing posters, press releases, and social media content to expand FSM's reach. She planned and executed event campaigns to "foster cohesion, ensure clear communication, and drive participation." Both positions, on paper, packaged her as a trained authority on human behavior: a skilled shepherd of lost souls.
+
 **Surface Faith**:
 A devout believer whose catchphrases include "Entrust to the Divine" and "Gratitude". However, her hidden core doctrine is a hybrid of New Age Law of Attraction. Though claiming faith, she actually believes more in "cosmic energy" and "frequencies". She defines all dissent and logical analysis as "negative energy", believing these pollute her aura and block good fortune.
 
@@ -67,6 +72,16 @@ A devout believer whose catchphrases include "Entrust to the Divine" and "Gratit
 
 **Character Trait**:
 She often speaks as though she believes she is on the moral high ground, but in fact she is not.
+
+**The CV Paradox**:
+Her résumé is a masterclass in self-packaging. The same person who claims:
+- *"Oversaw the behavioral transformation of 200 individuals"* → stood by silently while a German-language group chat excluded ONE from all core discussions
+- *"Managed team conflicts"* → used ONE's polite, non-committal reply as a deflection shield to sidestep accountability
+- *"Strengthened communication and support"* → weaponized the player's personal trauma as attack material mid-argument
+- *"Drove members toward shared goals"* → met the player's pain with *"What's the use of bringing up being boycotted by middle school classmates again?"*
+- *"Facilitated coordination between all parties"* → blamed two consecutive months of the player's emotional low entirely on a single individual, refusing to acknowledge any structural cause
+
+The sharpest irony: **the very council she chaired exists precisely to prevent the behavior she inflicted on ONE.** She spent years teaching 200 people the meaning of courtesy — and leveraged exactly those credentials to position herself as a trustworthy guide on the rebirth journey. Her background in surveillance and brainwashing does not disqualify her in this world. Here, it is her greatest credential.
 
 ---
 
