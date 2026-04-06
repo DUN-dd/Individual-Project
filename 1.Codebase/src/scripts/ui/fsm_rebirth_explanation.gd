@@ -1,0 +1,1224 @@
+extends Control
+signal close_requested
+const UIStyleManager = preload("res://1.Codebase/src/scripts/ui/ui_style_manager.gd")
+const ERROR_CONTEXT := "FSMRebirthExplanation"
+const PIG_SNAKE_PIGEON_URL := "https://en.wikipedia.org/wiki/The_Pig,_the_Snake_and_the_Pigeon"
+const PIG_SNAKE_PIGEON_CLICKS_NEEDED := 5
+const LYRICS_EASTER_EGG_URL := "https://www.youtube.com/watch?v=O7-81uAmgIw"
+const LYRICS_CLICK_TARGET := 5
+const LYRICS_CLICK_TIMEOUT := 5.0
+const LYRICS_DISCOVERY_SEQ := ["gloria", "fsm", "teacher"]
+const RELIC_EASTER_EGG_URL := "https://youtu.be/bjOAE17WajY"
+const RELIC_CLICK_TARGET := 5
+const RELIC_CLICK_TIMEOUT := 5.0
+const KITE_EASTER_EGG_URL := "https://open.spotify.com/track/5iXbvvbd1JotBgyk1RvHQW"
+const KITE_CLICK_TARGET := 5
+const KITE_CLICK_TIMEOUT := 5.0
+const HFGS_EASTER_EGG_URL := "https://www.youtube.com/results?search_query=%E9%84%A7%E5%81%A5%E6%B3%93+%E6%81%8D%E5%A6%82%E9%9A%94%E4%B8%96"
+const HFGS_CLICK_TARGET := 5
+const HFGS_CLICK_TIMEOUT := 5.0
+@onready var title_label: Label = $Root/ContentPanel/Margin/VBox/Header/Title
+@onready var header_icon: TextureRect = $Root/ContentPanel/Margin/VBox/Header/HeaderIcon
+@onready var close_button: Button = $Root/ContentPanel/Margin/VBox/Header/CloseButton
+@onready var subtitle_label: Label = $Root/ContentPanel/Margin/VBox/SubtitleLabel
+@onready var content_panel: PanelContainer = $Root/ContentPanel
+@onready var margin_container: MarginContainer = $Root/ContentPanel/Margin
+@onready var scroll_container: ScrollContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer
+@onready var content_vbox: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox
+@onready var bg_gradient: TextureRect = $Root/BackgroundGradient
+@onready var tab_mechanism: Button = $Root/ContentPanel/Margin/VBox/TabBar/TabMechanism
+@onready var tab_comparison: Button = $Root/ContentPanel/Margin/VBox/TabBar/TabComparison
+@onready var tab_philosophy: Button = $Root/ContentPanel/Margin/VBox/TabBar/TabPhilosophy
+@onready var mechanism_section: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection
+@onready var comparison_section: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection
+@onready var philosophy_section: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection
+@onready var mech_card1: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard1
+@onready var mech_title1: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard1/CardMargin1/CardVBox1/CardTitle1
+@onready var mech_body1: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard1/CardMargin1/CardVBox1/CardBody1
+@onready var mech_card2: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard2
+@onready var mech_title2: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard2/CardMargin2/CardVBox2/CardTitle2
+@onready var mech_body2: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard2/CardMargin2/CardVBox2/CardBody2
+@onready var mech_card3: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard3
+@onready var mech_title3: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard3/CardMargin3/CardVBox3/CardTitle3
+@onready var mech_body3: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard3/CardMargin3/CardVBox3/CardBody3
+@onready var mech_card4: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard4
+@onready var mech_title4: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard4/CardMargin4/CardVBox4/CardTitle4
+@onready var mech_body4: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/MechanismSection/MechanismCard4/CardMargin4/CardVBox4/CardBody4
+@onready var comp_intro_label: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompIntro/IntroMargin/IntroLabel
+@onready var journal_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/JournalCard
+@onready var journal_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/JournalCard/JournalMargin/JournalVBox/JournalTitle
+@onready var journal_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/JournalCard/JournalMargin/JournalVBox/JournalBody
+@onready var journal_warning: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/JournalCard/JournalMargin/JournalVBox/JournalWarning
+@onready var fsm_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/FSMCard
+@onready var fsm_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/FSMCard/FSMMargin/FSMVBox/FSMTitle
+@onready var fsm_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompColumns/FSMCard/FSMMargin/FSMVBox/FSMBody
+@onready var effects_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard
+@onready var effects_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard/EffectsMargin/EffectsVBox/EffectsTitle
+@onready var ej_label: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard/EffectsMargin/EffectsVBox/EffectsColumns/EffectsJournalCol/EJLabel
+@onready var ej_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard/EffectsMargin/EffectsVBox/EffectsColumns/EffectsJournalCol/EJBody
+@onready var ef_label: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard/EffectsMargin/EffectsVBox/EffectsColumns/EffectsFSMCol/EFLabel
+@onready var ef_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/EffectsCard/EffectsMargin/EffectsVBox/EffectsColumns/EffectsFSMCol/EFBody
+@onready var gloria_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/GloriaCard
+@onready var gloria_image: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/GloriaCard/GloriaMargin/GloriaHBox/GloriaImage
+@onready var gloria_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/GloriaCard/GloriaMargin/GloriaHBox/GloriaVBox/GloriaBody
+@onready var conseq_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/ConsequencesCard
+@onready var conseq_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/ConsequencesCard/ConseqMargin/ConseqVBox/ConseqTitle
+@onready var conseq_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/ConsequencesCard/ConseqMargin/ConseqVBox/ConseqBody
+@onready var philo_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/PhiloIntro/PhiloIntroMargin/PhiloIntroVBox/PhiloTitle
+@onready var philo_intro_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/PhiloIntro/PhiloIntroMargin/PhiloIntroVBox/PhiloIntroBody
+@onready var day_cards_container: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/DayCardsContainer
+@onready var conc_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard
+@onready var conc_title: Label = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcTitle
+@onready var conc_body: RichTextLabel = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcBody
+@onready var conc_gloria: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcHBox/ConcGloria
+@onready var conc_fsm: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcHBox/ConcFSM
+@onready var conc_teacher: TextureRect = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox/ConcHBox/ConcTeacher
+@onready var conc_vbox: VBoxContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/ConclusionCard/ConcMargin/ConcVBox
+var audio_manager: Node = null
+var _current_tab: int = 0 
+var _card_tweens: Array = []
+var _bg_tween: Tween = null
+var _fsm_image_click_count: int = 0
+var _fsm_image_easter_egg_unlocked: bool = false
+var _lyrics_click_count: int = 0
+var _lyrics_click_timer: float = 0.0
+var _lyrics_label: Label = null
+var _lyrics_discovered: bool = false
+var _lyrics_discovery_index: int = 0
+var _lyrics_discovery_timer: float = 0.0
+const _LYRICS_DISCOVERY_TIMEOUT := 4.0
+var _relic_click_count: int = 0
+var _relic_click_timer: float = 0.0
+var _relic_label: Label = null
+var _kite_click_count: int = 0
+var _kite_click_timer: float = 0.0
+var _kite_label: Label = null
+var _hfgs_click_count: int = 0
+var _hfgs_click_timer: float = 0.0
+var _hfgs_label: Label = null
+const DAY_ACCENT_COLORS: Array = [
+	Color(1.0, 0.84, 0.0),
+	Color(0.31, 0.76, 0.97),
+	Color(0.65, 0.84, 0.65),
+	Color(0.81, 0.58, 0.84),
+	Color(1.0, 0.54, 0.40),
+	Color(0.95, 0.55, 0.66),
+	Color(0.45, 0.78, 0.85),
+	Color(0.72, 0.68, 0.95),
+]
+func _ready() -> void:
+	z_index = 200
+	_refresh_services()
+	_setup_ui()
+	_connect_signals()
+	_populate_all_content()
+	_setup_lyrics_easter_egg()
+	_setup_relic_easter_egg()
+	_setup_hfgs_easter_egg()
+	_setup_conc_body_click()
+	_setup_kite_easter_egg()
+	_switch_tab(0)
+	UIStyleManager.fade_in(self, 0.5)
+	_update_layout()
+	if not resized.is_connected(_on_resized):
+		resized.connect(_on_resized)
+	_start_bg_animation()
+	if audio_manager:
+		audio_manager.play_music("mountain_king")
+func _exit_tree() -> void:
+	for t in _card_tweens:
+		if t and t.is_valid():
+			t.kill()
+	_card_tweens.clear()
+	if _bg_tween and _bg_tween.is_valid():
+		_bg_tween.kill()
+	_bg_tween = null
+func _process(delta: float) -> void:
+	if _lyrics_click_count > 0:
+		_lyrics_click_timer -= delta
+		if _lyrics_click_timer <= 0.0:
+			_lyrics_click_count = 0
+	if _lyrics_discovery_index > 0 and not _lyrics_discovered:
+		_lyrics_discovery_timer -= delta
+		if _lyrics_discovery_timer <= 0.0:
+			_lyrics_discovery_index = 0
+	if _relic_click_count > 0:
+		_relic_click_timer -= delta
+		if _relic_click_timer <= 0.0:
+			_relic_click_count = 0
+	if _kite_click_count > 0:
+		_kite_click_timer -= delta
+		if _kite_click_timer <= 0.0:
+			_kite_click_count = 0
+	if _hfgs_click_count > 0:
+		_hfgs_click_timer -= delta
+		if _hfgs_click_timer <= 0.0:
+			_hfgs_click_count = 0
+func _refresh_services() -> void:
+	if ServiceLocator:
+		audio_manager = ServiceLocator.get_audio_manager()
+func _setup_ui() -> void:
+	if content_panel:
+		var panel_style := StyleBoxFlat.new()
+		panel_style.bg_color = Color(0.06, 0.06, 0.12, 0.92)
+		panel_style.corner_radius_top_left = 0
+		panel_style.corner_radius_top_right = 0
+		panel_style.corner_radius_bottom_left = 0
+		panel_style.corner_radius_bottom_right = 0
+		panel_style.shadow_color = Color(0, 0, 0, 0)
+		panel_style.shadow_size = 0
+		content_panel.add_theme_stylebox_override("panel", panel_style)
+	if title_label:
+		title_label.text = _tr("FSM_REBIRTH_TITLE")
+		UIStyleManager.add_glow_effect(title_label, Color(1, 0.9, 0.4, 1), 0.4)
+	if subtitle_label:
+		subtitle_label.text = _tr("FSM_REBIRTH_PHILOSOPHY_INTRO")
+		subtitle_label.add_theme_color_override("font_color", Color(0.65, 0.7, 0.85, 0.7))
+	if header_icon:
+		UIStyleManager.pulse_effect(header_icon, 0.06, 2.0)
+	if close_button:
+		UIStyleManager.apply_button_style(close_button, "danger", "medium")
+		UIStyleManager.add_hover_scale_effect(close_button, 1.08)
+		UIStyleManager.add_press_feedback(close_button)
+		close_button.text = _tr("UI_CLOSE_BUTTON")
+	_style_tab_buttons()
+	_style_all_cards()
+func _setup_lyrics_easter_egg() -> void:
+	if not conc_vbox:
+		return
+	_lyrics_label = Label.new()
+	_lyrics_label.text = _tr("EASTER_EGG_LYRICS_TEXT")
+	_lyrics_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_lyrics_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_lyrics_label.add_theme_font_size_override("font_size", 15)
+	_lyrics_label.add_theme_color_override("font_color", Color(0.86, 0.79, 0.55, 0.48))
+	_lyrics_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_lyrics_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_lyrics_label.gui_input.connect(_on_lyrics_label_gui_input)
+	_lyrics_label.modulate.a = 0.0
+	_lyrics_label.visible = false
+	conc_vbox.add_child(_lyrics_label)
+	for img_ref: TextureRect in [conc_gloria, conc_fsm, conc_teacher]:
+		if img_ref:
+			img_ref.mouse_filter = Control.MOUSE_FILTER_STOP
+			img_ref.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if conc_gloria:
+		conc_gloria.gui_input.connect(_on_conc_image_clicked.bind("gloria"))
+	if conc_fsm:
+		conc_fsm.gui_input.connect(_on_conc_image_clicked.bind("fsm"))
+	if conc_teacher:
+		conc_teacher.gui_input.connect(_on_conc_image_clicked.bind("teacher"))
+func _on_conc_image_clicked(event: InputEvent, image_id: String) -> void:
+	if _lyrics_discovered:
+		return
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	var expected: String = LYRICS_DISCOVERY_SEQ[_lyrics_discovery_index]
+	if image_id == expected:
+		_lyrics_discovery_index += 1
+		_lyrics_discovery_timer = _LYRICS_DISCOVERY_TIMEOUT
+		var clicked_img: TextureRect = null
+		if image_id == "gloria":
+			clicked_img = conc_gloria
+		elif image_id == "fsm":
+			clicked_img = conc_fsm
+		elif image_id == "teacher":
+			clicked_img = conc_teacher
+		if clicked_img and is_instance_valid(clicked_img):
+			clicked_img.pivot_offset = clicked_img.size * 0.5
+			var tw := create_tween()
+			tw.tween_property(clicked_img, "scale", Vector2(1.08, 1.08), 0.1)
+			tw.tween_property(clicked_img, "scale", Vector2.ONE, 0.1)
+		if _lyrics_discovery_index >= LYRICS_DISCOVERY_SEQ.size():
+			_lyrics_discovered = true
+			_reveal_lyrics_label()
+	else:
+		_lyrics_discovery_index = 0
+func _reveal_lyrics_label() -> void:
+	if not _lyrics_label or not is_instance_valid(_lyrics_label):
+		return
+	_lyrics_label.visible = true
+	var tw := create_tween()
+	tw.tween_property(_lyrics_label, "modulate:a", 1.0, 0.8).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	if audio_manager:
+		audio_manager.play_sfx("ui_success", 0.6)
+func _on_lyrics_label_gui_input(event: InputEvent) -> void:
+	if not _lyrics_discovered:
+		return
+	if not (event is InputEventMouseButton):
+		return
+	var mouse_event := event as InputEventMouseButton
+	if mouse_event.button_index != MOUSE_BUTTON_LEFT or not mouse_event.pressed:
+		return
+	_lyrics_click_count += 1
+	_lyrics_click_timer = LYRICS_CLICK_TIMEOUT
+	if _lyrics_label and is_instance_valid(_lyrics_label):
+		_lyrics_label.pivot_offset = _lyrics_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_lyrics_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_lyrics_label, "scale", Vector2.ONE, 0.10)
+	if _lyrics_click_count < LYRICS_CLICK_TARGET:
+		return
+	_lyrics_click_count = 0
+	_lyrics_click_timer = 0.0
+	_show_lyrics_popup()
+func _show_lyrics_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(550, 380)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.14, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.85, 0.7, 0.3, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_LYRICS_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.9, 0.5))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.7, 0.6, 0.3, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_LYRICS_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 18)
+	body_lbl.add_theme_color_override("default_color", Color(0.95, 0.90, 0.80))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_LYRICS_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(LYRICS_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_relic_easter_egg() -> void:
+	if not comparison_section or not conseq_card:
+		return
+	_relic_label = Label.new()
+	_relic_label.text = _tr("EASTER_EGG_RELIC_TEXT")
+	_relic_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_relic_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_relic_label.add_theme_font_size_override("font_size", 13)
+	_relic_label.add_theme_color_override("font_color", Color(0.72, 0.65, 0.50, 0.42))
+	_relic_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_relic_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_relic_label.gui_input.connect(_on_relic_label_gui_input)
+	_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_HINT").format({"remaining": RELIC_CLICK_TARGET})
+	comparison_section.add_child(_relic_label)
+func _on_relic_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_relic_click_count += 1
+	_relic_click_timer = RELIC_CLICK_TIMEOUT
+	if _relic_label and is_instance_valid(_relic_label):
+		_relic_label.pivot_offset = _relic_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_relic_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_relic_label, "scale", Vector2.ONE, 0.10)
+	var remaining := RELIC_CLICK_TARGET - _relic_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_CLICK").format({"remaining": remaining})
+		else:
+			_relic_label.tooltip_text = _tr("EASTER_EGG_RELIC_HINT").format({"remaining": remaining})
+		return
+	_relic_click_count = 0
+	_relic_click_timer = 0.0
+	_show_relic_popup()
+func _show_relic_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(520, 340)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.08, 0.06, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.72, 0.60, 0.35, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_RELIC_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.92, 0.82, 0.50))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.7, 0.6, 0.3, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_RELIC_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 18)
+	body_lbl.add_theme_color_override("default_color", Color(0.95, 0.90, 0.80))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_RELIC_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(RELIC_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_kite_easter_egg() -> void:
+	if not mechanism_section:
+		return
+	_kite_label = Label.new()
+	_kite_label.text = _tr("EASTER_EGG_KITE_TEXT")
+	_kite_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_kite_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_kite_label.add_theme_font_size_override("font_size", 13)
+	_kite_label.add_theme_color_override("font_color", Color(0.60, 0.72, 0.80, 0.35))
+	_kite_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_kite_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_kite_label.gui_input.connect(_on_kite_label_gui_input)
+	_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_HINT").format({"remaining": KITE_CLICK_TARGET})
+	mechanism_section.add_child(_kite_label)
+func _on_kite_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_kite_click_count += 1
+	_kite_click_timer = KITE_CLICK_TIMEOUT
+	if _kite_label and is_instance_valid(_kite_label):
+		_kite_label.pivot_offset = _kite_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_kite_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_kite_label, "scale", Vector2.ONE, 0.10)
+	var remaining := KITE_CLICK_TARGET - _kite_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_CLICK").format({"remaining": remaining})
+		else:
+			_kite_label.tooltip_text = _tr("EASTER_EGG_KITE_HINT").format({"remaining": remaining})
+		return
+	_kite_click_count = 0
+	_kite_click_timer = 0.0
+	_show_kite_popup()
+func _show_kite_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.05, 0.92)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(560, 400)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.04, 0.07, 0.12, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.45, 0.70, 0.85, 0.6)
+	sb.shadow_size = 16
+	sb.shadow_color = Color(0, 0, 0, 0.6)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_KITE_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.55, 0.85, 1.0))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.4, 0.65, 0.85, 0.5)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_KITE_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 17)
+	body_lbl.add_theme_color_override("default_color", Color(0.92, 0.92, 0.96))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_KITE_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(KITE_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_kite_btn := Button.new()
+	close_kite_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_kite_btn.custom_minimum_size = Vector2(140, 44)
+	close_kite_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_kite_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_kite_btn, 1.06)
+	close_kite_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_kite_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)
+func _setup_conc_body_click() -> void:
+	if not conc_body:
+		return
+	conc_body.mouse_filter = Control.MOUSE_FILTER_STOP
+	conc_body.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	conc_body.gui_input.connect(_on_conc_body_gui_input)
+func _on_conc_body_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_show_lyrics_popup()
+func _style_tab_buttons() -> void:
+	var tabs: Array = [tab_mechanism, tab_comparison, tab_philosophy]
+	var tab_texts: Array = [
+		_tr("FSM_REBIRTH_SECTION_HOW_IT_WORKS"),
+		_tr("FSM_REBIRTH_SECTION_COMPARISON"),
+		_tr("FSM_REBIRTH_PHILOSOPHY_TITLE"),
+	]
+	for i in range(tabs.size()):
+		var tab: Button = tabs[i]
+		if tab:
+			tab.text = tab_texts[i]
+			UIStyleManager.add_hover_scale_effect(tab, 1.05)
+			UIStyleManager.add_press_feedback(tab)
+			tab.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+func _update_tab_visual(active_index: int) -> void:
+	var tabs: Array = [tab_mechanism, tab_comparison, tab_philosophy]
+	for i in range(tabs.size()):
+		var tab: Button = tabs[i]
+		if not tab:
+			continue
+		if i == active_index:
+			var active_style := StyleBoxFlat.new()
+			active_style.bg_color = Color(0.35, 0.25, 0.1, 0.9)
+			active_style.corner_radius_top_left = 10
+			active_style.corner_radius_top_right = 10
+			active_style.corner_radius_bottom_left = 10
+			active_style.corner_radius_bottom_right = 10
+			active_style.border_width_left = 2
+			active_style.border_width_top = 2
+			active_style.border_width_right = 2
+			active_style.border_width_bottom = 2
+			active_style.border_color = Color(1, 0.84, 0, 0.8)
+			active_style.shadow_color = Color(1, 0.84, 0, 0.25)
+			active_style.shadow_size = 6
+			active_style.shadow_offset = Vector2(0, 2)
+			active_style.content_margin_left = 16
+			active_style.content_margin_right = 16
+			active_style.content_margin_top = 8
+			active_style.content_margin_bottom = 8
+			tab.add_theme_stylebox_override("normal", active_style)
+			tab.add_theme_stylebox_override("hover", active_style)
+			tab.add_theme_stylebox_override("pressed", active_style)
+			tab.add_theme_color_override("font_color", Color(1, 0.9, 0.4))
+			tab.add_theme_color_override("font_hover_color", Color(1, 0.95, 0.6))
+			tab.add_theme_font_size_override("font_size", 17)
+		else:
+			var inactive_style := StyleBoxFlat.new()
+			inactive_style.bg_color = Color(0.12, 0.12, 0.18, 0.7)
+			inactive_style.corner_radius_top_left = 10
+			inactive_style.corner_radius_top_right = 10
+			inactive_style.corner_radius_bottom_left = 10
+			inactive_style.corner_radius_bottom_right = 10
+			inactive_style.border_width_left = 1
+			inactive_style.border_width_top = 1
+			inactive_style.border_width_right = 1
+			inactive_style.border_width_bottom = 1
+			inactive_style.border_color = Color(0.4, 0.4, 0.55, 0.5)
+			inactive_style.content_margin_left = 16
+			inactive_style.content_margin_right = 16
+			inactive_style.content_margin_top = 8
+			inactive_style.content_margin_bottom = 8
+			var hover_style := inactive_style.duplicate()
+			hover_style.bg_color = Color(0.18, 0.18, 0.25, 0.8)
+			hover_style.border_color = Color(0.5, 0.5, 0.7, 0.7)
+			tab.add_theme_stylebox_override("normal", inactive_style)
+			tab.add_theme_stylebox_override("hover", hover_style)
+			tab.add_theme_stylebox_override("pressed", inactive_style)
+			tab.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8))
+			tab.add_theme_color_override("font_hover_color", Color(0.85, 0.85, 0.95))
+			tab.add_theme_font_size_override("font_size", 16)
+func _style_all_cards() -> void:
+	var mech_cards: Array = [mech_card1, mech_card2, mech_card3, mech_card4]
+	var card_accent_colors: Array = [
+		Color(0.0, 0.55, 0.35, 0.5),  
+		Color(0.1, 0.35, 0.55, 0.5),  
+		Color(0.55, 0.2, 0.15, 0.5),  
+		Color(0.35, 0.15, 0.45, 0.5), 
+	]
+	for i in range(mech_cards.size()):
+		if mech_cards[i]:
+			_apply_card_style(mech_cards[i], card_accent_colors[i])
+	var comp_intro: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/ComparisonSection/CompIntro
+	if comp_intro:
+		_apply_card_style(comp_intro, Color(0.2, 0.18, 0.1, 0.5))
+	if journal_card:
+		_apply_card_style(journal_card, Color(0.05, 0.3, 0.15, 0.5))
+	if fsm_card:
+		_apply_card_style(fsm_card, Color(0.4, 0.1, 0.1, 0.5))
+	if effects_card:
+		_apply_card_style(effects_card, Color(0.3, 0.25, 0.05, 0.5))
+	if gloria_card:
+		_apply_card_style(gloria_card, Color(0.3, 0.15, 0.35, 0.5))
+	if conseq_card:
+		_apply_card_style(conseq_card, Color(0.4, 0.15, 0.1, 0.5))
+	var philo_intro_card: PanelContainer = $Root/ContentPanel/Margin/VBox/ScrollContainer/ContentVBox/PhilosophySection/PhiloIntro
+	if philo_intro_card:
+		_apply_card_style(philo_intro_card, Color(0.3, 0.25, 0.05, 0.5))
+	if conc_card:
+		_apply_card_style(conc_card, Color(0.25, 0.2, 0.05, 0.6))
+func _apply_card_style(panel: PanelContainer, accent_bg: Color) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(accent_bg.r * 0.4 + 0.06, accent_bg.g * 0.4 + 0.06, accent_bg.b * 0.4 + 0.08, 0.88)
+	style.corner_radius_top_left = 14
+	style.corner_radius_top_right = 14
+	style.corner_radius_bottom_left = 14
+	style.corner_radius_bottom_right = 14
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = Color(accent_bg.r + 0.2, accent_bg.g + 0.2, accent_bg.b + 0.2, 0.4)
+	style.shadow_color = Color(0, 0, 0, 0.35)
+	style.shadow_size = 8
+	style.shadow_offset = Vector2(0, 3)
+	style.content_margin_left = 2
+	style.content_margin_right = 2
+	style.content_margin_top = 2
+	style.content_margin_bottom = 2
+	panel.add_theme_stylebox_override("panel", style)
+func _connect_signals() -> void:
+	if close_button:
+		close_button.pressed.connect(_on_close_pressed)
+	if tab_mechanism:
+		tab_mechanism.pressed.connect(_on_tab_mechanism)
+	if tab_comparison:
+		tab_comparison.pressed.connect(_on_tab_comparison)
+	if tab_philosophy:
+		tab_philosophy.pressed.connect(_on_tab_philosophy)
+	_setup_fsm_image_easter_egg()
+func _on_resized() -> void:
+	_update_layout()
+func _update_layout() -> void:
+	var vp_size = get_viewport_rect().size
+	if content_panel:
+		content_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		content_panel.custom_minimum_size = vp_size
+	if margin_container:
+		var horizontal_margin = clampi(int(vp_size.x * 0.04), 28, 60)
+		var vertical_margin = clampi(int(vp_size.y * 0.03), 20, 40)
+		margin_container.add_theme_constant_override("margin_left", horizontal_margin)
+		margin_container.add_theme_constant_override("margin_right", horizontal_margin)
+		margin_container.add_theme_constant_override("margin_top", vertical_margin)
+		margin_container.add_theme_constant_override("margin_bottom", vertical_margin)
+	if scroll_container:
+		scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+func _tr(key: String) -> String:
+	if LocalizationManager:
+		return LocalizationManager.get_translation(key)
+	return key
+func _populate_all_content() -> void:
+	_populate_mechanism_content()
+	_populate_comparison_content()
+	_populate_philosophy_content()
+func _populate_mechanism_content() -> void:
+	if mech_title1:
+		mech_title1.text = "🌅 " + _tr("FSM_REBIRTH_DAILY_LOGIN_TITLE")
+	if mech_body1:
+		mech_body1.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_DAILY_LOGIN_BODY") + "[/color]"
+	if mech_title2:
+		mech_title2.text = "📋 " + _tr("FSM_REBIRTH_SECTION_HOW_IT_WORKS")
+	if mech_body2:
+		mech_body2.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_HOW_TO") + "[/color]"
+	if mech_title3:
+		mech_title3.text = "⚠️ " + _tr("FSM_REBIRTH_IMPORTANT_NOTE_TITLE")
+	if mech_body3:
+		mech_body3.text = "[color=#FFB4AB]" + _tr("FSM_REBIRTH_IMPORTANT_NOTE") + "[/color]"
+	if mech_title4:
+		mech_title4.text = "📜 " + _tr("FSM_REBIRTH_DAILY_RULE_TITLE")
+	if mech_body4:
+		mech_body4.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_DAILY_RULE") + "[/color]"
+func _populate_comparison_content() -> void:
+	if comp_intro_label:
+		comp_intro_label.text = "[center][color=#FFECB3][font_size=20]" + _tr("FSM_REBIRTH_COMPARISON_INTRO") + "[/font_size][/color][/center]"
+	if journal_title:
+		journal_title.text = _tr("FSM_REBIRTH_JOURNAL_TITLE")
+	if journal_body:
+		journal_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_JOURNAL_BODY") + "[/color]"
+	if journal_warning:
+		journal_warning.text = "[color=#FF8A65]" + _tr("FSM_REBIRTH_JOURNAL_WARNING") + "[/color]"
+	if fsm_title:
+		fsm_title.text = _tr("FSM_REBIRTH_FSM_TITLE")
+	if fsm_body:
+		fsm_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_FSM_BODY") + "[/color]"
+	if effects_title:
+		effects_title.text = _tr("FSM_REBIRTH_EFFECTS_TITLE")
+	if ej_label:
+		ej_label.text = "📖 " + _tr("FSM_REBIRTH_EFFECTS_JOURNAL_LABEL")
+	if ej_body:
+		ej_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_EFFECTS_JOURNAL") + "[/color]"
+	if ef_label:
+		ef_label.text = "🍝 " + _tr("FSM_REBIRTH_EFFECTS_FSM_LABEL")
+	if ef_body:
+		ef_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_EFFECTS_FSM") + "[/color]"
+	if gloria_body:
+		gloria_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_GLORIA") + "[/color]"
+	if conseq_title:
+		conseq_title.text = "⚡ " + _tr("FSM_REBIRTH_CONSEQUENCES_TITLE")
+	if conseq_body:
+		conseq_body.text = "[color=#E0E0E0]" + _tr("FSM_REBIRTH_CONSEQUENCES") + "[/color]"
+func _populate_philosophy_content() -> void:
+	if philo_title:
+		philo_title.text = "✨ " + _tr("FSM_REBIRTH_PHILOSOPHY_TITLE")
+	if philo_intro_body:
+		philo_intro_body.text = "[color=#FFECB3]" + _tr("FSM_REBIRTH_PHILOSOPHY_INTRO") + "[/color]"
+	_create_day_cards()
+	if conc_title:
+		conc_title.text = _tr("FSM_REBIRTH_CONCLUSION_TITLE")
+	if conc_body:
+		conc_body.text = "[center][color=#FFECB3]" + _tr("FSM_REBIRTH_CONCLUSION_BODY") + "[/color][/center]"
+func _create_day_cards() -> void:
+	if not day_cards_container:
+		return
+	for child in day_cards_container.get_children():
+		child.queue_free()
+	for day in range(1, 9):
+		var day_str := str(day)
+		var accent: Color = DAY_ACCENT_COLORS[day - 1]
+		var card := PanelContainer.new()
+		card.layout_mode = 2
+		card.clip_contents = true
+		_apply_card_style(card, Color(accent.r * 0.3, accent.g * 0.3, accent.b * 0.3, 0.5))
+		var bg_image := TextureRect.new()
+		var tex = load("res://1.Codebase/src/assets/rebirth_challenge/rebirth_day_%d.png" % day)
+		if tex:
+			bg_image.texture = tex
+		bg_image.layout_mode = 2
+		bg_image.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bg_image.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		bg_image.expand_mode = 1  
+		bg_image.stretch_mode = 6  
+		bg_image.modulate = Color(1.0, 1.0, 1.0, 0.4)
+		card.add_child(bg_image)
+		var overlay := ColorRect.new()
+		overlay.layout_mode = 2
+		overlay.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		overlay.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		overlay.color = Color(accent.r * 0.08, accent.g * 0.08, accent.b * 0.08, 0.6)
+		card.add_child(overlay)
+		var card_margin := MarginContainer.new()
+		card_margin.layout_mode = 2
+		card_margin.add_theme_constant_override("margin_left", 28)
+		card_margin.add_theme_constant_override("margin_top", 22)
+		card_margin.add_theme_constant_override("margin_right", 28)
+		card_margin.add_theme_constant_override("margin_bottom", 22)
+		card.add_child(card_margin)
+		var card_vbox := VBoxContainer.new()
+		card_vbox.layout_mode = 2
+		card_vbox.add_theme_constant_override("separation", 12)
+		card_margin.add_child(card_vbox)
+		var title_hbox := HBoxContainer.new()
+		title_hbox.layout_mode = 2
+		title_hbox.add_theme_constant_override("separation", 12)
+		card_vbox.add_child(title_hbox)
+		var day_badge := Label.new()
+		day_badge.layout_mode = 2
+		day_badge.text = "Day %d" % day
+		day_badge.add_theme_font_size_override("font_size", 14)
+		day_badge.add_theme_color_override("font_color", Color(0.1, 0.1, 0.15))
+		var badge_style := StyleBoxFlat.new()
+		badge_style.bg_color = accent
+		badge_style.corner_radius_top_left = 8
+		badge_style.corner_radius_top_right = 8
+		badge_style.corner_radius_bottom_left = 8
+		badge_style.corner_radius_bottom_right = 8
+		badge_style.content_margin_left = 12
+		badge_style.content_margin_right = 12
+		badge_style.content_margin_top = 4
+		badge_style.content_margin_bottom = 4
+		day_badge.add_theme_stylebox_override("normal", badge_style)
+		title_hbox.add_child(day_badge)
+		var day_title := Label.new()
+		day_title.layout_mode = 2
+		day_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		day_title.text = _tr("FSM_REBIRTH_DAY%s_TITLE" % day_str)
+		day_title.add_theme_font_size_override("font_size", 22)
+		day_title.add_theme_color_override("font_color", accent)
+		day_title.autowrap_mode = TextServer.AUTOWRAP_WORD
+		title_hbox.add_child(day_title)
+		var sep := HSeparator.new()
+		sep.layout_mode = 2
+		var sep_style := StyleBoxFlat.new()
+		sep_style.bg_color = Color(accent.r, accent.g, accent.b, 0.45)
+		sep_style.content_margin_top = 1
+		sep_style.content_margin_bottom = 1
+		sep.add_theme_stylebox_override("separator", sep_style)
+		card_vbox.add_child(sep)
+		var reality_label := RichTextLabel.new()
+		reality_label.layout_mode = 2
+		reality_label.bbcode_enabled = true
+		reality_label.fit_content = true
+		reality_label.add_theme_font_size_override("normal_font_size", 16)
+		reality_label.text = "[color=#F0F0F0]" + _tr("FSM_REBIRTH_DAY%s_REALITY" % day_str) + "[/color]"
+		card_vbox.add_child(reality_label)
+		var sublim_label := RichTextLabel.new()
+		sublim_label.layout_mode = 2
+		sublim_label.bbcode_enabled = true
+		sublim_label.fit_content = true
+		sublim_label.add_theme_font_size_override("normal_font_size", 16)
+		sublim_label.text = "[color=#B9F6CA]" + _tr("FSM_REBIRTH_DAY%s_SUBLIMATION" % day_str) + "[/color]"
+		card_vbox.add_child(sublim_label)
+		var meaning_label := RichTextLabel.new()
+		meaning_label.layout_mode = 2
+		meaning_label.bbcode_enabled = true
+		meaning_label.fit_content = true
+		meaning_label.add_theme_font_size_override("normal_font_size", 16)
+		meaning_label.text = "[color=#FFE082]" + _tr("FSM_REBIRTH_DAY%s_MEANING" % day_str) + "[/color]"
+		card_vbox.add_child(meaning_label)
+		day_cards_container.add_child(card)
+func _on_tab_mechanism() -> void:
+	_switch_tab(0)
+func _on_tab_comparison() -> void:
+	_switch_tab(1)
+func _on_tab_philosophy() -> void:
+	_switch_tab(2)
+func _switch_tab(index: int) -> void:
+	if audio_manager and _current_tab != index:
+		audio_manager.play_sfx("ui_click", 0.6)
+	_current_tab = index
+	_update_tab_visual(index)
+	if scroll_container:
+		scroll_container.scroll_vertical = 0
+	var sections: Array = [mechanism_section, comparison_section, philosophy_section]
+	for i in range(sections.size()):
+		var section = sections[i]
+		if not section:
+			continue
+		if i == index:
+			section.show()
+			_animate_section_in(section)
+		else:
+			section.hide()
+func _animate_section_in(section: VBoxContainer) -> void:
+	if not section:
+		return
+	for t in _card_tweens:
+		if t and t.is_valid():
+			t.kill()
+	_card_tweens.clear()
+	var delay := 0.0
+	for child in section.get_children():
+		if child is Control:
+			child.modulate.a = 0.0
+			var tween := create_tween()
+			_card_tweens.append(tween)
+			tween.tween_property(child, "modulate:a", 1.0, 0.35).set_delay(delay).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+			delay += 0.08
+func _start_bg_animation() -> void:
+	if not bg_gradient:
+		return
+	_bg_tween = create_tween()
+	_bg_tween.set_loops(0)
+	_bg_tween.tween_property(bg_gradient, "modulate:a", 0.5, 4.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_bg_tween.tween_property(bg_gradient, "modulate:a", 0.75, 4.0).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	if conc_gloria:
+		UIStyleManager.pulse_effect(conc_gloria, 0.04, 2.5)
+	if conc_fsm:
+		UIStyleManager.pulse_effect(conc_fsm, 0.05, 3.0)
+	if conc_teacher:
+		UIStyleManager.pulse_effect(conc_teacher, 0.04, 2.8)
+	if gloria_image:
+		UIStyleManager.pulse_effect(gloria_image, 0.03, 2.0)
+func _on_close_pressed() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	close_requested.emit()
+	var tween := create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.3).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_callback(queue_free)
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event is InputEventKey:
+		if event.pressed and event.keycode == KEY_ESCAPE:
+			_on_close_pressed()
+			accept_event()
+func _setup_fsm_image_easter_egg() -> void:
+	if conc_fsm:
+		conc_fsm.mouse_filter = Control.MOUSE_FILTER_STOP
+		conc_fsm.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		conc_fsm.tooltip_text = _tr("EASTER_EGG_PIG_SNAKE_PIGEON_HINT").format({"remaining": PIG_SNAKE_PIGEON_CLICKS_NEEDED})
+		if not conc_fsm.gui_input.is_connected(_on_fsm_image_gui_input):
+			conc_fsm.gui_input.connect(_on_fsm_image_gui_input)
+func _on_fsm_image_gui_input(event: InputEvent) -> void:
+	if _fsm_image_easter_egg_unlocked:
+		return
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_fsm_image_click_count += 1
+	if conc_fsm and is_instance_valid(conc_fsm):
+		var tween := create_tween()
+		tween.tween_property(conc_fsm, "scale", Vector2(1.06, 1.06), 0.08)
+		tween.tween_property(conc_fsm, "scale", Vector2.ONE, 0.08)
+	if _fsm_image_click_count >= PIG_SNAKE_PIGEON_CLICKS_NEEDED:
+		_fsm_image_easter_egg_unlocked = true
+		if audio_manager:
+			audio_manager.play_sfx("group_present", 0.9)
+		OS.shell_open(PIG_SNAKE_PIGEON_URL)
+		_show_pig_snake_pigeon_easter_egg()
+		return
+	var remaining := PIG_SNAKE_PIGEON_CLICKS_NEEDED - _fsm_image_click_count
+	if conc_fsm:
+		conc_fsm.tooltip_text = _tr("EASTER_EGG_PIG_SNAKE_PIGEON_CLICK").format({"remaining": remaining})
+func _show_pig_snake_pigeon_easter_egg() -> void:
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 20
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.0, 0.02, 0.95)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var popup_panel := Panel.new()
+	popup_panel.custom_minimum_size = Vector2(600, 360)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.03, 0.05, 0.09, 0.985)
+	sb.border_color = Color(0.36, 0.5, 0.7, 0.82)
+	sb.border_width_left = 2
+	sb.border_width_top = 2
+	sb.border_width_right = 2
+	sb.border_width_bottom = 2
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.shadow_color = Color(0.0, 0.0, 0.0, 0.72)
+	sb.shadow_size = 26
+	popup_panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(popup_panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 36)
+	margin.add_theme_constant_override("margin_top", 28)
+	margin.add_theme_constant_override("margin_right", 36)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	popup_panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 18)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_PIG_SNAKE_PIGEON_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 26)
+	title_lbl.add_theme_color_override("font_color", Color(0.88, 0.93, 0.98))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.36, 0.5, 0.7, 0.45)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 22)
+	body_lbl.add_theme_color_override("default_color", Color(0.9, 0.92, 0.96))
+	body_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body_lbl.text = _tr("EASTER_EGG_PIG_SNAKE_PIGEON_BODY")
+	vbox.add_child(body_lbl)
+	var button_row := HBoxContainer.new()
+	button_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	button_row.add_theme_constant_override("separation", 12)
+	vbox.add_child(button_row)
+	var open_btn := Button.new()
+	open_btn.text = _tr("EASTER_EGG_PIG_SNAKE_PIGEON_OPEN")
+	open_btn.custom_minimum_size = Vector2(190, 44)
+	UIStyleManager.apply_button_style(open_btn, "accent", "medium")
+	UIStyleManager.add_hover_scale_effect(open_btn, 1.04)
+	open_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	open_btn.pressed.connect(func() -> void:
+		OS.shell_open(PIG_SNAKE_PIGEON_URL)
+	)
+	button_row.add_child(open_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(150, 44)
+	UIStyleManager.apply_button_style(close_btn, "normal", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.04)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	close_btn.pressed.connect(overlay.queue_free)
+	button_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	add_child(overlay)
+	UIStyleManager.fade_in(overlay, 0.25)
+func _setup_hfgs_easter_egg() -> void:
+	if not mechanism_section:
+		return
+	_hfgs_label = Label.new()
+	_hfgs_label.text = _tr("EASTER_EGG_HFGS_TEXT")
+	_hfgs_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hfgs_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hfgs_label.add_theme_font_size_override("font_size", 13)
+	_hfgs_label.add_theme_color_override("font_color", Color(0.55, 0.70, 0.85, 0.38))
+	_hfgs_label.mouse_filter = Control.MOUSE_FILTER_STOP
+	_hfgs_label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_hfgs_label.gui_input.connect(_on_hfgs_label_gui_input)
+	_hfgs_label.tooltip_text = _tr("EASTER_EGG_HFGS_HINT").format({"remaining": HFGS_CLICK_TARGET})
+	mechanism_section.add_child(_hfgs_label)
+func _on_hfgs_label_gui_input(event: InputEvent) -> void:
+	if not (event is InputEventMouseButton):
+		return
+	var mb := event as InputEventMouseButton
+	if mb.button_index != MOUSE_BUTTON_LEFT or not mb.pressed:
+		return
+	_hfgs_click_count += 1
+	_hfgs_click_timer = HFGS_CLICK_TIMEOUT
+	if _hfgs_label and is_instance_valid(_hfgs_label):
+		_hfgs_label.pivot_offset = _hfgs_label.size * 0.5
+		var tween := create_tween()
+		tween.tween_property(_hfgs_label, "scale", Vector2(1.03, 1.03), 0.10)
+		tween.tween_property(_hfgs_label, "scale", Vector2.ONE, 0.10)
+	var remaining := HFGS_CLICK_TARGET - _hfgs_click_count
+	if remaining > 0:
+		if remaining <= 2:
+			_hfgs_label.tooltip_text = _tr("EASTER_EGG_HFGS_CLICK").format({"remaining": remaining})
+		else:
+			_hfgs_label.tooltip_text = _tr("EASTER_EGG_HFGS_HINT").format({"remaining": remaining})
+		return
+	_hfgs_click_count = 0
+	_hfgs_click_timer = 0.0
+	_show_hfgs_popup()
+func _show_hfgs_popup() -> void:
+	if audio_manager:
+		audio_manager.play_sfx("ui_click", 0.8)
+	var overlay := Control.new()
+	overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.z_index = 210
+	var bg := ColorRect.new()
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.color = Color(0.0, 0.02, 0.08, 0.93)
+	overlay.add_child(bg)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	overlay.add_child(center)
+	var panel := Panel.new()
+	panel.custom_minimum_size = Vector2(540, 360)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.05, 0.07, 0.14, 0.97)
+	sb.corner_radius_top_left = 18
+	sb.corner_radius_top_right = 18
+	sb.corner_radius_bottom_left = 18
+	sb.corner_radius_bottom_right = 18
+	sb.border_width_left = 1
+	sb.border_width_right = 1
+	sb.border_width_top = 1
+	sb.border_width_bottom = 1
+	sb.border_color = Color(0.40, 0.60, 0.80, 0.60)
+	sb.shadow_size = 18
+	sb.shadow_color = Color(0, 0, 0, 0.65)
+	panel.add_theme_stylebox_override("panel", sb)
+	center.add_child(panel)
+	var margin := MarginContainer.new()
+	margin.set_anchors_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 40)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 32)
+	margin.add_theme_constant_override("margin_bottom", 28)
+	panel.add_child(margin)
+	var vbox := VBoxContainer.new()
+	vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+	var title_lbl := Label.new()
+	title_lbl.text = _tr("EASTER_EGG_HFGS_TITLE")
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	title_lbl.add_theme_color_override("font_color", Color(0.65, 0.82, 0.96))
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_lbl)
+	var sep := HSeparator.new()
+	sep.modulate = Color(0.40, 0.60, 0.80, 0.45)
+	vbox.add_child(sep)
+	var body_lbl := RichTextLabel.new()
+	body_lbl.bbcode_enabled = true
+	body_lbl.text = _tr("EASTER_EGG_HFGS_BODY")
+	body_lbl.fit_content = true
+	body_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body_lbl.add_theme_font_size_override("normal_font_size", 18)
+	body_lbl.add_theme_color_override("default_color", Color(0.90, 0.92, 0.98))
+	vbox.add_child(body_lbl)
+	var spacer := Control.new()
+	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vbox.add_child(spacer)
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 16)
+	vbox.add_child(btn_row)
+	var listen_btn := Button.new()
+	listen_btn.text = _tr("EASTER_EGG_HFGS_LISTEN")
+	listen_btn.custom_minimum_size = Vector2(140, 44)
+	listen_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(listen_btn, "primary", "medium")
+	UIStyleManager.add_hover_scale_effect(listen_btn, 1.06)
+	listen_btn.pressed.connect(func(): OS.shell_open(HFGS_EASTER_EGG_URL))
+	btn_row.add_child(listen_btn)
+	var close_btn := Button.new()
+	close_btn.text = _tr("EASTER_EGG_CLOSE")
+	close_btn.custom_minimum_size = Vector2(140, 44)
+	close_btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	UIStyleManager.apply_button_style(close_btn, "danger", "medium")
+	UIStyleManager.add_hover_scale_effect(close_btn, 1.06)
+	close_btn.pressed.connect(overlay.queue_free)
+	btn_row.add_child(close_btn)
+	overlay.modulate.a = 0.0
+	get_tree().root.add_child(overlay)
+	var fade_tw := create_tween()
+	fade_tw.tween_property(overlay, "modulate:a", 1.0, 0.35)

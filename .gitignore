@@ -1,0 +1,51 @@
+# Godot-specific ignores
+.godot/
+
+# Export builds
+builds/
+exports/
+*.zip
+*.tar.gz
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+2.Report/ai_usage_2026-04-02_04-12-03.timestamp.translation
+2.Report/ai_usage_2026-04-02_04-12-03.status.translation
+2.Report/ai_usage_2026-04-02_04-12-03.response.translation
+2.Report/ai_usage_2026-04-02_04-12-03.purpose.translation
+2.Report/ai_usage_2026-04-02_04-12-03.provider.translation
+2.Report/ai_usage_2026-04-02_04-12-03.prompt.translation
+2.Report/ai_usage_2026-04-02_04-12-03.output.translation
+2.Report/ai_usage_2026-04-02_04-12-03.model.translation
+2.Report/ai_usage_2026-04-02_04-12-03.mode.translation
+2.Report/ai_usage_2026-04-02_04-12-03.input.translation
+2.Report/ai_usage_2026-04-02_04-12-03.en.translation
+2.Report/ai_usage_2026-04-02_04-12-03.csv.import
+2.Report/ai_usage_2026-04-02_04-12-03.ai.translation
