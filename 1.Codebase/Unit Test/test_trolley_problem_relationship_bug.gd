@@ -84,6 +84,11 @@ func test_reproduction():
 			if g_to_p.has("player") and g_to_p["player"] is Dictionary:
 				g_to_p["player"]["value"] = 0
 				g_to_p["player"]["status"] = "Neutral"
+	var initial_gloria_value: int = 0
+	if teammate_system and teammate_system.has_method("get_relationships_for"):
+		var before_g := teammate_system.get_relationships_for("gloria")
+		if before_g.has("player") and before_g["player"] is Dictionary:
+			initial_gloria_value = int(before_g["player"].get("value", 0))
 	generator.resolve_dilemma("choice_1")
 	var player_to_gloria = teammate_system.get_relationships_for("player").get("gloria", {})
 	var gloria_to_player = teammate_system.get_relationships_for("gloria").get("player", {})
@@ -95,7 +100,7 @@ func test_reproduction():
 	else:
 		print(" Player -> Gloria was NOT updated (or updated differently)")
 		_passed += 1
-	if gloria_to_player.get("status") == "Disappointed" and gloria_to_player.get("value") == -10:
+	if gloria_to_player.get("status") == "Disappointed" and gloria_to_player.get("value") == initial_gloria_value - 10:
 		print(" Gloria -> Player was updated with 'Disappointed' (Correct)")
 		_passed += 1
 	else:

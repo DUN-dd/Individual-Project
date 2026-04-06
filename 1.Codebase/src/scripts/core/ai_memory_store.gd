@@ -83,7 +83,7 @@ func _strip_conflicting_phrases(entries: Array) -> Array:
 		var content: String = str(entry.get("content", ""))
 		var changed := false
 		var all_strip_phrases := _get_all_strip_phrases()
-	for phrase in all_strip_phrases:
+		for phrase in all_strip_phrases:
 			if content.find(phrase) != -1:
 				content = content.replace(phrase, "")
 				changed = true

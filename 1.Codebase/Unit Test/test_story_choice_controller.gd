@@ -15,6 +15,7 @@ var awaiting_ai_response: bool = false
 var ui_controller = null
 var narrative_controller = null
 var overlay_controller = null
+var state_controller = null
 var ui = null
 """
 	mock_script.reload()
